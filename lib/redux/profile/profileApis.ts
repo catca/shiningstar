@@ -1,5 +1,6 @@
-import { NEXT_SERVER } from 'config';
 import fetcher from 'lib/common/fetcher';
+import { NEXT_SERVER } from 'config';
+
 import type {
   UserData,
   Board,
@@ -9,7 +10,7 @@ import type {
 
 export async function getProfileData(pages: string) {
   const data: UserData = await fetcher<UserData>(
-    `${NEXT_SERVER}/user/${pages}`,
+    `${NEXT_SERVER}/v1/user/${pages}`,
   );
   // const data: UserData[] = testUserData.filter((arr) => {
   //   if (arr.id === pages) {
@@ -20,9 +21,7 @@ export async function getProfileData(pages: string) {
 }
 
 export async function getProfileIds() {
-  const userInfo: BaseUser3[] = await fetcher<BaseUser3[]>(
-    `${NEXT_SERVER}/user/ids`,
-  );
+  const userInfo: BaseUser3[] = await fetcher(`${NEXT_SERVER}/v1/user/ids`);
 
   const paths = userInfo.map((arr) => {
     return arr.id;
@@ -34,9 +33,17 @@ export async function getProfileIds() {
   return paths;
 }
 
+// 유저 팔로우 api
+export async function fetchFollow(userId: string, userInfo: BaseUser3[]) {
+  return await fetcher(`${NEXT_SERVER}/v1/user/${userId}`, {
+    method: 'POST',
+    body: JSON.stringify(userInfo),
+  });
+}
+
 export async function getBase3UserProfile() {
   const userList: BaseUser3[] = await fetcher<BaseUser3[]>(
-    `${NEXT_SERVER}/user/ids`,
+    `${NEXT_SERVER}/v1/user/ids`,
   );
 
   // const userList: BaseUser3[] = testUserData.map((arr) => {
@@ -47,16 +54,16 @@ export async function getBase3UserProfile() {
 }
 
 // 게시글 유저이름으로 조회
-export async function getUserBoard(name: string) {
+export async function getUserBoard(userId: string) {
   // test 게시글 데이터로 대체
   // return board.filter((arr) => {
-  //   if (arr.name === name) {
+  //   if (arr.userId === userId) {
   //     return arr;
   //   }
   // }) as BoardData[];
 
   const boardList: Board[] = await fetcher<Board[]>(
-    `${NEXT_SERVER}/board?userId=${name}`,
+    `${NEXT_SERVER}/v1/board?userId=${userId}`,
   );
 
   return boardList;
