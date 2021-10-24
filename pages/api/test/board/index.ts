@@ -1,16 +1,18 @@
-import { dbConnect } from 'lib/mongoDB/dbConnect';
+import { connectToDatabase } from 'lib/mongoDB/mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
-import Board from 'lib/mongoDB/models/Board';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  console.log('connect?');
-  await dbConnect();
-  console.log('connect!');
+  const { db } = await connectToDatabase();
+  const userId = req.query.userId;
 
-  await Board.find({}).then((datas: any) => {
-    res.status(200).json(datas);
-  });
+  if (userId) {
+    const board = await db.collection('board').find({ id: userId }).toArray();
+    return res.status(200).json(board);
+  } else {
+    const board = await db.collection('board').find({}).toArray();
+    return res.status(200).json(board);
+  }
 }
