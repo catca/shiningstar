@@ -5,7 +5,7 @@ import { GetStaticProps } from 'next';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
-import { getUserBoard } from 'lib/redux/profile/profileApis';
+import { getTotalBoards } from 'lib/redux/profile/profileApis';
 import { selectProfile } from 'lib/redux/profile/profileSlice';
 import { setBoardData } from 'lib/redux/profile/profileSlice';
 import { Board } from 'types/profile/types';
@@ -20,7 +20,7 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setBoardData(boardData));
+    // dispatch(setBoardData(boardData));
   }, []);
   return (
     <>
@@ -28,28 +28,28 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
         <title>instagram</title>
         <meta name="description" content="instagram" />
       </Head>
-      {login ? (
-        <Container>
-          <main>
-            <Section>
-              <div>
-                {/* <div>스토리</div> */}
-                {console.log(boardData)}
-                {boardData.map((boardData, index) => {
-                  return <Post key={index} postData={boardData} />;
-                })}
-              </div>
-              <div>
-                {/* <div>나</div> */}
-                {/* <div>추천</div> */}
-                <Footer />
-              </div>
-            </Section>
-          </main>
-        </Container>
-      ) : (
+      {/* {login ? ( */}
+      <Container>
+        <main>
+          <Section>
+            <div>
+              {/* <div>스토리</div> */}
+              {console.log(boardData)}
+              {boardData.map((boardData, index) => {
+                return <Post key={index} postData={boardData} />;
+              })}
+            </div>
+            <div>
+              {/* <div>나</div> */}
+              {/* <div>추천</div> */}
+              <Footer />
+            </div>
+          </Section>
+        </main>
+      </Container>
+      {/* ) : (
         <LoginPage />
-      )}
+      )} */}
     </>
   );
 };
@@ -59,7 +59,7 @@ export default Main;
 export const getStaticProps: GetStaticProps = async () => {
   return {
     props: {
-      boardData: (await getUserBoard('winter')) as Board[],
+      boardData: (await getTotalBoards()) as Board[],
     },
     revalidate: 1,
   };

@@ -68,12 +68,12 @@ const Post = ({ postData }: { postData: Board }) => {
                 <ProfileImage
                   border={false}
                   size={'board'}
-                  imageUrl={`/profile/${postData.id}.png`}
+                  imageUrl={`/profile/${postData.username}.png`}
                 />
               </div>
               <div>
                 <span>
-                  <Link href="/">{postData.id}</Link>
+                  <Link href="/">{postData.username}</Link>
                 </span>
               </div>
             </Header>
@@ -160,7 +160,7 @@ const Post = ({ postData }: { postData: Board }) => {
               <FavoriteSection>
                 <div>
                   좋아요&nbsp;
-                  <span>{postFormatNumber(postData.favorite.length)}</span>개
+                  <span>{postFormatNumber(postData.favoriteCnt)}</span>개
                 </div>
               </FavoriteSection>
               <WriteWrapper>
@@ -168,14 +168,16 @@ const Post = ({ postData }: { postData: Board }) => {
                   <PostDescriptionWrapper>
                     <div>
                       <NameSpan>
-                        <Link href={`/${postData.id}`}>{postData.id}</Link>
+                        <Link href={`/${postData.username}`}>
+                          {postData.username}
+                        </Link>
                       </NameSpan>
                       &nbsp;
                       <PostDescription>
                         <span>
-                          {postData.title.split('\n').length > 1 ? (
+                          {postData.content.split('\n').length > 1 ? (
                             seeMore ? (
-                              postData.title.split('\n').map((line) => {
+                              postData.content.split('\n').map((line) => {
                                 return (
                                   <span key={line}>
                                     {line}
@@ -185,7 +187,7 @@ const Post = ({ postData }: { postData: Board }) => {
                               })
                             ) : (
                               <>
-                                {postData.title.split('\n')[0]}
+                                {postData.content.split('\n')[0]}
                                 <SeeMore>
                                   ...&nbsp;
                                   <button onClick={postSeeMore}>더 보기</button>
@@ -193,21 +195,21 @@ const Post = ({ postData }: { postData: Board }) => {
                               </>
                             )
                           ) : (
-                            postData.title
+                            postData.content
                           )}
                         </span>
                       </PostDescription>
                     </div>
                   </PostDescriptionWrapper>
                   <ReplyWrapper>
-                    {postData.reply.length > 2 && (
+                    {postData.commentCnt > 2 && (
                       <ReplyCounter>
                         <Link href={'/'}>
-                          댓글 {postData.reply.length}개 모두 보기
+                          댓글 {postData.commentCnt}개 모두 보기
                         </Link>
                       </ReplyCounter>
                     )}
-                    {postData.reply.map((reply, index) => {
+                    {/* {postData.reply.map((reply, index) => {
                       return (
                         <div key={index}>
                           <div>
@@ -221,7 +223,7 @@ const Post = ({ postData }: { postData: Board }) => {
                           </div>
                         </div>
                       );
-                    })}
+                    })} */}
                   </ReplyWrapper>
                 </div>
               </WriteWrapper>
@@ -338,7 +340,7 @@ type ImgCount = {
 const ImageCounter = styled.div<ImgCount>`
   width: 6px;
   height: 6px;
-  background: ${(props: { index: number; imgCount: number; }) =>
+  background: ${(props: { index: number; imgCount: number }) =>
     props.index === props.imgCount - 1 ? '#0095f6' : '#a8a8a8'};
   border-radius: 50%;
   &:not(:last-of-type) {
@@ -360,9 +362,9 @@ const ImgDiv = styled.div<ImgCount>`
   transition: transform 0.3s;
   transform: translateX(
     ${({ imgCount, positionx }) =>
-    positionx
-      ? `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`
-      : `${-100 * (imgCount - 1)}%`}
+      positionx
+        ? `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`
+        : `${-100 * (imgCount - 1)}%`}
   );
 `;
 
@@ -405,7 +407,8 @@ type ImgLength = {
 
 const IconSection = styled.section<ImgLength>`
   display: flex;
-  margin-top: ${(props: { imgLength: number; }) => (props.imgLength > 1 ? '-34px' : '4px')};
+  margin-top: ${(props: { imgLength: number }) =>
+    props.imgLength > 1 ? '-34px' : '4px'};
   padding: 0 16px;
   & button {
     width: 40px;
