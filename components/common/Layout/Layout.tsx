@@ -13,7 +13,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {router.asPath === '/login' || router.asPath === '/signup' || (router.asPath === '/' && !login) ? (
+      {router.asPath === '/login' ||
+      router.asPath === '/signup' ||
+      (router.asPath === '/' && !login) ? (
         <section
           style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
           <div className={s.layout}>{children}</div>
