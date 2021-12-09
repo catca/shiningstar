@@ -35,7 +35,7 @@ const Navbar = () => {
 
   React.useEffect(() => {
     const handleCloseSearch = (e: any) => {
-      if (!inputRef.current.contains(e.target)) {
+      if (!inputRef.current?.contains(e.target)) {
         // 이 부분은 해결 못하겠다,,, 타입에러 어케하지 ㅠㅠ
         if (onUserList && (!el.current || !el.current.contains(e.target))) {
           setOnUserList(false);

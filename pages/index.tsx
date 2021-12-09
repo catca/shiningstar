@@ -28,28 +28,28 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
         <title>instagram</title>
         <meta name="description" content="instagram" />
       </Head>
-      {/* {login ? ( */}
-      <Container>
-        <main>
-          <Section>
-            <div>
-              {/* <div>스토리</div> */}
-              {console.log(boardData)}
-              {boardData.map((boardData, index) => {
-                return <Post key={index} postData={boardData} />;
-              })}
-            </div>
-            <div>
-              {/* <div>나</div> */}
-              {/* <div>추천</div> */}
-              <Footer />
-            </div>
-          </Section>
-        </main>
-      </Container>
-      {/* ) : (
+      {login ? (
+        <Container>
+          <main>
+            <Section>
+              <div>
+                {/* <div>스토리</div> */}
+                {console.log(boardData)}
+                {boardData.map((boardData, index) => {
+                  return <Post key={index} postData={boardData} />;
+                })}
+              </div>
+              <div>
+                {/* <div>나</div> */}
+                {/* <div>추천</div> */}
+                <Footer />
+              </div>
+            </Section>
+          </main>
+        </Container>
+      ) : (
         <LoginPage />
-      )} */}
+      )}
     </>
   );
 };

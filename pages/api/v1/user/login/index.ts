@@ -10,7 +10,8 @@ export default async function handler(
   await dbConnect();
   switch (method) {
     case 'POST':
-      User.findOne({ email: req.body.email }, (err: any, user: any) => {
+      console.log(req.body)
+      User.findOne({ username: req.body.username }, (err: any, user: any) => {
         if (!user)
           return res.status(404).json({
             success: false,
