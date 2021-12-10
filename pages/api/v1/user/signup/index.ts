@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { dbConnect } from 'lib/mongoDB/dbConnect';
 import User from 'lib/mongoDB/models/User';
+import Profile from 'lib/mongoDB/models/Profile';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -49,6 +50,11 @@ export default async function handler(
 
           user.save((err: any, doc: any) => {
             if (err) return res.status(500).json({ success: false, err });
+            const profile = new Profile({ username: req.body.username, name: req.body.name });
+            console.log(profile);
+            profile.save((err: any, doc: any) => {
+              if (err) return res.status(500).json({ success: false, err });
+            });
             const mailOptions = {
               from: 'instacodesend@gmail.com',
               to: user.email,
