@@ -209,12 +209,12 @@ const Post = ({ postData }: { postData: Board }) => {
                         </Link>
                       </ReplyCounter>
                     )}
-                    {/* {postData.reply.map((reply, index) => {
+                    {postData.comment ? postData.comment.map((reply: any, index: number) => {
                       return (
                         <div key={index}>
                           <div>
                             <NameSpan>
-                              <Link href={`/${reply.id}`}>{reply.id}</Link>
+                              <Link href={`/${reply.username}`}>{reply.username}</Link>
                             </NameSpan>
                             &nbsp;
                             <span>
@@ -223,7 +223,7 @@ const Post = ({ postData }: { postData: Board }) => {
                           </div>
                         </div>
                       );
-                    })} */}
+                    }) : null}
                   </ReplyWrapper>
                 </div>
               </WriteWrapper>
@@ -362,9 +362,9 @@ const ImgDiv = styled.div<ImgCount>`
   transition: transform 0.3s;
   transform: translateX(
     ${({ imgCount, positionx }) =>
-      positionx
-        ? `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`
-        : `${-100 * (imgCount - 1)}%`}
+    positionx
+      ? `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`
+      : `${-100 * (imgCount - 1)}%`}
   );
 `;
 

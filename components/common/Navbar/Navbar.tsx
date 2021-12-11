@@ -4,8 +4,7 @@ import Image from 'next/image';
 import s from './Navbar.module.css';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { selectLogin } from 'lib/redux/login/loginSlice';
-import { logout } from 'lib/redux/user/userSlice';
+import { logout, selectUser } from 'lib/redux/user/userSlice';
 
 import HomeIcon from '@material-ui/icons/Home';
 import TelegramIcon from '@material-ui/icons/Telegram';
@@ -21,7 +20,7 @@ import { BaseUser3 } from 'types/profile/types';
 import { LogoutRounded } from '@mui/icons-material';
 
 const Navbar = () => {
-  const { myUserInfo } = useSelector(selectLogin);
+  const { userInfo } = useSelector(selectUser);
   const [userList, setUserList] = React.useState<BaseUser3[]>([]);
   const dispatch = useDispatch();
 
@@ -130,13 +129,13 @@ const Navbar = () => {
               </Link>
 
               {/* TODO:누르면 메뉴바 나오도록 */}
-              <Link href="/winter">
+              <Link href={`/${userInfo.username}`}>
                 <a>
                   <ProfileImage
                     size={'nav'}
                     border={true}
                     borderColor={'black'}
-                    imageUrl={myUserInfo.imageUrl}
+                    imageUrl={userInfo.profileImageUrl}
                   />
                 </a>
               </Link>
