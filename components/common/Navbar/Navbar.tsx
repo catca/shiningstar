@@ -4,7 +4,6 @@ import Image from 'next/image';
 import s from './Navbar.module.css';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { selectLogin } from 'lib/redux/login/loginSlice';
 import { logout, selectUser } from 'lib/redux/user/userSlice';
 
 import HomeIcon from '@material-ui/icons/Home';

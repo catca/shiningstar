@@ -15,13 +15,27 @@ import styled from '@emotion/styled';
 import Post from 'components/main/Post';
 import { LoginPage } from './login';
 
+import axios from 'axios';
+import { NEXT_SERVER } from 'config';
+import { useState } from 'react';
+
 const Main = ({ boardData }: { boardData: Board[] }) => {
-  const { login } = useSelector(selectUser);
+  const { login, userInfo } = useSelector(selectUser);
+  const [mainData, setMainData] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // dispatch(setBoardData(boardData));
-  }, []);
+    if (userInfo.accessToken) {
+      axios.get(`${NEXT_SERVER}/test/main`, {
+        headers: {
+          Authorization: `Bearer ${userInfo.accessToken}`
+        }
+      }).then(response => {
+        console.log(response.data);
+        setMainData(response.data);
+      })
+    }
+  }, [userInfo]);
   return (
     <>
       <Head>
@@ -34,8 +48,7 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
             <Section>
               <div>
                 {/* <div>스토리</div> */}
-                {console.log(boardData)}
-                {boardData.map((boardData, index) => {
+                {mainData.map((boardData, index) => {
                   return <Post key={index} postData={boardData} />;
                 })}
               </div>
