@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import s from './Navbar.module.css';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, selectUser } from 'lib/redux/user/userSlice';
+import {
+  selectModal,
+  setModal,
+} from 'lib/redux/modal/modalSlice';
 
 import HomeIcon from '@material-ui/icons/Home';
 import TelegramIcon from '@material-ui/icons/Telegram';
@@ -14,6 +18,7 @@ import AddIcon from '@material-ui/icons/Add';
 
 import ProfileImage from 'components/profile/ProfileImage';
 import UserSearchList from './SearchBox';
+import NewPost from 'components/modal/NewPost';
 
 import { getBase3UserProfile } from 'lib/redux/profile/profileApis';
 import { BaseUser3 } from 'types/profile/types';
@@ -21,6 +26,8 @@ import { LogoutRounded } from '@mui/icons-material';
 
 const Navbar = () => {
   const { userInfo } = useSelector(selectUser);
+  const { showModal } = useSelector(selectModal);
+  const [newPost, setNewPost] = useState(false);
   const [userList, setUserList] = React.useState<BaseUser3[]>([]);
   const dispatch = useDispatch();
 
@@ -113,6 +120,7 @@ const Navbar = () => {
                   <FavoriteBorderIcon
                     color={'disabled'}
                     style={{ fontSize: '30px' }}
+                    onClick={() => dispatch(logout())}
                   />
                 </a>
               </Link>
@@ -123,7 +131,7 @@ const Navbar = () => {
                   <AddIcon
                     color={'disabled'}
                     style={{ fontSize: '30px' }}
-                    onClick={() => dispatch(logout())}
+                    onClick={() => dispatch(setModal('newPost', true))}
                   />
                 </a>
               </Link>
@@ -143,6 +151,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      {showModal.newPost && <NewPost />}
     </>
   );
 };
