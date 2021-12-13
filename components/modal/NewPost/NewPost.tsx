@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
-import s from '../CommonModal.module.css';
+import s from '../CommonModal.module.scss';
 
 import CloseSharpIcon from '@material-ui/icons/CloseSharp';
 import Button from '@material-ui/core/Button';
@@ -72,8 +72,14 @@ const NewPost: React.FC = () => {
       <div className={s.innerContainerPost}>
         <div>
           <div className={s.headerPost}>
+            <div><svg aria-label="돌아가기" color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24"><line fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="2.909" x2="22.001" y1="12.004" y2="12.004"></line><polyline fill="none" points="9.276 4.726 2.001 12.004 9.276 19.274" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline></svg></div>
             <div>
               <h1>새 게시물 만들기</h1>
+            </div>
+            <div>
+              <button>
+                다음
+              </button>
             </div>
           </div>
           <div className={s.contentWrapPost}>

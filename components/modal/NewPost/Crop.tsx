@@ -17,15 +17,12 @@ const Crop = (image: any) => {
 
   const showCroppedImage = async () => {
     const croppedImage = await getCroppedImg(
-      image,
+      image.image,
       resultCroppedAreaPixels
     )
     console.log(croppedImage)
     setImg(croppedImage);
   }
-  React.useEffect(() => {
-    console.log(image)
-  }, [])
 
   return (
     <>
@@ -38,8 +35,8 @@ const Crop = (image: any) => {
         onCropComplete={onCropComplete}
         onZoomChange={setZoom}
       />
-      {/* <button onClick={showCroppedImage}>저장</button>
-      <img src={img} alt="Cropped" /> */}
+      {/* <button onClick={showCroppedImage} style={{ position: 'absolute', zIndex: 3000 }}>저장</button>
+      <img src={img} alt="Cropped" style={{ position: 'absolute', zIndex: 2001 }} /> */}
     </>
   )
 }
