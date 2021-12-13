@@ -10,6 +10,7 @@ interface ShowModal {
   reply: boolean;
   favorite: boolean;
   newPost: boolean;
+  postDelete: boolean;
 }
 
 interface ModalSliceProps {
@@ -29,6 +30,7 @@ export const initialShowModal: ShowModal = {
   reply: false,
   favorite: false,
   newPost: false,
+  postDelete: false,
 };
 
 const initialState: ModalSliceProps = {
@@ -74,6 +76,8 @@ export const modalSlice = createSlice({
         state.showModal.favorite = action.payload.value;
       } else if (action.payload.key === 'newPost') {
         state.showModal.newPost = action.payload.value;
+      } else if (action.payload.key === 'postDelete') {
+        state.showModal.postDelete = action.payload.value;
       }
     },
     SET_SHOW_MODAL_INITIAL: (state, action: PayloadAction<ShowModal>) => {
@@ -87,7 +91,6 @@ export const modalSlice = createSlice({
 
 export const {
   SET_SHOW_BOARD_MODAL,
-
   SET_SELECETED_BOARD,
   SET_SELECETED_BOARD_USER,
   SET_SHOW_MODAL,

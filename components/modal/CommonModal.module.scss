@@ -268,13 +268,24 @@
   padding: 0 1rem;
   & > div {
     display: flex;
-  justify-content: center;
+    justify-content: center;
     & > h1 {
       display: flex;
     justify-content: center;
     font-size: 16px;
     font-weight: 600;
     color: rgba(38, 38, 38, 1);
+    }
+    & > div {
+      width: 48px;
+      & > button {
+        font-size: 14px;
+        font-weight: 600;
+        color: #0095f6;
+        background-color: #FFFFFF;
+        border: 0;
+        cursor: pointer;
+      }
     }
   }
 }

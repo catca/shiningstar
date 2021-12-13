@@ -13,7 +13,7 @@ const createImage = (url: string) =>
  * @param {Object} pixelCrop - pixelCrop Object provided by react-easy-crop
  */
 export default async function getCroppedImg(imageSrc: string, pixelCrop: { width: number; height: number; x: number; y: number }) {
-    const image = await createImage(imageSrc)
+    const image: any = await createImage(imageSrc)
     const canvas = document.createElement('canvas')
     canvas.width = pixelCrop.width
     canvas.height = pixelCrop.height

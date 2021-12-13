@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import s from '../CommonModal.module.css';
+import s from '../CommonModal.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectModal,
@@ -29,9 +29,9 @@ import cn from 'classnames';
 
 import { Reply } from 'types/profile/types';
 
-interface BoardModalProps {}
+interface BoardModalProps { }
 
-const BoardModal: React.FC<BoardModalProps> = ({}) => {
+const BoardModal: React.FC<BoardModalProps> = ({ }) => {
   const { selectedBoard } = useSelector(selectModal);
   const { myUserInfo } = useSelector(selectLogin);
   const dispatch = useDispatch();
