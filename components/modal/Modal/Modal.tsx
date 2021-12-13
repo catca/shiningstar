@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
-import s from '../CommonModal.module.css';
+import s from '../CommonModal.module.scss';
 
 import { selectProfile } from 'lib/redux/profile/profileSlice';
 import { selectLogin } from 'lib/redux/login/loginSlice';
