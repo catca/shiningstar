@@ -5,6 +5,7 @@ import loginSlice from './login/loginSlice';
 import modalSlice from './modal/modalSlice';
 import profileSlice from './profile/profileSlice';
 import userSlice from './user/userSlice';
+import newPostSlice from './newPost/newPostSlice';
 import logger from 'redux-logger';
 import thunk from 'redux-thunk';
 import { ThunkAction } from 'redux-thunk';
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   modal: modalSlice,
   login: loginSlice,
   user: userSlice,
+  newPost: newPostSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

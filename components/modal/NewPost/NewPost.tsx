@@ -8,6 +8,11 @@ import {
   selectModal,
   setModal,
 } from 'lib/redux/modal/modalSlice';
+import {
+  initPostImage,
+  setPostImage,
+  selectNewPost,
+} from 'lib/redux/newPost/newPostSlice';
 import Crop from './Crop';
 
 interface ModalProps {
@@ -18,7 +23,7 @@ const NewPost: React.FC = () => {
   const [postImages, setPostImages] = useState<{ id: number; image: any; cropImage: string; }[]>([]);
   const nextId = useRef(1);
   const [postState, setPostState] = useState<string>('newPost')
-  const { showModal } = useSelector(selectModal);
+  const images = useSelector(selectNewPost);
   const dispatch = useDispatch();
   const closeModal = (
     e:
@@ -26,6 +31,8 @@ const NewPost: React.FC = () => {
       | React.MouseEvent<SVGSVGElement, MouseEvent>,
   ) => {
     e.preventDefault();
+    dispatch(setModal('newPost', false));
+    dispatch(initPostImage());
   };
 
   const hiddenFileInput: any = React.useRef(null);
@@ -62,6 +69,7 @@ const NewPost: React.FC = () => {
 
       setPostImages(() => [...postImages, postImage]);
       setPostState(() => 'crop');
+      dispatch(setPostImage(imageDataUrl));
       nextId.current += 1;
     }
   };
@@ -73,24 +81,27 @@ const NewPost: React.FC = () => {
   }
 
   const prevPostState = () => {
-    if (postState === 'content') {
+    if (postState === 'crop') {
+      setPostState(() => 'newPost');
+      dispatch(initPostImage());
+    } else if (postState === 'content') {
       setPostState(() => 'crop');
     }
   }
 
   const Content: React.FC = () => {
     return (
-      <div>hello</div>
+      <div>I want to go home. but i can not</div>
     )
   }
 
   useEffect(() => {
-    console.log(postImages)
-  }, [postImages])
+    dispatch(initPostImage());
+  }, [])
 
   return (
     <>
-      <div className={s.outerContainerPost} onClick={() => dispatch(setModal('newPost', false))} />
+      <div className={s.outerContainerPost} onClick={closeModal} />
       <div className={s.innerContainerPost}>
         <div>
           <div className={s.headerPost}>
@@ -137,21 +148,27 @@ const NewPost: React.FC = () => {
                     </button>
                   </div>
                 </div> :
-                postState === 'crop' ?
-                  postImages.map((image, index) => {
-                    console.log(postImages);
+                postState === 'crop' ? (images[0].image &&
+                  images.map((props, index) => {
+                    console.log(props);
                     return (
                       <Crop
-                        image={image}
+                        image={props.image}
                         key={index}
-                        setPostImages={setPostImages}
-                        postImages={postImages}
-                        id={index + 1} />
+                        id={props.id} />
                     )
-                  }) :
-                  <div>집에 가자</div>
+                  })) :
+                  <>
+                    {images.map((props, index) => {
+                      console.log(props);
+                      return (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={props.croppedImage} alt="Cropped" key={index} />
+                      )
+                    })}
+                    <Content />
+                  </>
               }
-              {/* {<Content />} */}
             </div>
             <form>
               <input accept="image/jpeg,image/png,image/heic,image/heif"
