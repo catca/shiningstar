@@ -150,7 +150,6 @@ const NewPost: React.FC = () => {
                 </div> :
                 postState === 'crop' ? (images[0].image &&
                   images.map((props, index) => {
-                    console.log(props);
                     return (
                       <Crop
                         image={props.image}
