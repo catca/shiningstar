@@ -11,7 +11,7 @@ export default async function handler(
     const follower = req.query.follower;
     if (follower) {
     } else {
-      var userInfo = await db.collection('user').findOne({ id: userId });
+      let userInfo = await db.collection('user').findOne({ id: userId });
 
       return res.status(200).json(userInfo);
     }

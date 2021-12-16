@@ -16,36 +16,38 @@ export default async function handler(
   if (authorization?.slice(undefined, 6) === 'Bearer') {
     user = await User.findOne({ token: authorization?.slice(7) });
   }
-  const follow = await Follow.aggregate([
+  const username = await Follow.aggregate([
     { $match: { follow: user.username } },
-    { $project: { _id: 0, follower: 1 } }
+    { $project: { _id: 0, username: '$follower' } },
   ]);
-  const renameKeys = (mapping: { [s: string]: unknown; } | ArrayLike<unknown>, objArr: any) => {
-    const renamedObjArr = [];
-    for (let obj of objArr) {
-      const renamedObj = {};
-      for (let [before, after] of Object.entries(mapping)) {
-        if (obj[before]) {
-          renamedObj[after] = obj[before];
-        }
-      }
-      renamedObjArr.push(renamedObj);
-    }
-    return renamedObjArr;
-  }
-  const mapping = {
-    follower: 'username'
-  };
-  const username = renameKeys(mapping, follow);
-  console.log('username', username);
+  console.log('follow', username);
+  // const renameKeys = (
+  //   mapping: { [s: string]: unknown } | ArrayLike<unknown>,
+  //   objArr: any,
+  // ) => {
+  //   const renamedObjArr = [];
+  //   for (let obj of objArr) {
+  //     const renamedObj: { [s: string]: string } = {};
+  //     for (let [before, after] of Object.entries(mapping)) {
+  //       if (obj[before]) {
+  //         renamedObj[after] = obj[before];
+  //       }
+  //     }
+  //     renamedObjArr.push(renamedObj);
+  //   }
+  //   return renamedObjArr;
+  // };
+  // const mapping = {
+  //   follower: 'username',
+  // };
+  // const username = renameKeys(mapping, follow);
+  // console.log('username', username);
   Board.aggregate(
     [
       {
-        $match:
-        {
-          $or:
-            username
-        }
+        $match: {
+          $or: username,
+        },
       },
       {
         $lookup: {
