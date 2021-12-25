@@ -3,11 +3,12 @@ import { RootState } from '../store';
 
 interface NewPostSliceProps {
   id: number;
+  exist: boolean;
   image: string;
   croppedImage: string;
   croppedAreaPixel: {
-    width: number,
-    height: number,
+    width: number | unknown,
+    height: number | unknown,
     x: number,
     y: number
   }
@@ -20,6 +21,7 @@ interface UpdateCroppedImage {
 
 const initialState: NewPostSliceProps[] = [{
   id: 1,
+  exist: false,
   image: '',
   croppedImage: '',
   croppedAreaPixel: {
@@ -35,7 +37,7 @@ export const newPostSlice = createSlice({
   initialState,
   reducers: {
     INIT_POST_IMAGE: (state) => {
-      state = initialState;
+      state[0] = initialState[0];
     },
     SET_POST_IMAGE: (state, action: PayloadAction<string>) => {
       state[0].image = action.payload;
@@ -51,6 +53,7 @@ export const newPostSlice = createSlice({
       state[action.payload.id - 1].croppedAreaPixel.height = action.payload.height;
       state[action.payload.id - 1].croppedAreaPixel.x = action.payload.x;
       state[action.payload.id - 1].croppedAreaPixel.y = action.payload.y;
+      state[action.payload.id - 1].exist = true;
     },
   },
 });

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 import { containerClasses } from '@mui/material';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -9,6 +10,8 @@ import {
   updateCroppedImage,
   updateCroppedAreaPixel
 } from 'lib/redux/newPost/newPostSlice';
+
+import s from '../CommonModal.module.scss';
 
 interface CropProps {
   image: string,
@@ -40,6 +43,10 @@ const Crop = ({ image, id }: CropProps) => {
     dispatch(updateCroppedImage({ id: id, croppedImage: image }));
   }, [])
 
+  useEffect(() => {
+    console.log(newPostData[id - 1].croppedAreaPixel);
+  }, [newPostData[id - 1].croppedAreaPixel])
+
   return (
     <>
       <Cropper
@@ -50,12 +57,35 @@ const Crop = ({ image, id }: CropProps) => {
         onCropChange={setCrop}
         onCropComplete={onCropComplete}
         onZoomChange={setZoom}
-        initialCroppedAreaPixels={newPostData[id - 1].croppedAreaPixel}
+        initialCroppedAreaPixels={newPostData[id - 1].exist ? newPostData[id - 1].croppedAreaPixel : null}
+        style={{ containerStyle: containerStyle, mediaStyle: mediaStyle, cropAreaStyle: cropAreaStyle }}
       />
-      {/* <button onClick={showCroppedImage} style={{ position: 'absolute', zIndex: 3000 }}>저장</button> */}
-      {/* <img src={img} alt="Cropped" style={{ position: 'absolute', zIndex: 2001 }} /> */}
+      {/* <div>
+        <img src={image} style={{ width: '100%', height: '100%' }} />
+        <div className={s.reactEasyCrop_CropAreaGrid}>
+
+        </div>
+      </div> */}
     </>
   )
+}
+
+const containerStyle = {
+  height: 'calc(100% - 57px)',
+  transform: 'translateY(57px)',
+}
+
+const mediaStyle: any = {
+  color: 'rgba(0, 0, 0, 0)',
+  height: '100%',
+  width: '100%',
+  objectFit: 'contain',
+}
+
+const cropAreaStyle = {
+  color: 'rgba(0, 0, 0, 0)',
+  height: '100%',
+  width: '100%',
 }
 
 export default Crop;
