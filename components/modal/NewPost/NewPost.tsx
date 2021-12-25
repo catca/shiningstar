@@ -30,8 +30,8 @@ const NewPost: React.FC = () => {
       | React.MouseEvent<SVGSVGElement, MouseEvent>,
   ) => {
     e.preventDefault();
-    dispatch(setModal('newPost', false));
     dispatch(initPostImage());
+    dispatch(setModal('newPost', false));
   };
 
   const hiddenFileInput: any = React.useRef(null);
@@ -49,6 +49,7 @@ const NewPost: React.FC = () => {
   }
 
   const handleChange = async (event: any) => {
+    console.log(event.target.files);
     const fileUploaded = event.target.files[0];
     console.log(fileUploaded);
     if (event.target.files && event.target.files.length > 0) {
@@ -89,7 +90,11 @@ const NewPost: React.FC = () => {
   };
 
   const Content: React.FC = () => {
-    return <div>I want to go home. but i can not</div>;
+    return (
+      <div className={s.contentWrapContent}>
+        I want to go home. but i can not
+      </div>
+    );
   };
 
   useEffect(() => {
@@ -184,20 +189,24 @@ const NewPost: React.FC = () => {
               ) : postState === 'crop' ? (
                 images[0].image &&
                 images.map((props, index) => {
-                  console.log(props);
                   return <Crop image={props.image} key={index} id={props.id} />;
                 })
               ) : (
-                <>
+                <div className={s.contentWrap}>
                   {images.map((props, index) => {
                     console.log(props);
                     return (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={props.croppedImage} alt="Cropped" key={index} />
+                      <img
+                        src={props.croppedImage}
+                        alt="Cropped"
+                        key={index}
+                        className={s.croppedImg}
+                      />
                     );
                   })}
-                  <Content />
-                </>
+                  {/* <Content /> */}
+                </div>
               )}
             </div>
             <form>
