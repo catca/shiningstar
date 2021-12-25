@@ -55,6 +55,8 @@ const UserProfile = ({
     dispatch(initialBanner());
     dispatch(setBoardModal(false));
     dispatch(setUserData(userData));
+    console.log(userData);
+    console.log(boardData);
     dispatch(setModalInitial());
     dispatch(setBoardData(boardData));
   }, [profile]);

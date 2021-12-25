@@ -14,11 +14,12 @@ import MoreHorizSharpIcon from '@material-ui/icons/MoreHorizSharp';
 
 import { formatNumber } from 'lib/common';
 import { selectLogin } from 'lib/redux/login/loginSlice';
+import { selectUser } from 'lib/redux/user/userSlice';
 
 interface UserInfoProps {}
 
 const UserInfo: React.FC<UserInfoProps> = ({}) => {
-  const { login, myUserInfo } = useSelector(selectLogin);
+  const { login, userInfo } = useSelector(selectUser);
   const { userData } = useSelector(selectProfile);
   const dispatch = useDispatch();
 
@@ -34,7 +35,7 @@ const UserInfo: React.FC<UserInfoProps> = ({}) => {
         <div className={s.pcinfo}>
           <div className={s.tit01}>
             <div>{userData.username}</div>
-            {myUserInfo.username === userData.username ? (
+            {userInfo.username === userData.username ? (
               <>
                 <div>
                   <Link href="/accounts/edit">
