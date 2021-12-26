@@ -13,7 +13,11 @@ import {
   setPostImage,
   selectNewPost,
 } from 'lib/redux/newPost/newPostSlice';
+import { selectUser } from 'lib/redux/user/userSlice';
 import Crop from './Crop';
+import classNames from 'classnames';
+import ProfileImage from 'components/profile/ProfileImage';
+import Link from 'next/link';
 
 interface ModalProps {
   modalData: ModalDataType[];
@@ -23,7 +27,9 @@ const NewPost: React.FC = () => {
   const [postImages, setPostImages] = useState<{ id: number; image: any; cropImage: string; }[]>([]);
   const nextId = useRef(1);
   const [postState, setPostState] = useState<string>('newPost')
+  const [text, setText] = useState(0)
   const images = useSelector(selectNewPost);
+  const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
   const closeModal = (
     e:
@@ -92,7 +98,50 @@ const NewPost: React.FC = () => {
 
   const Content: React.FC = () => {
     return (
-      <div className={s.contentWrapContent}>I want to go home. but i can not</div>
+      <div className={s.contentWrapContent}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', margin: '16px' }}>
+            <div style={{ marginRight: '12px' }}>
+              <Link href={`/${userInfo.username}`}>
+                <a>
+                  <ProfileImage
+                    size={'nav'}
+                    border={true}
+                    borderColor={'black'}
+                    imageUrl={userInfo.profileImageUrl}
+                  />
+                </a>
+              </Link>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', color: '#262626' }}>
+              <div>
+                {userInfo.username}
+              </div>
+            </div>
+          </div>
+          <div style={{ width: '100%' }}>
+            <textarea name="" id="" placeholder="문구 입력..."
+              autoComplete='none'
+              autoCorrect='none'
+              style={{ boxSizing: 'border-box', border: 'none', resize: 'none', padding: '0 16px', width: '100%', height: '168px', outline: 'none', overflow: 'auto', lineHeight: '16px', fontSize: '16px' }}
+            />
+          </div>
+        </div>
+        <div style={{ display: 'flex' }}>
+          <div style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', width: '100%' }}>
+            <button style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: 'none', padding: '8px', cursor: 'pointer' }}>
+              <svg aria-label="이모티콘" color="#8e8e8e" fill="#8e8e8e" height="20" role="img" viewBox="0 0 24 24" width="20">
+                <path d="M15.83 10.997a1.167 1.167 0 101.167 1.167 1.167 1.167 0 00-1.167-1.167zm-6.5 1.167a1.167 1.167 0 10-1.166 1.167 1.167 1.167 0 001.166-1.167zm5.163 3.24a3.406 3.406 0 01-4.982.007 1 1 0 10-1.557 1.256 5.397 5.397 0 008.09 0 1 1 0 00-1.55-1.263zM12 .503a11.5 11.5 0 1011.5 11.5A11.513 11.513 0 0012 .503zm0 21a9.5 9.5 0 119.5-9.5 9.51 9.51 0 01-9.5 9.5z" />
+              </svg>
+            </button>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ padding: '0 16px', fontSize: '12px' }}>
+              {text}/2500
+            </div>
+          </div>
+        </div>
+      </div>
     )
   }
 
@@ -103,7 +152,7 @@ const NewPost: React.FC = () => {
   return (
     <>
       <div className={s.outerContainerPost} onClick={closeModal} />
-      <div className={s.innerContainerPost}>
+      <div className={classNames(s.innerContainerPost, { [s.innerContainerPostText]: postState === 'content' })} >
         <div>
           <div className={s.headerPost}>
             <div>
@@ -132,7 +181,7 @@ const NewPost: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className={s.contentWrapPost}>
+          <div className={classNames(s.contentWrapPost, { [s.contentWrapPostText]: postState === 'content' })}>
             <div>
               {postState === 'newPost' ?
                 <div className={s.contentPost}>
@@ -159,14 +208,16 @@ const NewPost: React.FC = () => {
                     )
                   })) :
                   <div className={s.contentWrap}>
-                    {images.map((props, index) => {
-                      console.log(props);
-                      return (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={props.croppedImage} alt="Cropped" key={index} className={s.croppedImg} />
-                      )
-                    })}
-                    {/* <Content /> */}
+                    <div>
+                      {images.map((props, index) => {
+                        console.log(props);
+                        return (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={props.croppedImage} alt="Cropped" key={index} className={s.croppedImg} />
+                        )
+                      })}
+                    </div>
+                    <Content />
                   </div>
               }
             </div>

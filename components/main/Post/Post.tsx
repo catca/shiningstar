@@ -340,7 +340,7 @@ type ImgCount = {
 const ImageCounter = styled.div<ImgCount>`
   width: 6px;
   height: 6px;
-  background: ${(props: { index: number; imgCount: number }) =>
+  background: ${(props) =>
     props.index === props.imgCount - 1 ? '#0095f6' : '#a8a8a8'};
   border-radius: 50%;
   &:not(:last-of-type) {
