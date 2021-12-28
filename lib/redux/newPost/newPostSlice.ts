@@ -37,15 +37,31 @@ export const newPostSlice = createSlice({
   initialState,
   reducers: {
     INIT_POST_IMAGE: (state) => {
+      while (state.length > 1) {
+        state.pop();
+      }
       state[0] = initialState[0];
     },
     SET_POST_IMAGE: (state, action: PayloadAction<string>) => {
       state[0].image = action.payload;
     },
-    ADD_POST_IMAGE: (state, action: PayloadAction<string>) => {
-      state[0].image = action.payload;
+    ADD_POST_IMAGE: (state, action: PayloadAction<any>) => {
+      console.log(action.payload)
+      state.push({
+        id: action.payload.id,
+        exist: false,
+        image: action.payload.image,
+        croppedImage: '',
+        croppedAreaPixel: {
+          width: 0,
+          height: 0,
+          x: 0,
+          y: 0
+        }
+      })
     },
     UPDATE_CROPPED_IMAGE: (state, action: PayloadAction<UpdateCroppedImage>) => {
+      console.log(action.payload.id - 1)
       state[action.payload.id - 1].croppedImage = action.payload.croppedImage;
     },
     UPDATE_CROPPED_AREA_PIXEL: (state, action: PayloadAction<any>) => {
@@ -70,7 +86,7 @@ export const setPostImage = (data: string) => {
   };
 };
 
-export const addPostImage = (data: string) => {
+export const addPostImage = (data: any) => {
   return async (dispatch: any) => {
     dispatch(ADD_POST_IMAGE(data));
   };

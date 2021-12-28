@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useRef, useState } from 'react';
 import s from '../CommonModal.module.scss';
 
@@ -12,6 +13,7 @@ import {
   initPostImage,
   setPostImage,
   selectNewPost,
+  addPostImage,
 } from 'lib/redux/newPost/newPostSlice';
 import { selectUser } from 'lib/redux/user/userSlice';
 import Crop from './Crop';
@@ -24,10 +26,12 @@ interface ModalProps {
 }
 
 const NewPost: React.FC = () => {
-  const [postImages, setPostImages] = useState<{ id: number; image: any; cropImage: string; }[]>([]);
   const nextId = useRef(1);
+  const [imageNumber, setImageNumber] = useState<number>(1);
   const [postState, setPostState] = useState<string>('newPost')
-  const [text, setText] = useState(0)
+  const [zoom, setZoom] = useState<number>(1)
+  const [imageControl, setImageControl] = useState<boolean>(false);
+  const [text, setText] = useState<number>(0)
   const images = useSelector(selectNewPost);
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -71,12 +75,15 @@ const NewPost: React.FC = () => {
       const postImage = {
         id: nextId.current,
         image: imageDataUrl,
-        cropImage: ''
       }
 
-      setPostImages(() => [...postImages, postImage]);
       setPostState(() => 'crop');
-      dispatch(setPostImage(imageDataUrl));
+      if (nextId.current === 1) {
+        dispatch(setPostImage(imageDataUrl));
+      } else {
+        dispatch(addPostImage(postImage));
+      }
+      setImageNumber(() => nextId.current);
       nextId.current += 1;
     }
   };
@@ -123,6 +130,7 @@ const NewPost: React.FC = () => {
             <textarea name="" id="" placeholder="문구 입력..."
               autoComplete='none'
               autoCorrect='none'
+              spellCheck="false"
               style={{ boxSizing: 'border-box', border: 'none', resize: 'none', padding: '0 16px', width: '100%', height: '168px', outline: 'none', overflow: 'auto', lineHeight: '16px', fontSize: '16px' }}
             />
           </div>
@@ -174,10 +182,19 @@ const NewPost: React.FC = () => {
             </div>
             <div>
               <div>
-                {postState !== 'newPost' &&
+                {postState === 'crop' ?
                   <button onClick={nextPostState}>
                     다음
-                  </button>}
+                  </button>
+                  :
+                  (
+                    postState === 'content' ?
+                      <button onClick={nextPostState}>
+                        공유하기
+                      </button>
+                      :
+                      null
+                  )}
               </div>
             </div>
           </div>
@@ -199,14 +216,89 @@ const NewPost: React.FC = () => {
                   </div>
                 </div> :
                 postState === 'crop' ? (images[0].image &&
-                  images.map((props, index) => {
-                    return (
-                      <Crop
-                        image={props.image}
-                        key={index}
-                        id={props.id} />
-                    )
-                  })) :
+                  <>
+                    <div className={s.imageWrap}>
+                      {images.map((props) => {
+                        return (
+                          <Crop
+                            image={props.image}
+                            key={props.id}
+                            id={props.id}
+                          />
+                        )
+                      })}
+                    </div>
+                    {imageControl &&
+                      <div className={s.thumbnailContainer} style={{ width: `${images.length * 94 + 100}px` }}>
+                        <div style={{ height: '94px', width: `${images.length * 94}px` }}>
+                          <div style={{ position: 'absolute', transform: 'none' }}>
+                            <button type="button" style={{ backgroundColor: '#fff', border: 'none', padding: 0, height: '94px' }}>
+                              <div style={{ boxShadow: 'rgba(0, 0, 0, 0) 0px 2px 6px 2px', transform: 'none' }}>
+                                <div style={{ height: '100%', width: `${images.length * 94}px`, display: 'flex' }}>
+                                  {images.map((props, index) => {
+                                    return (
+                                      <div key={index} style={{ position: 'relative' }}>
+                                        <img
+                                          src={props.croppedImage}
+                                          alt={props.image}
+                                          style={{
+                                            // backgroundImage: `url(${image})`, backgroundRepeat: 'no-repeat', 
+                                            height: '94px', transform: 'translateX(0px) translateY(0px) scale(1)', transition: 'none 0s ease 0s', width: '94px'
+                                          }} />
+                                        <div role="button" className={s.thumbnailDeleteWrap}>
+                                          <button type="button">
+                                            <div>
+                                              <svg aria-label="삭제" color="#ffffff" fill="#ffffff" height="12" role="img" viewBox="0 0 24 24" width="12">
+                                                <line fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="21" x2="3" y1="3" y2="21">
+                                                </line>
+                                                <line fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="21" x2="3" y1="21" y2="3">
+                                                </line>
+                                              </svg>
+                                            </div>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <div aria-disabled="false" role="button" onClick={handleClick}>
+                            <div style={{ height: '100%', width: '100%' }}>
+                              <svg aria-label="+ 아이콘" color="#8e8e8e" fill="#8e8e8e" height="22" role="img" viewBox="0 0 24 24" width="22">
+                                <path d="M21 11.3h-8.2V3c0-.4-.3-.8-.8-.8s-.8.4-.8.8v8.2H3c-.4 0-.8.3-.8.8s.3.8.8.8h8.2V21c0 .4.3.8.8.8s.8-.3.8-.8v-8.2H21c.4 0 .8-.3.8-.8s-.4-.7-.8-.7z">
+                                </path>
+                              </svg>
+                            </div>
+                          </div>
+                          <form method="POST" role="presentation" style={{ display: 'none' }}>
+                            <input accept="image/jpeg,image/png,image/heic,image/heif"
+                              type="file"
+                              ref={hiddenFileInput}
+                              onChange={handleChange}
+                              style={{ display: 'none' }} />
+                          </form>
+                        </div>
+                      </div>
+                    }
+                    <div style={{ position: 'absolute', bottom: '0', right: '0', padding: '8px' }} role="button">
+                      <div className={s.zoomButtonWrap} onClick={() => setImageControl(true)}>
+                        <div>
+                          <button className={s.zoomButton} type="button">
+                            <div>
+                              <svg aria-label="미디어 갤러리 열기" color="#ffffff" fill="#ffffff" height="16" role="img" viewBox="0 0 24 24" width="16">
+                                <path d="M19 15V5a4.004 4.004 0 00-4-4H5a4.004 4.004 0 00-4 4v10a4.004 4.004 0 004 4h10a4.004 4.004 0 004-4zM3 15V5a2.002 2.002 0 012-2h10a2.002 2.002 0 012 2v10a2.002 2.002 0 01-2 2H5a2.002 2.002 0 01-2-2zm18.862-8.773A.501.501 0 0021 6.57v8.431a6 6 0 01-6 6H6.58a.504.504 0 00-.35.863A3.944 3.944 0 009 23h6a8 8 0 008-8V9a3.95 3.95 0 00-1.138-2.773z" />
+                              </svg>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) :
                   <div className={s.contentWrap}>
                     <div>
                       {images.map((props, index) => {
