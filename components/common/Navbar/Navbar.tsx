@@ -5,10 +5,7 @@ import s from './Navbar.module.css';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, selectUser } from 'lib/redux/user/userSlice';
-import {
-  selectModal,
-  setModal,
-} from 'lib/redux/modal/modalSlice';
+import { selectModal, setModal } from 'lib/redux/modal/modalSlice';
 
 import HomeIcon from '@material-ui/icons/Home';
 import TelegramIcon from '@material-ui/icons/Telegram';

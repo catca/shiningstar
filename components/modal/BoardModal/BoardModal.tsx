@@ -10,7 +10,6 @@ import {
   setSelectBoard,
   setSelectedReplyIdx,
 } from 'lib/redux/modal/modalSlice';
-import { selectLogin } from 'lib/redux/login/loginSlice';
 
 import { ProfileImage } from 'components/profile';
 
@@ -28,12 +27,15 @@ import { formatNumber, idInListChecker, idNotInList } from 'lib/common';
 import cn from 'classnames';
 
 import { Reply } from 'types/profile/types';
+import { selectUser } from 'lib/redux/user/userSlice';
+import { selectProfile } from 'lib/redux/profile/profileSlice';
 
-interface BoardModalProps { }
+interface BoardModalProps {}
 
-const BoardModal: React.FC<BoardModalProps> = ({ }) => {
+const BoardModal: React.FC<BoardModalProps> = ({}) => {
   const { selectedBoard } = useSelector(selectModal);
-  const { myUserInfo } = useSelector(selectLogin);
+  const { userData } = useSelector(selectProfile);
+  const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
 
   const [reply, setReply] = React.useState<Reply>({
@@ -56,55 +58,55 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
     });
   };
 
-  const goodHandler = (user: string) => {
-    // TODO: rest api 통해서 좋아요 누르기 취소 기능 구현해야함
-    if (selectedBoard !== undefined) {
-      if (idInListChecker(selectedBoard.favorite, user)) {
-        // TODO: api 로직 다시 짜기
-        const newFav = idNotInList(selectedBoard.favorite, user);
+  // const goodHandler = (user: string) => {
+  //   // TODO: rest api 통해서 좋아요 누르기 취소 기능 구현해야함
+  //   if (selectedBoard !== undefined) {
+  //     if (idInListChecker(selectedBoard.favorite, user)) {
+  //       // TODO: api 로직 다시 짜기
+  //       const newFav = idNotInList(selectedBoard.favorite, user);
 
-        setFavorite((f) => f - 1);
-        setPressFavorite(false);
-        dispatch(setSelectBoard({ ...selectedBoard, favorite: newFav }));
-      } else {
-        setFavorite((f) => f + 1);
-        setPressFavorite(true);
-        dispatch(
-          setSelectBoard({
-            ...selectedBoard,
-            favorite: [
-              ...selectedBoard.favorite,
-              {
-                idusername: myUserInfo.username,
-                name: myUserInfo.name,
-                imageUrl: '/profile/winter.png',
-              },
-            ],
-          }),
-        );
-      }
-      console.log(favorite);
-    }
-  };
+  //       setFavorite((f) => f - 1);
+  //       setPressFavorite(false);
+  //       dispatch(setSelectBoard({ ...selectedBoard, favorite: newFav }));
+  //     } else {
+  //       setFavorite((f) => f + 1);
+  //       setPressFavorite(true);
+  //       dispatch(
+  //         setSelectBoard({
+  //           ...selectedBoard,
+  //           favorite: [
+  //             ...selectedBoard.favorite,
+  //             {
+  //               idusername: userInfo.username,
+  //               name: userInfo.name,
+  //               imageUrl: '/profile/winter.png',
+  //             },
+  //           ],
+  //         }),
+  //       );
+  //     }
+  //     console.log(favorite);
+  //   }
+  // };
 
-  const postReplyHandler = (reply: Reply) => {
-    //TODO: rest api post 과정 추가
-    // 현재는 테스트식으로 확인 가능하게 만든 로직임
+  // const postReplyHandler = (reply: Reply) => {
+  //   //TODO: rest api post 과정 추가
+  //   // 현재는 테스트식으로 확인 가능하게 만든 로직임
 
-    var board = selectedBoard;
-    if (board !== undefined) {
-      dispatch(setSelectBoard({ ...board, reply: [...board.reply, reply] }));
-      setReply({
-        username: '익명',
-        name: '익명',
-        imageUrl: '/profile/winter.png',
-        content: '',
-        createdDate: new Date().toString(),
-        modifiedDate: new Date().toString(),
-        reReply: [],
-      });
-    }
-  };
+  //   var board = selectedBoard;
+  //   if (board !== undefined) {
+  //     dispatch(setSelectBoard({ ...board, reply: [...board.reply, reply] }));
+  //     setReply({
+  //       username: '익명',
+  //       name: '익명',
+  //       imageUrl: '/profile/winter.png',
+  //       content: '',
+  //       createdDate: new Date().toString(),
+  //       modifiedDate: new Date().toString(),
+  //       reReply: [],
+  //     });
+  //   }
+  // };
 
   const inputFocusing = () => {
     textareaRef.current.focus();
@@ -113,11 +115,11 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
   React.useEffect(() => {
     if (selectedBoard !== undefined) {
       setFavorite(selectedBoard.favoriteCnt);
-      idInListChecker(selectedBoard.favorite, myUserInfo.username)
-        ? setPressFavorite(true)
-        : setPressFavorite(false);
+      // idInListChecker(selectedBoard.favorite, userInfo.username)
+      //   ? setPressFavorite(true)
+      //   : setPressFavorite(false);
     }
-  }, [myUserInfo.username, selectedBoard]);
+  }, [userInfo.username, selectedBoard]);
 
   return (
     <>
@@ -133,10 +135,10 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
           <div className={s.innerContainer}>
             <div className={cn(s.header, s.mobileFlex)}>
               <div>
-                <ProfileImage size="board" imageUrl={selectedBoard.imageUrl} />
-                <Link href={`/${selectedBoard.username}`}>
+                <ProfileImage size="board" imageUrl={userData.imageUrl} />
+                <Link href={`/${userData.username}`}>
                   <a id={s.profileId}>
-                    <b>{selectedBoard.username}</b>
+                    <b>{userData.username}</b>
                   </a>
                 </Link>
               </div>
@@ -163,13 +165,10 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
             <div className={s.content}>
               <div className={cn(s.header, s.pcFlex)}>
                 <div>
-                  <ProfileImage
-                    size="board"
-                    imageUrl={selectedBoard.imageUrl}
-                  />
-                  <Link href={`/${selectedBoard.username}`}>
+                  <ProfileImage size="board" imageUrl={userData.imageUrl} />
+                  <Link href={`/${userData.username}`}>
                     <a id={s.profileId}>
-                      <b>{selectedBoard.username}</b>
+                      <b>{userData.username}</b>
                     </a>
                   </Link>
                 </div>
@@ -181,14 +180,14 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
                     {pressFavorite ? (
                       <a>
                         <FavoriteIcon
-                          onClick={() => goodHandler(myUserInfo.username)}
+                          // onClick={() => goodHandler(userInfo.username)}
                           style={{ color: 'red', fontSize: '26px' }}
                         />
                       </a>
                     ) : (
                       <a>
                         <FavoriteBorderRoundedIcon
-                          onClick={() => goodHandler(myUserInfo.username)}
+                          // onClick={() => goodHandler(userInfo.username)}
                           style={{ fontSize: '26px' }}
                         />
                       </a>
@@ -222,7 +221,7 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
               </div>
               <div className={s.comment}>
                 {/* TODO: 댓글 목록 map 으로 하기 */}
-                {selectedBoard.reply.map((reply: Reply, idx) => {
+                {/* {selectedBoard.comment.map((reply: Reply, idx: number) => {
                   return (
                     <ReplyContent
                       reply={reply}
@@ -234,7 +233,7 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
                       }
                     />
                   );
-                })}
+                })} */}
               </div>
               <div className={cn(s.footer, s.pcBlock)}>
                 <div className={s.footerIcon}>
@@ -242,14 +241,14 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
                     {pressFavorite ? (
                       <a>
                         <FavoriteIcon
-                          onClick={() => goodHandler(myUserInfo.username)}
+                          // onClick={() => goodHandler(userInfo.username)}
                           style={{ color: 'red', fontSize: '26px' }}
                         />
                       </a>
                     ) : (
                       <a>
                         <FavoriteBorderRoundedIcon
-                          onClick={() => goodHandler(myUserInfo.username)}
+                          // onClick={() => goodHandler(userInfo.username)}
                           style={{ fontSize: '26px' }}
                         />
                       </a>
@@ -296,7 +295,7 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
                   onChange={onReplyHandler}
                 />
                 <Button
-                  onClick={() => postReplyHandler(reply)}
+                  // onClick={() => postReplyHandler(reply)}
                   disabled={reply.content.length === 0}
                   size="small"
                   style={{ color: '#2294ff' }}>
