@@ -11,12 +11,14 @@ import {
   setPostImage,
   selectNewPost,
   addPostImage,
+  deletePostImage,
 } from 'lib/redux/newPost/newPostSlice';
 import { selectUser } from 'lib/redux/user/userSlice';
 import Crop from './Crop';
 import classNames from 'classnames';
 import ProfileImage from 'components/profile/ProfileImage';
 import Link from 'next/link';
+import styled from '@emotion/styled';
 
 interface ModalProps {
   modalData: ModalDataType[];
@@ -24,6 +26,7 @@ interface ModalProps {
 
 const NewPost: React.FC = () => {
   const nextId = useRef(1);
+  const imageControlRef = useRef<HTMLDivElement>(null);
   const [imageNumber, setImageNumber] = useState<number>(1);
   const [postState, setPostState] = useState<string>('newPost')
   const [zoom, setZoom] = useState<number>(1)
@@ -100,6 +103,13 @@ const NewPost: React.FC = () => {
     }
   };
 
+  const prevImg = () => {
+    setImageNumber((imageNumber) => imageNumber - 1);
+  };
+  const nextImg = () => {
+    setImageNumber((imageNumber) => imageNumber + 1);
+  };
+
   const Content: React.FC = () => {
     return (
       <div className={s.contentWrapContent}>
@@ -153,6 +163,29 @@ const NewPost: React.FC = () => {
   useEffect(() => {
     dispatch(initPostImage());
   }, []);
+
+  function clickClopEvent(event: { target: any; currentTarget: { querySelector: (arg0: string) => { (): any; new(): any; querySelectorAll: { (arg0: string): any; new(): any; }; }; }; }) {
+    var target = event.target;
+    console.log(target, imageControlRef.current);
+    console.log(imageControlRef.current?.contains(target));
+
+    if (imageControl === false)
+      return;
+
+    if (imageControlRef.current?.contains(target))
+      return;
+    setImageControl(false);
+  }
+
+  const deleteImage = (deleteId: number) => {
+    console.log('deleteId', deleteId)
+    if (imageNumber === 1) {
+      setPostState(() => 'newPost');
+    } else {
+      console.log(imageNumber);
+    }
+    dispatch(deletePostImage({ id: deleteId }));
+  }
 
   return (
     <>
@@ -213,7 +246,7 @@ const NewPost: React.FC = () => {
                   :
                   (
                     postState === 'content' ?
-                      <button onClick={nextPostState}>
+                      <button>
                         공유하기
                       </button>
                       :
@@ -250,36 +283,61 @@ const NewPost: React.FC = () => {
                   </div>
                 </div>) :
                 postState === 'crop' ? (images[0].image &&
-                  <>
+                  <div onClick={clickClopEvent}>
                     <div className={s.imageWrap}>
                       {images.map((props) => {
                         return (
-                          <Crop
-                            image={props.image}
-                            key={props.id}
-                            id={props.id}
-                          />
-                        )
+                          <div key={props.id} style={{ display: `${props.id === imageNumber ? 'block' : 'none'}` }}>
+                            <Crop
+                              image={props.image}
+                              id={props.id}
+                            />
+                          </div>)
                       })}
                     </div>
+                    {imageNumber > 1 && (
+                      <div className={s.prevButtonWrapper} onClick={prevImg}>
+                        <div
+                          style={{
+                            backgroundImage: 'url(/instagramIcon.png)',
+                            backgroundPosition: '-130px -98px',
+                          }}></div>
+                      </div>
+                    )}
+                    {imageNumber < images.length && (
+                      <div className={s.nextButtonWrapper} onClick={nextImg}>
+                        <div
+                          style={{
+                            backgroundImage: 'url(/instagramIcon.png)',
+                            backgroundPosition: '-162px -98px',
+                          }}></div>
+                      </div>
+                    )}
                     {imageControl &&
-                      <div className={s.thumbnailContainer} style={{ width: `${images.length * 94 + 100}px` }}>
-                        <div style={{ height: '94px', width: `${images.length * 94}px` }}>
+                      <div
+                        ref={imageControlRef}
+                        className={s.thumbnailContainer}
+                        style={{ width: `${images.length * 94 + (images.length - 1) * 12 + 100}px` }}>
+                        <div style={{ height: '94px', width: `${images.length * 94 + (images.length - 1) * 12}px` }}>
                           <div style={{ position: 'absolute', transform: 'none' }}>
-                            <button type="button" style={{ backgroundColor: '#fff', border: 'none', padding: 0, height: '94px' }}>
-                              <div style={{ boxShadow: 'rgba(0, 0, 0, 0) 0px 2px 6px 2px', transform: 'none' }}>
-                                <div style={{ height: '100%', width: `${images.length * 94}px`, display: 'flex' }}>
+                            <div style={{ backgroundColor: 'rgba(0, 0, 0, 0)', border: 'none', padding: 0, height: '94px' }}>
+                              <div style={{ backgroundColor: 'rgba(0, 0, 0, 0)', boxShadow: 'rgba(0, 0, 0, 0) 0px 2px 6px 2px', transform: 'none' }}>
+                                <div style={{ backgroundColor: 'rgba(0, 0, 0, 0)', height: '100%', width: `${images.length * 94 + (images.length - 1) * 12}px`, display: 'flex' }}>
                                   {images.map((props, index) => {
                                     return (
-                                      <div key={index} style={{ position: 'relative' }}>
+                                      <div
+                                        key={index}
+                                        style={{ backgroundColor: 'rgba(0, 0, 0, 0)', position: 'relative', marginRight: '12px' }}
+                                        onClick={() => setImageNumber(() => index)}
+                                      >
                                         <img
                                           src={props.croppedImage}
                                           alt={props.image}
                                           style={{
                                             // backgroundImage: `url(${image})`, backgroundRepeat: 'no-repeat', 
-                                            height: '94px', transform: 'translateX(0px) translateY(0px) scale(1)', transition: 'none 0s ease 0s', width: '94px'
+                                            height: '94px', transform: 'translateX(0px) translateY(0px) scale(1)', transition: 'none 0s ease 0s', width: '94px',
                                           }} />
-                                        <div role="button" className={s.thumbnailDeleteWrap}>
+                                        <div role="button" className={s.thumbnailDeleteWrap} onClick={() => deleteImage(props.id)} >
                                           <button type="button">
                                             <div>
                                               <svg aria-label="삭제" color="#ffffff" fill="#ffffff" height="12" role="img" viewBox="0 0 24 24" width="12">
@@ -296,17 +354,19 @@ const NewPost: React.FC = () => {
                                   })}
                                 </div>
                               </div>
-                            </button>
+                            </div>
                           </div>
                         </div>
-                        <div>
-                          <div aria-disabled="false" role="button" onClick={handleClick}>
-                            <div style={{ height: '100%', width: '100%' }}>
-                              <svg aria-label="+ 아이콘" color="#8e8e8e" fill="#8e8e8e" height="22" role="img" viewBox="0 0 24 24" width="22">
-                                <path d="M21 11.3h-8.2V3c0-.4-.3-.8-.8-.8s-.8.4-.8.8v8.2H3c-.4 0-.8.3-.8.8s.3.8.8.8h8.2V21c0 .4.3.8.8.8s.8-.3.8-.8v-8.2H21c.4 0 .8-.3.8-.8s-.4-.7-.8-.7z">
-                                </path>
-                              </svg>
-                            </div>
+                        <div style={{ height: '94px', flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                          <div
+                            onClick={handleClick}
+                            aria-disabled="false" role="button"
+                            style={{ height: '48px', width: '48px', border: '1px solid #FFF', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}
+                          >
+                            <svg aria-label="+ 아이콘" color="#8e8e8e" fill="#8e8e8e" height="22" role="img" viewBox="0 0 24 24" width="22">
+                              <path d="M21 11.3h-8.2V3c0-.4-.3-.8-.8-.8s-.8.4-.8.8v8.2H3c-.4 0-.8.3-.8.8s.3.8.8.8h8.2V21c0 .4.3.8.8.8s.8-.3.8-.8v-8.2H21c.4 0 .8-.3.8-.8s-.4-.7-.8-.7z">
+                              </path>
+                            </svg>
                           </div>
                           <form method="POST" role="presentation" style={{ display: 'none' }}>
                             <input accept="image/jpeg,image/png,image/heic,image/heif"
@@ -331,17 +391,40 @@ const NewPost: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  </>
+                  </div>
                 ) :
                   <div className={s.contentWrap}>
-                    <div>
+                    <div style={{ position: 'relative' }}>
                       {images.map((props, index) => {
-                        console.log(props);
                         return (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={props.croppedImage} alt="Cropped" key={index} className={s.croppedImg} />
+                          <img
+                            key={index}
+                            className={s.croppedImg}
+                            src={props.croppedImage}
+                            alt="Cropped"
+                            style={{ display: `${index + 1 === imageNumber ? 'block' : 'none'}` }}
+                          />
                         )
                       })}
+                      {imageNumber > 1 && (
+                        <div className={s.prevButtonWrapper} onClick={prevImg}>
+                          <div
+                            style={{
+                              backgroundImage: 'url(/instagramIcon.png)',
+                              backgroundPosition: '-130px -98px',
+                            }}></div>
+                        </div>
+                      )}
+                      {imageNumber < images.length && (
+                        <div className={s.nextButtonWrapper} onClick={nextImg}>
+                          <div
+                            style={{
+                              backgroundImage: 'url(/instagramIcon.png)',
+                              backgroundPosition: '-162px -98px',
+                            }}></div>
+                        </div>
+                      )}
                     </div>
                     <Content />
                   </div>
@@ -364,3 +447,14 @@ const NewPost: React.FC = () => {
 };
 
 export default NewPost;
+
+type ContainerProps = {
+  key: number;
+  index: number;
+  current: number;
+};
+
+const Container = styled.div<ContainerProps>`
+  display: ${({ index, current }) => current === index ? 'block' : 'none'};
+`;
+

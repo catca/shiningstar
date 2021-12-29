@@ -46,7 +46,7 @@ export const newPostSlice = createSlice({
       state[0].image = action.payload;
     },
     ADD_POST_IMAGE: (state, action: PayloadAction<any>) => {
-      console.log(action.payload)
+      console.log('add', action.payload)
       state.push({
         id: action.payload.id,
         exist: false,
@@ -62,14 +62,18 @@ export const newPostSlice = createSlice({
     },
     UPDATE_CROPPED_IMAGE: (state, action: PayloadAction<UpdateCroppedImage>) => {
       console.log(action.payload.id - 1)
-      state[action.payload.id - 1].croppedImage = action.payload.croppedImage;
+      state[state.findIndex((element, index, arr) => element.id === action.payload.id)].croppedImage = action.payload.croppedImage;
     },
     UPDATE_CROPPED_AREA_PIXEL: (state, action: PayloadAction<any>) => {
-      state[action.payload.id - 1].croppedAreaPixel.width = action.payload.width;
-      state[action.payload.id - 1].croppedAreaPixel.height = action.payload.height;
-      state[action.payload.id - 1].croppedAreaPixel.x = action.payload.x;
-      state[action.payload.id - 1].croppedAreaPixel.y = action.payload.y;
-      state[action.payload.id - 1].exist = true;
+      state[state.findIndex((element, index, arr) => element.id === action.payload.id)].croppedAreaPixel.width = action.payload.width;
+      state[state.findIndex((element, index, arr) => element.id === action.payload.id)].croppedAreaPixel.height = action.payload.height;
+      state[state.findIndex((element, index, arr) => element.id === action.payload.id)].croppedAreaPixel.x = action.payload.x;
+      state[state.findIndex((element, index, arr) => element.id === action.payload.id)].croppedAreaPixel.y = action.payload.y;
+      state[state.findIndex((element, index, arr) => element.id === action.payload.id)].exist = true;
+    },
+    DELETE_POST_IMAGE: (state, action: PayloadAction<any>) => {
+      console.log(action.payload)
+      return state.filter((item) => item.id !== action.payload.id);
     },
   },
 });
@@ -104,7 +108,13 @@ export const updateCroppedAreaPixel = (data: any) => {
   };
 };
 
-export const { INIT_POST_IMAGE, SET_POST_IMAGE, ADD_POST_IMAGE, UPDATE_CROPPED_IMAGE, UPDATE_CROPPED_AREA_PIXEL } = newPostSlice.actions;
+export const deletePostImage = (data: any) => {
+  return async (dispatch: any) => {
+    dispatch(DELETE_POST_IMAGE(data));
+  };
+};
+
+export const { INIT_POST_IMAGE, SET_POST_IMAGE, ADD_POST_IMAGE, UPDATE_CROPPED_IMAGE, UPDATE_CROPPED_AREA_PIXEL, DELETE_POST_IMAGE } = newPostSlice.actions;
 export const selectNewPost = (state: RootState) => state.newPost;
 
 export default newPostSlice.reducer;

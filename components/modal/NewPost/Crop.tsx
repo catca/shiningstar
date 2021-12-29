@@ -13,17 +13,18 @@ import {
 
 import s from '../CommonModal.module.scss';
 import { UserInfo } from 'components/profile';
+import classNames from 'classnames';
 
 interface CropProps {
   image: string,
-  id: number
+  id: number,
 }
 
 const Crop = ({ image, id }: CropProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [zoomButton, setZoomButton] = useState(false);
-  const [imageControl, setImageControl] = useState(false);
+  const [zoom, setZoom] = useState<number>(1);
+  const [zoomButton, setZoomButton] = useState<boolean>(false);
+  const [imageControl, setImageControl] = useState<boolean>(false);
   const newPostData = useSelector(selectNewPost);
   const zoomRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
@@ -46,7 +47,7 @@ const Crop = ({ image, id }: CropProps) => {
   useEffect(() => {
     // postState content => crop 으로 돌아왔을 때 cropped 상태 유지 필요
     dispatch(updateCroppedImage({ id: id, croppedImage: image }));
-  }, []);
+  }, [dispatch, id, image]);
 
   function clickClopEvent(event: { target: any; currentTarget: { querySelector: (arg0: string) => { (): any; new(): any; querySelectorAll: { (arg0: string): any; new(): any; }; }; }; }) {
     var target = event.target;
@@ -82,7 +83,8 @@ const Crop = ({ image, id }: CropProps) => {
         onCropChange={setCrop}
         onCropComplete={onCropComplete}
         onZoomChange={setZoom}
-        initialCroppedAreaPixels={newPostData[id - 1].exist ? newPostData[id - 1].croppedAreaPixel : null}
+        initialCroppedAreaPixels={newPostData[newPostData.findIndex((element, index, arr) => element.id === id)].exist ?
+          newPostData[newPostData.findIndex((element, index, arr) => element.id === id)].croppedAreaPixel : null}
         style={{ containerStyle: containerStyle, mediaStyle: mediaStyle, cropAreaStyle: cropAreaStyle }}
       />
       <div style={{ position: 'absolute', bottom: '0', left: '0', padding: '8px' }} role="button">
@@ -97,7 +99,7 @@ const Crop = ({ image, id }: CropProps) => {
                       style={{ backgroundImage: 'linear-gradient(to right, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 0%, rgb(0, 0, 0) 0%, rgb(0, 0, 0) 100%)' }}
                       type="range"
                       min={1}
-                      max={3}
+                      max={2}
                       step={0.1}
                       value={zoom}
                       onChange={(e) => setZoom(parseFloat(e.target.value))}
@@ -142,4 +144,4 @@ const cropAreaStyle = {
   width: '100%',
 }
 
-export default Crop;
+export default React.memo(Crop);
