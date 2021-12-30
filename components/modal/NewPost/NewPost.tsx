@@ -28,10 +28,10 @@ const NewPost: React.FC = () => {
   const nextId = useRef(1);
   const imageControlRef = useRef<HTMLDivElement>(null);
   const [imageNumber, setImageNumber] = useState<number>(1);
-  const [postState, setPostState] = useState<string>('newPost')
-  const [zoom, setZoom] = useState<number>(1)
+  const [postState, setPostState] = useState<string>('newPost');
+  const [zoom, setZoom] = useState<number>(1);
   const [imageControl, setImageControl] = useState<boolean>(false);
-  const [text, setText] = useState<number>(0)
+  const [text, setText] = useState<number>(0);
   const images = useSelector(selectNewPost);
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -75,7 +75,7 @@ const NewPost: React.FC = () => {
       const postImage = {
         id: nextId.current,
         image: imageDataUrl,
-      }
+      };
 
       setPostState(() => 'crop');
       if (nextId.current === 1) {
@@ -127,70 +127,124 @@ const NewPost: React.FC = () => {
                 </a>
               </Link>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', color: '#262626' }}>
-              <div>
-                {userInfo.username}
-              </div>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                fontWeight: 'bold',
+                color: '#262626',
+              }}>
+              <div>{userInfo.username}</div>
             </div>
           </div>
           <div style={{ width: '100%' }}>
-            <textarea name="" id="" placeholder="문구 입력..."
-              autoComplete='none'
-              autoCorrect='none'
+            <textarea
+              name=""
+              id=""
+              placeholder="문구 입력..."
+              autoComplete="none"
+              autoCorrect="none"
               spellCheck="false"
-              style={{ boxSizing: 'border-box', border: 'none', resize: 'none', padding: '0 16px', width: '100%', height: '168px', outline: 'none', overflow: 'auto', lineHeight: '16px', fontSize: '16px' }}
+              style={{
+                boxSizing: 'border-box',
+                border: 'none',
+                resize: 'none',
+                padding: '0 16px',
+                width: '100%',
+                height: '168px',
+                outline: 'none',
+                overflow: 'auto',
+                lineHeight: '16px',
+                fontSize: '16px',
+              }}
             />
           </div>
         </div>
         <div style={{ display: 'flex' }}>
-          <div style={{ display: 'flex', alignItems: 'center', padding: '4px 8px', width: '100%' }}>
-            <button style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', border: 'none', padding: '8px', cursor: 'pointer' }}>
-              <svg aria-label="이모티콘" color="#8e8e8e" fill="#8e8e8e" height="20" role="img" viewBox="0 0 24 24" width="20">
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '4px 8px',
+              width: '100%',
+            }}>
+            <button
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                backgroundColor: '#fff',
+                border: 'none',
+                padding: '8px',
+                cursor: 'pointer',
+              }}>
+              <svg
+                aria-label="이모티콘"
+                color="#8e8e8e"
+                fill="#8e8e8e"
+                height="20"
+                role="img"
+                viewBox="0 0 24 24"
+                width="20">
                 <path d="M15.83 10.997a1.167 1.167 0 101.167 1.167 1.167 1.167 0 00-1.167-1.167zm-6.5 1.167a1.167 1.167 0 10-1.166 1.167 1.167 1.167 0 001.166-1.167zm5.163 3.24a3.406 3.406 0 01-4.982.007 1 1 0 10-1.557 1.256 5.397 5.397 0 008.09 0 1 1 0 00-1.55-1.263zM12 .503a11.5 11.5 0 1011.5 11.5A11.513 11.513 0 0012 .503zm0 21a9.5 9.5 0 119.5-9.5 9.51 9.51 0 01-9.5 9.5z" />
               </svg>
             </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
             <div style={{ padding: '0 16px', fontSize: '12px' }}>
               {text}/2500
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   useEffect(() => {
     dispatch(initPostImage());
   }, []);
 
-  function clickClopEvent(event: { target: any; currentTarget: { querySelector: (arg0: string) => { (): any; new(): any; querySelectorAll: { (arg0: string): any; new(): any; }; }; }; }) {
+  function clickClopEvent(event: {
+    target: any;
+    currentTarget: {
+      querySelector: (arg0: string) => {
+        (): any;
+        new (): any;
+        querySelectorAll: { (arg0: string): any; new (): any };
+      };
+    };
+  }) {
     var target = event.target;
     console.log(target, imageControlRef.current);
     console.log(imageControlRef.current?.contains(target));
 
-    if (imageControl === false)
-      return;
+    if (imageControl === false) return;
 
-    if (imageControlRef.current?.contains(target))
-      return;
+    if (imageControlRef.current?.contains(target)) return;
     setImageControl(false);
   }
 
   const deleteImage = (deleteId: number) => {
-    console.log('deleteId', deleteId)
+    console.log('deleteId', deleteId);
     if (imageNumber === 1) {
       setPostState(() => 'newPost');
     } else {
       console.log(imageNumber);
     }
     dispatch(deletePostImage({ id: deleteId }));
-  }
+  };
 
   return (
     <>
       <div className={s.outerContainerPost} onClick={closeModal} />
-      <div className={classNames(s.innerContainerPost, { [s.innerContainerPostText]: postState === 'content' })} >
+      <div
+        className={classNames(s.innerContainerPost, {
+          [s.innerContainerPostText]: postState === 'content',
+        })}>
         <div>
           <div className={s.headerPost}>
             <div>
@@ -233,29 +287,24 @@ const NewPost: React.FC = () => {
                 {postState === 'newPost'
                   ? '새 게시물 만들기'
                   : postState === 'crop'
-                    ? '자르기'
-                    : '새 게시물 만들기'}
+                  ? '자르기'
+                  : '새 게시물 만들기'}
               </h1>
             </div>
             <div>
               <div>
-                {postState === 'crop' ?
-                  <button onClick={nextPostState}>
-                    다음
-                  </button>
-                  :
-                  (
-                    postState === 'content' ?
-                      <button>
-                        공유하기
-                      </button>
-                      :
-                      null
-                  )}
+                {postState === 'crop' ? (
+                  <button onClick={nextPostState}>다음</button>
+                ) : postState === 'content' ? (
+                  <button>공유하기</button>
+                ) : null}
               </div>
             </div>
           </div>
-          <div className={classNames(s.contentWrapPost, { [s.contentWrapPostText]: postState === 'content' })}>
+          <div
+            className={classNames(s.contentWrapPost, {
+              [s.contentWrapPostText]: postState === 'content',
+            })}>
             <div>
               {postState === 'newPost' ? (
                 <div className={s.contentPost}>
@@ -281,18 +330,19 @@ const NewPost: React.FC = () => {
                   <div className={s.inputButton}>
                     <button onClick={handleClick}>컴퓨터에서 선택</button>
                   </div>
-                </div>) :
-                postState === 'crop' ? (images[0].image &&
+                </div>
+              ) : postState === 'crop' ? (
+                images[0].image && (
                   <div onClick={clickClopEvent}>
                     <div className={s.imageWrap}>
                       {images.map((props) => {
-                        return (
-                          <div key={props.id} style={{ display: `${props.id === imageNumber ? 'block' : 'none'}` }}>
-                            <Crop
-                              image={props.image}
-                              id={props.id}
-                            />
-                          </div>)
+                        if (props.id === imageNumber) {
+                          return (
+                            <div key={props.id}>
+                              <Crop image={props.image} id={props.id} />
+                            </div>
+                          );
+                        }
                       })}
                     </div>
                     {imageNumber > 1 && (
@@ -313,77 +363,187 @@ const NewPost: React.FC = () => {
                           }}></div>
                       </div>
                     )}
-                    {imageControl &&
+                    {imageControl && (
                       <div
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
-                        style={{ width: `${images.length * 94 + (images.length - 1) * 12 + 100}px` }}>
-                        <div style={{ height: '94px', width: `${images.length * 94 + (images.length - 1) * 12}px` }}>
-                          <div style={{ position: 'absolute', transform: 'none' }}>
-                            <div style={{ backgroundColor: 'rgba(0, 0, 0, 0)', border: 'none', padding: 0, height: '94px' }}>
-                              <div style={{ backgroundColor: 'rgba(0, 0, 0, 0)', boxShadow: 'rgba(0, 0, 0, 0) 0px 2px 6px 2px', transform: 'none' }}>
-                                <div style={{ backgroundColor: 'rgba(0, 0, 0, 0)', height: '100%', width: `${images.length * 94 + (images.length - 1) * 12}px`, display: 'flex' }}>
+                        style={{
+                          width: `${
+                            images.length * 94 + (images.length - 1) * 12 + 100
+                          }px`,
+                        }}>
+                        <div
+                          style={{
+                            height: '94px',
+                            width: `${
+                              images.length * 94 + (images.length - 1) * 12
+                            }px`,
+                          }}>
+                          <div
+                            style={{ position: 'absolute', transform: 'none' }}>
+                            <div
+                              style={{
+                                backgroundColor: 'rgba(0, 0, 0, 0)',
+                                border: 'none',
+                                padding: 0,
+                                height: '94px',
+                              }}>
+                              <div
+                                style={{
+                                  backgroundColor: 'rgba(0, 0, 0, 0)',
+                                  boxShadow: 'rgba(0, 0, 0, 0) 0px 2px 6px 2px',
+                                  transform: 'none',
+                                }}>
+                                <div
+                                  style={{
+                                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                                    height: '100%',
+                                    width: `${
+                                      images.length * 94 +
+                                      (images.length - 1) * 12
+                                    }px`,
+                                    display: 'flex',
+                                  }}>
                                   {images.map((props, index) => {
                                     return (
                                       <div
                                         key={index}
-                                        style={{ backgroundColor: 'rgba(0, 0, 0, 0)', position: 'relative', marginRight: '12px' }}
-                                        onClick={() => setImageNumber(() => index)}
-                                      >
+                                        style={{
+                                          backgroundColor: 'rgba(0, 0, 0, 0)',
+                                          position: 'relative',
+                                          marginRight: '12px',
+                                        }}
+                                        onClick={() =>
+                                          setImageNumber(() => index)
+                                        }>
                                         <img
                                           src={props.croppedImage}
                                           alt={props.image}
                                           style={{
-                                            // backgroundImage: `url(${image})`, backgroundRepeat: 'no-repeat', 
-                                            height: '94px', transform: 'translateX(0px) translateY(0px) scale(1)', transition: 'none 0s ease 0s', width: '94px',
-                                          }} />
-                                        <div role="button" className={s.thumbnailDeleteWrap} onClick={() => deleteImage(props.id)} >
+                                            // backgroundImage: `url(${image})`, backgroundRepeat: 'no-repeat',
+                                            height: '94px',
+                                            transform:
+                                              'translateX(0px) translateY(0px) scale(1)',
+                                            transition: 'none 0s ease 0s',
+                                            width: '94px',
+                                          }}
+                                        />
+                                        <div
+                                          role="button"
+                                          className={s.thumbnailDeleteWrap}
+                                          onClick={() => deleteImage(props.id)}>
                                           <button type="button">
                                             <div>
-                                              <svg aria-label="삭제" color="#ffffff" fill="#ffffff" height="12" role="img" viewBox="0 0 24 24" width="12">
-                                                <line fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="21" x2="3" y1="3" y2="21">
-                                                </line>
-                                                <line fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="21" x2="3" y1="21" y2="3">
-                                                </line>
+                                              <svg
+                                                aria-label="삭제"
+                                                color="#ffffff"
+                                                fill="#ffffff"
+                                                height="12"
+                                                role="img"
+                                                viewBox="0 0 24 24"
+                                                width="12">
+                                                <line
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth="2"
+                                                  x1="21"
+                                                  x2="3"
+                                                  y1="3"
+                                                  y2="21"></line>
+                                                <line
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                  strokeWidth="2"
+                                                  x1="21"
+                                                  x2="3"
+                                                  y1="21"
+                                                  y2="3"></line>
                                               </svg>
                                             </div>
                                           </button>
                                         </div>
                                       </div>
-                                    )
+                                    );
                                   })}
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-                        <div style={{ height: '94px', flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <div
+                          style={{
+                            height: '94px',
+                            flexGrow: 1,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
                           <div
                             onClick={handleClick}
-                            aria-disabled="false" role="button"
-                            style={{ height: '48px', width: '48px', border: '1px solid #FFF', borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}
-                          >
-                            <svg aria-label="+ 아이콘" color="#8e8e8e" fill="#8e8e8e" height="22" role="img" viewBox="0 0 24 24" width="22">
-                              <path d="M21 11.3h-8.2V3c0-.4-.3-.8-.8-.8s-.8.4-.8.8v8.2H3c-.4 0-.8.3-.8.8s.3.8.8.8h8.2V21c0 .4.3.8.8.8s.8-.3.8-.8v-8.2H21c.4 0 .8-.3.8-.8s-.4-.7-.8-.7z">
-                              </path>
+                            aria-disabled="false"
+                            role="button"
+                            style={{
+                              height: '48px',
+                              width: '48px',
+                              border: '1px solid #FFF',
+                              borderRadius: '50%',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              cursor: 'pointer',
+                            }}>
+                            <svg
+                              aria-label="+ 아이콘"
+                              color="#8e8e8e"
+                              fill="#8e8e8e"
+                              height="22"
+                              role="img"
+                              viewBox="0 0 24 24"
+                              width="22">
+                              <path d="M21 11.3h-8.2V3c0-.4-.3-.8-.8-.8s-.8.4-.8.8v8.2H3c-.4 0-.8.3-.8.8s.3.8.8.8h8.2V21c0 .4.3.8.8.8s.8-.3.8-.8v-8.2H21c.4 0 .8-.3.8-.8s-.4-.7-.8-.7z"></path>
                             </svg>
                           </div>
-                          <form method="POST" role="presentation" style={{ display: 'none' }}>
-                            <input accept="image/jpeg,image/png,image/heic,image/heif"
+                          <form
+                            method="POST"
+                            role="presentation"
+                            style={{ display: 'none' }}>
+                            <input
+                              accept="image/jpeg,image/png,image/heic,image/heif"
                               type="file"
                               ref={hiddenFileInput}
                               onChange={handleChange}
-                              style={{ display: 'none' }} />
+                              style={{ display: 'none' }}
+                            />
                           </form>
                         </div>
                       </div>
-                    }
-                    <div style={{ position: 'absolute', bottom: '0', right: '0', padding: '8px' }} role="button">
-                      <div className={s.zoomButtonWrap} onClick={() => setImageControl(true)}>
+                    )}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '0',
+                        right: '0',
+                        padding: '8px',
+                      }}
+                      role="button">
+                      <div
+                        className={s.zoomButtonWrap}
+                        onClick={() => setImageControl(true)}>
                         <div>
                           <button className={s.zoomButton} type="button">
                             <div>
-                              <svg aria-label="미디어 갤러리 열기" color="#ffffff" fill="#ffffff" height="16" role="img" viewBox="0 0 24 24" width="16">
+                              <svg
+                                aria-label="미디어 갤러리 열기"
+                                color="#ffffff"
+                                fill="#ffffff"
+                                height="16"
+                                role="img"
+                                viewBox="0 0 24 24"
+                                width="16">
                                 <path d="M19 15V5a4.004 4.004 0 00-4-4H5a4.004 4.004 0 00-4 4v10a4.004 4.004 0 004 4h10a4.004 4.004 0 004-4zM3 15V5a2.002 2.002 0 012-2h10a2.002 2.002 0 012 2v10a2.002 2.002 0 01-2 2H5a2.002 2.002 0 01-2-2zm18.862-8.773A.501.501 0 0021 6.57v8.431a6 6 0 01-6 6H6.58a.504.504 0 00-.35.863A3.944 3.944 0 009 23h6a8 8 0 008-8V9a3.95 3.95 0 00-1.138-2.773z" />
                               </svg>
                             </div>
@@ -392,43 +552,48 @@ const NewPost: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                ) :
-                  <div className={s.contentWrap}>
-                    <div style={{ position: 'relative' }}>
-                      {images.map((props, index) => {
-                        return (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            key={index}
-                            className={s.croppedImg}
-                            src={props.croppedImage}
-                            alt="Cropped"
-                            style={{ display: `${index + 1 === imageNumber ? 'block' : 'none'}` }}
-                          />
-                        )
-                      })}
-                      {imageNumber > 1 && (
-                        <div className={s.prevButtonWrapper} onClick={prevImg}>
-                          <div
-                            style={{
-                              backgroundImage: 'url(/instagramIcon.png)',
-                              backgroundPosition: '-130px -98px',
-                            }}></div>
-                        </div>
-                      )}
-                      {imageNumber < images.length && (
-                        <div className={s.nextButtonWrapper} onClick={nextImg}>
-                          <div
-                            style={{
-                              backgroundImage: 'url(/instagramIcon.png)',
-                              backgroundPosition: '-162px -98px',
-                            }}></div>
-                        </div>
-                      )}
-                    </div>
-                    <Content />
+                )
+              ) : (
+                <div className={s.contentWrap}>
+                  <div style={{ position: 'relative' }}>
+                    {images.map((props, index) => {
+                      return (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={index}
+                          className={s.croppedImg}
+                          src={props.croppedImage}
+                          alt="Cropped"
+                          style={{
+                            display: `${
+                              index + 1 === imageNumber ? 'block' : 'none'
+                            }`,
+                          }}
+                        />
+                      );
+                    })}
+                    {imageNumber > 1 && (
+                      <div className={s.prevButtonWrapper} onClick={prevImg}>
+                        <div
+                          style={{
+                            backgroundImage: 'url(/instagramIcon.png)',
+                            backgroundPosition: '-130px -98px',
+                          }}></div>
+                      </div>
+                    )}
+                    {imageNumber < images.length && (
+                      <div className={s.nextButtonWrapper} onClick={nextImg}>
+                        <div
+                          style={{
+                            backgroundImage: 'url(/instagramIcon.png)',
+                            backgroundPosition: '-162px -98px',
+                          }}></div>
+                      </div>
+                    )}
                   </div>
-              }
+                  <Content />
+                </div>
+              )}
             </div>
             <form>
               <input
@@ -455,6 +620,5 @@ type ContainerProps = {
 };
 
 const Container = styled.div<ContainerProps>`
-  display: ${({ index, current }) => current === index ? 'block' : 'none'};
+  display: ${({ index, current }) => (current === index ? 'block' : 'none')};
 `;
-
