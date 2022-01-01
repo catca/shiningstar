@@ -51,7 +51,7 @@ export const newPostSlice = createSlice({
         id: action.payload.id,
         exist: false,
         image: action.payload.image,
-        croppedImage: '',
+        croppedImage: action.payload.image,
         croppedAreaPixel: {
           width: 0,
           height: 0,

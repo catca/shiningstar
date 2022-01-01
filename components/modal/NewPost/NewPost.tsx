@@ -45,10 +45,12 @@ const NewPost: React.FC = () => {
     dispatch(setModal('newPost', false));
   };
 
-  const hiddenFileInput: any = React.useRef(null);
+  const hiddenFileInput: any = useRef<HTMLInputElement>(null);
 
   const handleClick = (event: any) => {
-    hiddenFileInput.current.click();
+    event.preventDefault();
+    let myInput: HTMLElement | null = document.getElementById("input");
+    myInput?.click();
   };
 
   function readFile(file: Blob) {
@@ -60,18 +62,11 @@ const NewPost: React.FC = () => {
   }
 
   const handleChange = async (event: any) => {
-    console.log(event.target.files);
     const fileUploaded = event.target.files[0];
-    console.log(fileUploaded);
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       let imageDataUrl: any = await readFile(file);
-      // // apply rotation if needed
-      // const orientation = await getOrientation(file)
-      // const rotation = ORIENTATION_TO_ANGLE[orientation]
-      // if (rotation) {
-      //   imageDataUrl = await getRotatedImage(imageDataUrl, rotation)
-      // }
+
       const postImage = {
         id: nextId.current,
         image: imageDataUrl,
@@ -80,10 +75,11 @@ const NewPost: React.FC = () => {
       setPostState(() => 'crop');
       if (nextId.current === 1) {
         dispatch(setPostImage(imageDataUrl));
+        setImageNumber(() => 1);
       } else {
         dispatch(addPostImage(postImage));
+        setImageNumber((imageNumber) => imageNumber + 1);
       }
-      setImageNumber(() => nextId.current);
       nextId.current += 1;
     }
   };
@@ -93,11 +89,11 @@ const NewPost: React.FC = () => {
       setPostState(() => 'content');
     }
   };
-
   const prevPostState = () => {
     if (postState === 'crop') {
       setPostState(() => 'newPost');
       dispatch(initPostImage());
+      nextId.current = 1;
     } else if (postState === 'content') {
       setPostState(() => 'crop');
     }
@@ -108,6 +104,50 @@ const NewPost: React.FC = () => {
   };
   const nextImg = () => {
     setImageNumber((imageNumber) => imageNumber + 1);
+  };
+
+
+  useEffect(() => {
+    dispatch(initPostImage());
+  }, []);
+
+  function clickClopEvent(event: {
+    target: any;
+    currentTarget: {
+      querySelector: (arg0: string) => {
+        (): any;
+        new(): any;
+        querySelectorAll: { (arg0: string): any; new(): any };
+      };
+    };
+  }) {
+    var target = event.target;
+
+    if (imageControl === false) return;
+
+    if (imageControlRef.current?.contains(target)) return;
+    setImageControl(false);
+  }
+
+  useEffect(() => {
+    console.log('num', imageNumber, nextId.current);
+  }, [imageNumber]);
+
+  const deleteImage = (e: any, deleteId: number) => {
+    console.log('deleteId', deleteId);
+    e.preventDefault();
+    if (images.length === 1) {
+      setPostState(() => 'newPost');
+      dispatch(initPostImage());
+      nextId.current = 1;
+    } else {
+      if (imageNumber === 1) {
+        setImageNumber(() => 1);
+      } else {
+        setImageNumber((imageNumber) => imageNumber - 1);
+      }
+    }
+    dispatch(deletePostImage({ id: deleteId }));
   };
 
   const Content: React.FC = () => {
@@ -204,40 +244,6 @@ const NewPost: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    dispatch(initPostImage());
-  }, []);
-
-  function clickClopEvent(event: {
-    target: any;
-    currentTarget: {
-      querySelector: (arg0: string) => {
-        (): any;
-        new (): any;
-        querySelectorAll: { (arg0: string): any; new (): any };
-      };
-    };
-  }) {
-    var target = event.target;
-    console.log(target, imageControlRef.current);
-    console.log(imageControlRef.current?.contains(target));
-
-    if (imageControl === false) return;
-
-    if (imageControlRef.current?.contains(target)) return;
-    setImageControl(false);
-  }
-
-  const deleteImage = (deleteId: number) => {
-    console.log('deleteId', deleteId);
-    if (imageNumber === 1) {
-      setPostState(() => 'newPost');
-    } else {
-      console.log(imageNumber);
-    }
-    dispatch(deletePostImage({ id: deleteId }));
-  };
-
   return (
     <>
       <div className={s.outerContainerPost} onClick={closeModal} />
@@ -287,8 +293,8 @@ const NewPost: React.FC = () => {
                 {postState === 'newPost'
                   ? '새 게시물 만들기'
                   : postState === 'crop'
-                  ? '자르기'
-                  : '새 게시물 만들기'}
+                    ? '자르기'
+                    : '새 게시물 만들기'}
               </h1>
             </div>
             <div>
@@ -332,11 +338,11 @@ const NewPost: React.FC = () => {
                   </div>
                 </div>
               ) : postState === 'crop' ? (
-                images[0].image && (
+                images[0]?.image && (
                   <div onClick={clickClopEvent}>
                     <div className={s.imageWrap}>
-                      {images.map((props) => {
-                        if (props.id === imageNumber) {
+                      {images.map((props, index) => {
+                        if (index === imageNumber - 1) {
                           return (
                             <div key={props.id}>
                               <Crop image={props.image} id={props.id} />
@@ -368,16 +374,13 @@ const NewPost: React.FC = () => {
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
                         style={{
-                          width: `${
-                            images.length * 94 + (images.length - 1) * 12 + 100
-                          }px`,
+                          width: `${images.length * 94 + (images.length - 1) * 12 + 100}px`,
                         }}>
                         <div
                           style={{
                             height: '94px',
-                            width: `${
-                              images.length * 94 + (images.length - 1) * 12
-                            }px`,
+                            width: `${images.length * 94 + (images.length - 1) * 12
+                              }px`,
                           }}>
                           <div
                             style={{ position: 'absolute', transform: 'none' }}>
@@ -398,10 +401,9 @@ const NewPost: React.FC = () => {
                                   style={{
                                     backgroundColor: 'rgba(0, 0, 0, 0)',
                                     height: '100%',
-                                    width: `${
-                                      images.length * 94 +
+                                    width: `${images.length * 94 +
                                       (images.length - 1) * 12
-                                    }px`,
+                                      }px`,
                                     display: 'flex',
                                   }}>
                                   {images.map((props, index) => {
@@ -412,10 +414,7 @@ const NewPost: React.FC = () => {
                                           backgroundColor: 'rgba(0, 0, 0, 0)',
                                           position: 'relative',
                                           marginRight: '12px',
-                                        }}
-                                        onClick={() =>
-                                          setImageNumber(() => index)
-                                        }>
+                                        }}>
                                         <img
                                           src={props.croppedImage}
                                           alt={props.image}
@@ -427,12 +426,16 @@ const NewPost: React.FC = () => {
                                             transition: 'none 0s ease 0s',
                                             width: '94px',
                                           }}
+                                          onClick={() =>
+                                            setImageNumber(() => index + 1)
+                                          }
                                         />
                                         <div
                                           role="button"
                                           className={s.thumbnailDeleteWrap}
-                                          onClick={() => deleteImage(props.id)}>
-                                          <button type="button">
+                                          onClick={(e) => deleteImage(e, props.id)}
+                                          style={{ display: `${index + 1 === imageNumber ? 'block' : 'none'}` }}>
+                                          <button type="button" style={{ cursor: 'pointer' }}>
                                             <div>
                                               <svg
                                                 aria-label="삭제"
@@ -565,9 +568,8 @@ const NewPost: React.FC = () => {
                           src={props.croppedImage}
                           alt="Cropped"
                           style={{
-                            display: `${
-                              index + 1 === imageNumber ? 'block' : 'none'
-                            }`,
+                            display: `${index + 1 === imageNumber ? 'block' : 'none'
+                              }`,
                           }}
                         />
                       );
@@ -595,10 +597,11 @@ const NewPost: React.FC = () => {
                 </div>
               )}
             </div>
-            <form>
+            <form >
               <input
                 accept="image/jpeg,image/png,image/heic,image/heif"
                 type="file"
+                id="input"
                 ref={hiddenFileInput}
                 onChange={handleChange}
                 style={{ display: 'none' }}

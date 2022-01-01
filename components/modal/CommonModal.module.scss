@@ -250,7 +250,7 @@
 
 .innerContainerPost {
   position: absolute;
-  max-width: 855px;
+  max-width: 958px;
   min-width: 348px;
   min-height: 391px;
   max-height: 898px;
@@ -324,8 +324,8 @@
   flex-direction: row;
   width: calc(100vmin - 219px);
   height: calc(100vmin - 219px);
-  max-height: min(calc(100vw - 372px),855px);
-  max-width: min(calc(100vw - 372px),855px);
+  max-height: min(calc(100vw - 332px),895px);
+  max-width: min(calc(100vw - 332px),958px);
   min-height: 348px;
   min-width: 348px;
   & > div {

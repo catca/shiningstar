@@ -133,15 +133,15 @@ const containerStyle = {
 
 const mediaStyle: any = {
   color: 'rgba(0, 0, 0, 0)',
-  height: '100%',
-  width: '100%',
+  // height: '100%',
+  // width: '100%',
   objectFit: 'contain',
 }
 
 const cropAreaStyle = {
   color: 'rgba(0, 0, 0, 0)',
-  height: '100%',
-  width: '100%',
+  // height: '100%',
+  // width: '100%',
 }
 
 export default React.memo(Crop);
