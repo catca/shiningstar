@@ -15,6 +15,16 @@ const dataUrlToFile = async (dataUrl: string, fileName: string, mimeType: string
   return new File([blob], fileName, { type: mimeType });
 }
 
+var storage = multer.diskStorage({
+  destination: (_req, _file, cb) => {
+    cb(null, './public/uploads/')
+  },
+  filename: (_req, file, cb) => {
+    cb(null, `${Date.now()}_${file.originalname}`)
+  },
+})
+var upload = multer({ storage: storage }).array("file");
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -23,34 +33,21 @@ export default async function handler(
   await dbConnect();
   switch (method) {
     case 'POST':
-      const authorization = req.headers.authorization;
-      let user;
-      if (authorization?.slice(undefined, 6) === 'Bearer') {
-        user = await User.findOne({ token: authorization?.slice(7) });
-      }
+      console.log(req);
+      upload(req, res, err => {
+        if (err) {
+          return res.json({ success: false, err })
+        }
+        return res.json({ success: true })
+      })
 
-      var file = dataUrlToFile(req.body[0].croppedImage, 'test.gif', 'image/gif');
-      // var storage = multer.diskStorage({
-      //   destination: function (req: any, file: any, cb: (arg0: null, arg1: string) => void) {
-      //     cb(null, "./public/uploads");
-      //   },
-      //   filename: function (req: any, file: { originalname: any; }, cb: (arg0: null, arg1: string) => void) {
-      //     const nowDate = Date.now();
-      //     cb(null, `${nowDate}_${file.originalname}`);
-      //   },
-      //   fileFilter: function (req: any, file: { originalname: any; }, callback: (arg0: Error | null, arg1: boolean | undefined) => void) {
-      //     var ext = path.extname(file.originalname);
-      //     if (ext !== ".png" && ext !== ".jpg" && ext !== ".jpeg") {
-      //       return callback(null, false);
-      //     }
-      //     callback(null, true);
-      //   },
-      //   limits: {
-      //     fileSize: 1024 * 1024,
-      //   },
-      // });
-      // var upload = multer({ storage: storage });
-      res.status(200).json({ file: file })
+      // const authorization = req.headers.authorization;
+      // let user;
+      // if (authorization?.slice(undefined, 6) === 'Bearer') {
+      //   user = await User.findOne({ token: authorization?.slice(7) });
+      // }
+
+      // var file = dataUrlToFile(req.body[0].croppedImage, 'test.gif', 'image/gif');
       break;
     default:
       res.status(500).json({ success: false });

@@ -19,6 +19,8 @@ import classNames from 'classnames';
 import ProfileImage from 'components/profile/ProfileImage';
 import Link from 'next/link';
 import styled from '@emotion/styled';
+import axios from 'axios';
+import { NEXT_SERVER } from 'config';
 
 interface ModalProps {
   modalData: ModalDataType[];
@@ -149,6 +151,43 @@ const NewPost: React.FC = () => {
     }
     dispatch(deletePostImage({ id: deleteId }));
   };
+
+  const postContent = () => {
+    var formdata = new FormData();
+    for (let j = 0; j < images.length; j++) {
+      const imgDataUrl = images[j].croppedImage;
+      var blobBin = atob(imgDataUrl.split(',')[1]);	// base64 데이터 디코딩
+      var array = [];
+      for (var i = 0; i < blobBin.length; i++) {
+        array.push(blobBin.charCodeAt(i));
+      }
+      var file = new Blob([new Uint8Array(array)], { type: 'image/png' });	// Blob 생성
+      formdata.append("file", file);
+    }
+    /* key 확인하기 */
+    for (let key of formdata.keys()) {
+      console.log(key);
+    }
+
+    /* value 확인하기 */
+    for (let value of formdata.values()) {
+      console.log(value);
+    }
+    axios.post(`${NEXT_SERVER}/test/newPost`, formdata, {
+      headers: {
+        'Content-Type': `multipart/form-data`
+      },
+      onUploadProgress: (event) => {
+        console.log(`Current progress:`, Math.round((event.loaded * 100) / event.total));
+      },
+    })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  }
 
   const Content: React.FC = () => {
     return (
@@ -302,7 +341,7 @@ const NewPost: React.FC = () => {
                 {postState === 'crop' ? (
                   <button onClick={nextPostState}>다음</button>
                 ) : postState === 'content' ? (
-                  <button>공유하기</button>
+                  <button onClick={postContent}>공유하기</button>
                 ) : null}
               </div>
             </div>
