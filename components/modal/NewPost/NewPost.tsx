@@ -34,6 +34,7 @@ const NewPost: React.FC = () => {
   const [zoom, setZoom] = useState<number>(1);
   const [imageControl, setImageControl] = useState<boolean>(false);
   const [text, setText] = useState<number>(0);
+  const [content, setContent] = useState<string>('');
   const images = useSelector(selectNewPost);
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ const NewPost: React.FC = () => {
 
   const handleChange = async (event: any) => {
     const fileUploaded = event.target.files[0];
+    console.log(fileUploaded);
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       let imageDataUrl: any = await readFile(file);
@@ -72,11 +74,12 @@ const NewPost: React.FC = () => {
       const postImage = {
         id: nextId.current,
         image: imageDataUrl,
+        name: fileUploaded.name,
       };
 
       setPostState(() => 'crop');
       if (nextId.current === 1) {
-        dispatch(setPostImage(imageDataUrl));
+        dispatch(setPostImage(postImage));
         setImageNumber(() => 1);
       } else {
         dispatch(addPostImage(postImage));
@@ -117,8 +120,8 @@ const NewPost: React.FC = () => {
     currentTarget: {
       querySelector: (arg0: string) => {
         (): any;
-        new (): any;
-        querySelectorAll: { (arg0: string): any; new (): any };
+        new(): any;
+        querySelectorAll: { (arg0: string): any; new(): any };
       };
     };
   }) {
@@ -151,6 +154,10 @@ const NewPost: React.FC = () => {
     dispatch(deletePostImage({ id: deleteId }));
   };
 
+  const changeContent = (e: any) => {
+    setContent(e.target.value);
+  }
+
   const postContent = () => {
     var formdata = new FormData();
     for (let j = 0; j < images.length; j++) {
@@ -161,8 +168,9 @@ const NewPost: React.FC = () => {
         array.push(blobBin.charCodeAt(i));
       }
       var file = new Blob([new Uint8Array(array)], { type: 'image/png' }); // Blob 생성
-      formdata.append('file', file);
+      formdata.append('file', file, images[j].name);
     }
+    formdata.append('content', content);
     /* key 확인하기 */
     for (let key of formdata.keys()) {
       console.log(key);
@@ -176,6 +184,7 @@ const NewPost: React.FC = () => {
       .post(`${NEXT_SERVER}/test/newPost`, formdata, {
         headers: {
           'Content-Type': `multipart/form-data`,
+          Authorization: `Bearer ${userInfo.accessToken}`,
         },
         onUploadProgress: (event) => {
           console.log(
@@ -190,100 +199,6 @@ const NewPost: React.FC = () => {
       .catch((error) => {
         console.log(error);
       });
-  };
-
-  const Content: React.FC = () => {
-    return (
-      <div className={s.contentWrapContent}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', margin: '16px' }}>
-            <div style={{ marginRight: '12px' }}>
-              <Link href={`/${userInfo.username}`}>
-                <a>
-                  <ProfileImage
-                    size={'nav'}
-                    border={true}
-                    borderColor={'black'}
-                    imageUrl={userInfo.profileImageUrl}
-                  />
-                </a>
-              </Link>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                fontWeight: 'bold',
-                color: '#262626',
-              }}>
-              <div>{userInfo.username}</div>
-            </div>
-          </div>
-          <div style={{ width: '100%' }}>
-            <textarea
-              name=""
-              id=""
-              placeholder="문구 입력..."
-              autoComplete="none"
-              autoCorrect="none"
-              spellCheck="false"
-              style={{
-                boxSizing: 'border-box',
-                border: 'none',
-                resize: 'none',
-                padding: '0 16px',
-                width: '100%',
-                height: '168px',
-                outline: 'none',
-                overflow: 'auto',
-                lineHeight: '16px',
-                fontSize: '16px',
-              }}
-            />
-          </div>
-        </div>
-        <div style={{ display: 'flex' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              padding: '4px 8px',
-              width: '100%',
-            }}>
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                backgroundColor: '#fff',
-                border: 'none',
-                padding: '8px',
-                cursor: 'pointer',
-              }}>
-              <svg
-                aria-label="이모티콘"
-                color="#8e8e8e"
-                fill="#8e8e8e"
-                height="20"
-                role="img"
-                viewBox="0 0 24 24"
-                width="20">
-                <path d="M15.83 10.997a1.167 1.167 0 101.167 1.167 1.167 1.167 0 00-1.167-1.167zm-6.5 1.167a1.167 1.167 0 10-1.166 1.167 1.167 1.167 0 001.166-1.167zm5.163 3.24a3.406 3.406 0 01-4.982.007 1 1 0 10-1.557 1.256 5.397 5.397 0 008.09 0 1 1 0 00-1.55-1.263zM12 .503a11.5 11.5 0 1011.5 11.5A11.513 11.513 0 0012 .503zm0 21a9.5 9.5 0 119.5-9.5 9.51 9.51 0 01-9.5 9.5z" />
-              </svg>
-            </button>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <div style={{ padding: '0 16px', fontSize: '12px' }}>
-              {text}/2500
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   return (
@@ -335,8 +250,8 @@ const NewPost: React.FC = () => {
                 {postState === 'newPost'
                   ? '새 게시물 만들기'
                   : postState === 'crop'
-                  ? '자르기'
-                  : '새 게시물 만들기'}
+                    ? '자르기'
+                    : '새 게시물 만들기'}
               </h1>
             </div>
             <div>
@@ -416,16 +331,14 @@ const NewPost: React.FC = () => {
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
                         style={{
-                          width: `${
-                            images.length * 94 + (images.length - 1) * 12 + 100
-                          }px`,
+                          width: `${images.length * 94 + (images.length - 1) * 12 + 100
+                            }px`,
                         }}>
                         <div
                           style={{
                             height: '94px',
-                            width: `${
-                              images.length * 94 + (images.length - 1) * 12
-                            }px`,
+                            width: `${images.length * 94 + (images.length - 1) * 12
+                              }px`,
                           }}>
                           <div
                             style={{ position: 'absolute', transform: 'none' }}>
@@ -446,10 +359,9 @@ const NewPost: React.FC = () => {
                                   style={{
                                     backgroundColor: 'rgba(0, 0, 0, 0)',
                                     height: '100%',
-                                    width: `${
-                                      images.length * 94 +
+                                    width: `${images.length * 94 +
                                       (images.length - 1) * 12
-                                    }px`,
+                                      }px`,
                                     display: 'flex',
                                   }}>
                                   {images.map((props, index) => {
@@ -483,11 +395,10 @@ const NewPost: React.FC = () => {
                                             deleteImage(e, props.id)
                                           }
                                           style={{
-                                            display: `${
-                                              index + 1 === imageNumber
-                                                ? 'block'
-                                                : 'none'
-                                            }`,
+                                            display: `${index + 1 === imageNumber
+                                              ? 'block'
+                                              : 'none'
+                                              }`,
                                           }}>
                                           <button
                                             type="button"
@@ -624,9 +535,8 @@ const NewPost: React.FC = () => {
                           src={props.croppedImage}
                           alt="Cropped"
                           style={{
-                            display: `${
-                              index + 1 === imageNumber ? 'block' : 'none'
-                            }`,
+                            display: `${index + 1 === imageNumber ? 'block' : 'none'
+                              }`,
                           }}
                         />
                       );
@@ -650,7 +560,100 @@ const NewPost: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <Content />
+                  <div className={s.contentWrapContent}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <div style={{ display: 'flex', margin: '16px' }}>
+                        <div style={{ marginRight: '12px' }}>
+                          <Link href={`/${userInfo.username}`}>
+                            <a>
+                              <ProfileImage
+                                size={'nav'}
+                                border={true}
+                                borderColor={'black'}
+                                imageUrl={userInfo.profileImageUrl}
+                              />
+                            </a>
+                          </Link>
+                        </div>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontWeight: 'bold',
+                            color: '#262626',
+                          }}>
+                          <div>{userInfo.username}</div>
+                        </div>
+                      </div>
+                      <div style={{ width: '100%' }}>
+                        <form>
+                          <textarea
+                            name="content"
+                            id="content"
+                            key="content"
+                            value={content}
+                            onChange={changeContent}
+                            placeholder="문구 입력..."
+                            autoComplete="none"
+                            autoCorrect="none"
+                            spellCheck="false"
+                            style={{
+                              boxSizing: 'border-box',
+                              border: 'none',
+                              resize: 'none',
+                              padding: '0 16px',
+                              width: '100%',
+                              height: '168px',
+                              outline: 'none',
+                              overflow: 'auto',
+                              lineHeight: '16px',
+                              fontSize: '16px',
+                            }}
+                          />
+                        </form>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '4px 8px',
+                          width: '100%',
+                        }}>
+                        <button
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: '#fff',
+                            border: 'none',
+                            padding: '8px',
+                            cursor: 'pointer',
+                          }}>
+                          <svg
+                            aria-label="이모티콘"
+                            color="#8e8e8e"
+                            fill="#8e8e8e"
+                            height="20"
+                            role="img"
+                            viewBox="0 0 24 24"
+                            width="20">
+                            <path d="M15.83 10.997a1.167 1.167 0 101.167 1.167 1.167 1.167 0 00-1.167-1.167zm-6.5 1.167a1.167 1.167 0 10-1.166 1.167 1.167 1.167 0 001.166-1.167zm5.163 3.24a3.406 3.406 0 01-4.982.007 1 1 0 10-1.557 1.256 5.397 5.397 0 008.09 0 1 1 0 00-1.55-1.263zM12 .503a11.5 11.5 0 1011.5 11.5A11.513 11.513 0 0012 .503zm0 21a9.5 9.5 0 119.5-9.5 9.51 9.51 0 01-9.5 9.5z" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}>
+                        <div style={{ padding: '0 16px', fontSize: '12px' }}>
+                          {text}/2500
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

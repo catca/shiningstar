@@ -3,29 +3,16 @@ import nextConnect from 'next-connect';
 
 import User from 'lib/mongoDB/models/User';
 import Board from 'lib/mongoDB/models/Board';
-import Follow from 'lib/mongoDB/models/Follow';
 import { connectToDatabase } from 'lib/mongoDB/mongodb';
-import { NextApiRequest, NextApiResponse } from 'next';
 
 import multer from 'multer';
-import path from 'path';
-import axios from 'axios';
-
-const dataUrlToFile = async (
-  dataUrl: string,
-  fileName: string,
-  mimeType: string,
-): Promise<File> => {
-  const res = await axios(dataUrl);
-  const blob: Blob = res.data;
-  return new File([blob], fileName, { type: mimeType });
-};
 
 var storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
     cb(null, './public/uploads/');
   },
   filename: (_req, file, cb) => {
+    console.log(file);
     cb(null, `${Date.now()}_${file.originalname}`);
   },
 });
@@ -35,15 +22,37 @@ const uploadMiddleware = upload.array('file');
 
 const apiRoute = nextConnect({
   // Handle any other HTTP method
-  onNoMatch: (req, res) => {
+  onNoMatch: (req, res: any) => {
     res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
   },
 });
 
 apiRoute.use(uploadMiddleware);
 
-apiRoute.post((req, res) => {
-  res.status(200).json({ data: 'success' });
+apiRoute.post(async (req: any, res: any) => {
+  await dbConnect();
+  const authorization = req.headers.authorization;
+  let user;
+  if (authorization?.slice(undefined, 6) === 'Bearer') {
+    user = await User.findOne({ token: authorization?.slice(7) });
+  }
+  const boardImageUrl = req.files.map((file: { path: string; }) => file.path.replace(/public/gi, "").replace(/\\/gi, "/"));
+  const boardData = {
+    username: user.username,
+    name: user.name,
+    content: req.body.content,
+    boardImageUrl: boardImageUrl,
+    createDate: new Date(),
+    modifiedDate: new Date(),
+  }
+  const board = new Board(boardData);
+  board.save((err: any, doc: any) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({ success: false, err });
+    }
+    res.status(200).json({ success: true });
+  });
 });
 
 export default apiRoute;

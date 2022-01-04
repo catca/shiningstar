@@ -3,6 +3,7 @@ import { RootState } from '../store';
 
 interface NewPostSliceProps {
   id: number;
+  name: string;
   exist: boolean;
   image: string;
   croppedImage: string;
@@ -14,6 +15,12 @@ interface NewPostSliceProps {
   }
 }
 
+interface UpdateImage {
+  id: number;
+  name: string;
+  image: string;
+}
+
 interface UpdateCroppedImage {
   id: number;
   croppedImage: string;
@@ -21,6 +28,7 @@ interface UpdateCroppedImage {
 
 const initialState: NewPostSliceProps[] = [{
   id: 1,
+  name: '',
   exist: false,
   image: '',
   croppedImage: '',
@@ -42,13 +50,15 @@ export const newPostSlice = createSlice({
       }
       state[0] = initialState[0];
     },
-    SET_POST_IMAGE: (state, action: PayloadAction<string>) => {
-      state[0].image = action.payload;
+    SET_POST_IMAGE: (state, action: PayloadAction<UpdateImage>) => {
+      state[0].image = action.payload.image;
+      state[0].name = action.payload.name;
     },
-    ADD_POST_IMAGE: (state, action: PayloadAction<any>) => {
+    ADD_POST_IMAGE: (state, action: PayloadAction<UpdateImage>) => {
       console.log('add', action.payload)
       state.push({
         id: action.payload.id,
+        name: action.payload.name,
         exist: false,
         image: action.payload.image,
         croppedImage: action.payload.image,
@@ -84,13 +94,13 @@ export const initPostImage = () => {
   };
 };
 
-export const setPostImage = (data: string) => {
+export const setPostImage = (data: UpdateImage) => {
   return async (dispatch: any) => {
     dispatch(SET_POST_IMAGE(data));
   };
 };
 
-export const addPostImage = (data: any) => {
+export const addPostImage = (data: UpdateImage) => {
   return async (dispatch: any) => {
     dispatch(ADD_POST_IMAGE(data));
   };

@@ -28,7 +28,6 @@ const BoardSchema = new mongoose.Schema<BoardProps>({
   },
   imageUrl: {
     type: String,
-    required: true,
     unique: false,
   },
   boardImageUrl: {
@@ -43,7 +42,6 @@ const BoardSchema = new mongoose.Schema<BoardProps>({
   },
   location: {
     type: String,
-    required: true,
     unique: false,
   },
   createDate: {
