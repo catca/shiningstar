@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import s from './Navbar.module.css';
+import s from './Navbar.module.scss';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, selectUser } from 'lib/redux/user/userSlice';
 import { selectModal, setModal } from 'lib/redux/modal/modalSlice';
-
-import HomeIcon from '@material-ui/icons/Home';
-import TelegramIcon from '@material-ui/icons/Telegram';
-import ExploreIcon from '@material-ui/icons/Explore';
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
-import AddIcon from '@material-ui/icons/Add';
 
 import ProfileImage from 'components/profile/ProfileImage';
 import UserSearchList from './SearchBox';
@@ -19,12 +13,11 @@ import NewPost from 'components/modal/NewPost';
 
 import { getBase3UserProfile } from 'lib/redux/profile/profileApis';
 import { BaseUser3 } from 'types/profile/types';
-import { LogoutRounded } from '@mui/icons-material';
+import { HomeIcon, DirectIcon, ExploreIcon, FavoriteIcon, NewPostIcon } from 'components/ui/Icon';
 
 const Navbar = () => {
   const { userInfo } = useSelector(selectUser);
   const { showModal } = useSelector(selectModal);
-  const [newPost, setNewPost] = useState(false);
   const [userList, setUserList] = React.useState<BaseUser3[]>([]);
   const dispatch = useDispatch();
 
@@ -91,59 +84,44 @@ const Navbar = () => {
             <div className={s.rightBanner}>
               <Link href="/">
                 <a>
-                  <HomeIcon style={{ fontSize: '30px' }} />
+                  <HomeIcon />
                 </a>
               </Link>
               <Link href="/direct">
                 <a>
-                  <TelegramIcon
-                    color={'disabled'}
-                    style={{ fontSize: '30px' }}
-                  />
+                  <DirectIcon />
                 </a>
               </Link>
 
               <Link href="/explore">
                 <a>
-                  <ExploreIcon
-                    color={'disabled'}
-                    style={{ fontSize: '30px' }}
-                  />
+                  <ExploreIcon />
                 </a>
               </Link>
 
-              <Link href="/">
-                <a>
-                  <FavoriteBorderIcon
-                    color={'disabled'}
-                    style={{ fontSize: '30px' }}
-                    onClick={() => dispatch(logout())}
-                  />
-                </a>
-              </Link>
+              <div onClick={() => dispatch(logout())}>
+                <FavoriteIcon />
+              </div>
 
-              {/* 이건 고민해봐야함  */}
-              <Link href="/">
-                <a>
-                  <AddIcon
-                    color={'disabled'}
-                    style={{ fontSize: '30px' }}
-                    onClick={() => dispatch(setModal('newPost', true))}
-                  />
-                </a>
-              </Link>
+              <div onClick={() => dispatch(setModal('newPost', true))}>
+                <div>
+                  <NewPostIcon />
+                </div>
+              </div>
 
               {/* TODO:누르면 메뉴바 나오도록 */}
-              <Link href={`/${userInfo.username}`}>
-                <a>
-                  <ProfileImage
-                    size={'nav'}
-                    border={true}
-                    borderColor={'black'}
-                    imageUrl={userInfo.profileImageUrl}
-                  />
-                </a>
-              </Link>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Link href={`/${userInfo.username}`} >
+                  <a style={{ transform: 'translateY(-2px)' }}>
+                    <ProfileImage
+                      size={'nav'}
+                      border={true}
+                      borderColor={'black'}
+                      imageUrl={userInfo.profileImageUrl}
+                    />
+                  </a>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -3,7 +3,6 @@ import nextConnect from 'next-connect';
 
 import User from 'lib/mongoDB/models/User';
 import Board from 'lib/mongoDB/models/Board';
-import { connectToDatabase } from 'lib/mongoDB/mongodb';
 
 import multer from 'multer';
 
