@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 export interface FavoriteProps {
-  commentsId: string;
+  boardId: string;
   username: string;
   createDate: Date;
 }
@@ -12,7 +12,7 @@ const BoardFavSchema = new mongoose.Schema<FavoriteProps>({
     required: true,
     unique: false,
   },
-  commentsId: {
+  boardId: {
     type: String,
     required: true,
     unique: false,
@@ -23,5 +23,5 @@ const BoardFavSchema = new mongoose.Schema<FavoriteProps>({
   },
 });
 
-export default mongoose.models.BoardFav ||
-  mongoose.model('BoardFav', BoardFavSchema, 'boardFavorites');
+export default mongoose.models.BoardFavorite ||
+  mongoose.model('BoardFavorite', BoardFavSchema, 'boardFavorites');

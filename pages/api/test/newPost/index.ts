@@ -6,6 +6,7 @@ import Board from 'lib/mongoDB/models/Board';
 import { connectToDatabase } from 'lib/mongoDB/mongodb';
 
 import multer from 'multer';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 var storage = multer.diskStorage({
   destination: (_req, _file, cb) => {
@@ -22,7 +23,7 @@ const uploadMiddleware = upload.array('file');
 
 const apiRoute = nextConnect({
   // Handle any other HTTP method
-  onNoMatch: (req, res: any) => {
+  onNoMatch: (req: NextApiRequest, res: NextApiResponse) => {
     res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
   },
 });
@@ -36,7 +37,9 @@ apiRoute.post(async (req: any, res: any) => {
   if (authorization?.slice(undefined, 6) === 'Bearer') {
     user = await User.findOne({ token: authorization?.slice(7) });
   }
-  const boardImageUrl = req.files.map((file: { path: string; }) => file.path.replace(/public/gi, "").replace(/\\/gi, "/"));
+  const boardImageUrl = req.files.map((file: { path: string }) =>
+    file.path.replace(/public/gi, '').replace(/\\/gi, '/'),
+  );
   const boardData = {
     username: user.username,
     name: user.name,
@@ -44,7 +47,7 @@ apiRoute.post(async (req: any, res: any) => {
     boardImageUrl: boardImageUrl,
     createDate: new Date(),
     modifiedDate: new Date(),
-  }
+  };
   const board = new Board(boardData);
   board.save((err: any, doc: any) => {
     if (err) {

@@ -47,6 +47,7 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
     modifiedDate: new Date().toString(),
     reReply: [],
   });
+
   const [favorite, setFavorite] = React.useState<number>(0);
   const [pressFavorite, setPressFavorite] = React.useState<boolean>(false);
   const textareaRef = React.useRef<any>(null);
@@ -115,7 +116,7 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
   React.useEffect(() => {
     if (selectedBoard !== undefined) {
       setFavorite(selectedBoard.favoriteCnt);
-      // idInListChecker(selectedBoard.favorite, userInfo.username)
+      // idInListChecker(selectedBoard.favorite, userInfo.username);
       //   ? setPressFavorite(true)
       //   : setPressFavorite(false);
     }
