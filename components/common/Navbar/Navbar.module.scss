@@ -23,9 +23,16 @@
   align-items: center;
 }
 .rightBanner {
-  display: grid;
+  display: flex;
   width: 200px;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  justify-content: space-between;
+  & > a {
+    height: 24px;
+  }
+  & > div {
+    height: 24px;
+    cursor: pointer;
+  }
 }
 
 .input {
@@ -55,7 +62,7 @@
   }
 
   .rightBanner {
-  width: 260px;
+    width: 260px;
   }
 }
 @media (min-width:1040px) {

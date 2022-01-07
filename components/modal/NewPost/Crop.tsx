@@ -24,7 +24,6 @@ const Crop = ({ image, id }: CropProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState<number>(1);
   const [zoomButton, setZoomButton] = useState<boolean>(false);
-  const [imageControl, setImageControl] = useState<boolean>(false);
   const newPostData = useSelector(selectNewPost);
   const zoomRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();

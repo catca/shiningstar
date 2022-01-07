@@ -4,13 +4,11 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { ProfileImage } from 'components/profile';
 import Link from 'next/link';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import { postFormatNumber } from 'lib/common';
-import ExploreIcon from '@material-ui/icons/Explore';
 import Swipe from 'react-easy-swipe';
 
 import { Board } from 'types/profile/types';
+import { FavoriteIcon, CommentIcon, DirectIcon, MarkIcon, EmoticonIcon, SeeMoreIcon } from 'components/ui/Icon';
 
 const Post = ({ postData }: { postData: Board }) => {
   const [imgCount, setImgCount] = useState(1);
@@ -81,7 +79,7 @@ const Post = ({ postData }: { postData: Board }) => {
               <button>
                 <div>
                   <div>
-                    <MoreHorizIcon />
+                    <SeeMoreIcon />
                   </div>
                 </div>
               </button>
@@ -138,22 +136,22 @@ const Post = ({ postData }: { postData: Board }) => {
               <IconSection imgLength={postData.boardImageUrl.length}>
                 <span>
                   <button>
-                    <FavoriteBorderIcon />
+                    <FavoriteIcon />
                   </button>
                 </span>
                 <span>
                   <button>
-                    <FavoriteBorderIcon />
+                    <CommentIcon />
                   </button>
                 </span>
                 <span>
                   <button>
-                    <FavoriteBorderIcon />
+                    <DirectIcon />
                   </button>
                 </span>
                 <span>
                   <button>
-                    <FavoriteBorderIcon />
+                    <MarkIcon />
                   </button>
                 </span>
               </IconSection>
@@ -234,7 +232,7 @@ const Post = ({ postData }: { postData: Board }) => {
                 <div>
                   <form>
                     <IconButton>
-                      <FavoriteBorderIcon />
+                      <EmoticonIcon />
                     </IconButton>
                     <textarea
                       placeholder="댓글 달기..."
