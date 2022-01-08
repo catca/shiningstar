@@ -4,7 +4,7 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { ProfileImage } from 'components/profile';
 import Link from 'next/link';
-import { postFormatNumber } from 'lib/common';
+import { postFormatNumber, timeConvert } from 'lib/common';
 import Swipe from 'react-easy-swipe';
 
 import { Board } from 'types/profile/types';
@@ -226,7 +226,7 @@ const Post = ({ postData }: { postData: Board }) => {
                 </div>
               </WriteWrapper>
               <TimeWrapper>
-                <time>1시간 전</time>
+                <time>{timeConvert(postData.createdDate)}</time>
               </TimeWrapper>
               <CommentSection>
                 <div>

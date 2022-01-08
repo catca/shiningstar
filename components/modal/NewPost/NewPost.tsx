@@ -21,6 +21,7 @@ import Link from 'next/link';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { NEXT_SERVER } from 'config';
+import { EmoticonIcon } from 'components/ui/Icon';
 
 interface ModalProps {
   modalData: ModalDataType[];
@@ -44,6 +45,7 @@ const NewPost: React.FC = () => {
       | React.MouseEvent<SVGSVGElement, MouseEvent>,
   ) => {
     e.preventDefault();
+    document.body.style.overflow = "unset";
     dispatch(initPostImage());
     dispatch(setModal('newPost', false));
   };
@@ -200,6 +202,10 @@ const NewPost: React.FC = () => {
         console.log(error);
       });
   };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+  }, []);
 
   return (
     <>
@@ -597,6 +603,7 @@ const NewPost: React.FC = () => {
                             autoComplete="none"
                             autoCorrect="none"
                             spellCheck="false"
+                            maxLength={2500}
                             style={{
                               boxSizing: 'border-box',
                               border: 'none',
@@ -630,16 +637,7 @@ const NewPost: React.FC = () => {
                             padding: '8px',
                             cursor: 'pointer',
                           }}>
-                          <svg
-                            aria-label="이모티콘"
-                            color="#8e8e8e"
-                            fill="#8e8e8e"
-                            height="20"
-                            role="img"
-                            viewBox="0 0 24 24"
-                            width="20">
-                            <path d="M15.83 10.997a1.167 1.167 0 101.167 1.167 1.167 1.167 0 00-1.167-1.167zm-6.5 1.167a1.167 1.167 0 10-1.166 1.167 1.167 1.167 0 001.166-1.167zm5.163 3.24a3.406 3.406 0 01-4.982.007 1 1 0 10-1.557 1.256 5.397 5.397 0 008.09 0 1 1 0 00-1.55-1.263zM12 .503a11.5 11.5 0 1011.5 11.5A11.513 11.513 0 0012 .503zm0 21a9.5 9.5 0 119.5-9.5 9.51 9.51 0 01-9.5 9.5z" />
-                          </svg>
+                          <EmoticonIcon />
                         </button>
                       </div>
                       <div
@@ -649,7 +647,7 @@ const NewPost: React.FC = () => {
                           justifyContent: 'center',
                         }}>
                         <div style={{ padding: '0 16px', fontSize: '12px' }}>
-                          {text}/2500
+                          {content.length}/2500
                         </div>
                       </div>
                     </div>

@@ -5,7 +5,7 @@ import s from './Navbar.module.scss';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, selectUser } from 'lib/redux/user/userSlice';
-import { selectModal, setModal } from 'lib/redux/modal/modalSlice';
+import { setModal } from 'lib/redux/modal/modalSlice';
 
 import ProfileImage from 'components/profile/ProfileImage';
 import UserSearchList from './SearchBox';
@@ -17,7 +17,6 @@ import { HomeIcon, DirectIcon, ExploreIcon, FavoriteIcon, NewPostIcon } from 'co
 
 const Navbar = () => {
   const { userInfo } = useSelector(selectUser);
-  const { showModal } = useSelector(selectModal);
   const [userList, setUserList] = React.useState<BaseUser3[]>([]);
   const dispatch = useDispatch();
 
@@ -126,7 +125,6 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-      {showModal.newPost && <NewPost />}
     </>
   );
 };
