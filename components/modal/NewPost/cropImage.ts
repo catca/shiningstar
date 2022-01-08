@@ -15,12 +15,12 @@ const createImage = (url: string) =>
 export default async function getCroppedImg(imageSrc: string, pixelCrop: { width: number; height: number; x: number; y: number }) {
     const image: any = await createImage(imageSrc)
     const canvas = document.createElement('canvas')
-    canvas.width = pixelCrop.width
-    canvas.height = pixelCrop.height
+    canvas.width = 614
+    canvas.height = 614
     const ctx = canvas.getContext('2d')
 
     ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.fillRect(0, 0, 614, 614)
     ctx.drawImage(
         image,
         pixelCrop.x,
@@ -29,8 +29,8 @@ export default async function getCroppedImg(imageSrc: string, pixelCrop: { width
         pixelCrop.height,
         0,
         0,
-        pixelCrop.width,
-        pixelCrop.height
+        614,
+        614
     )
 
     // As Base64 string

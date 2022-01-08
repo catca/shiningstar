@@ -59,3 +59,8 @@ export function idNotInList<T extends { id: string }>(
     }
   });
 }
+
+export const timeConvert = (time: number | string | any) => {
+
+  return time;
+}
