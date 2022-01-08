@@ -50,8 +50,15 @@ export default async function handler(
 
           user.save((err: any, doc: any) => {
             if (err) return res.status(500).json({ success: false, err });
-            const profile = new Profile({ username: req.body.username, name: req.body.name });
-            console.log(profile);
+            const profile = new Profile({
+              username: req.body.username,
+              name: req.body.name,
+              webSite: '',
+              introduce: '',
+              email: '',
+              phone: '',
+              gender: '',
+            });
             profile.save((err: any, doc: any) => {
               if (err) return res.status(500).json({ success: false, err });
             });

@@ -3,27 +3,29 @@ import s from '../AccountCommon.module.css';
 
 import ProfileInput from 'components/ui/Input';
 import { ProfileImage } from 'components/profile';
-import { EditUserProfile, Sex } from 'types/accounts/types';
+import { EditUserProfile, Gender } from 'types/accounts/types';
 
 import { useSelector } from 'react-redux';
-import { selectLogin } from 'lib/redux/login/loginSlice';
+import { selectUser } from 'lib/redux/user/userSlice';
 import { accountEditMap } from 'lib/redux/accounts/accountsApis';
 
 import cn from 'classnames';
+import axios from 'axios';
+import { NEXT_SERVER } from 'config';
 
 const AccountEdit = () => {
-  const { myUserInfo } = useSelector(selectLogin);
+  const { userInfo } = useSelector(selectUser);
 
   const [userProfile, setUserProfile] = React.useState<EditUserProfile>({
-    id: '',
+    username: '',
     name: '',
     webSite: '',
     introduce: '',
     email: '',
     phone: '',
-    sex: '비공개',
+    gender: '비공개',
   });
-  const selectBox: Sex[] = ['남성', '여성', '비공개'];
+  const selectBox: Gender[] = ['남성', '여성', '비공개'];
 
   const accountMap = accountEditMap;
 
@@ -38,26 +40,34 @@ const AccountEdit = () => {
   };
 
   React.useEffect(() => {
-    setUserProfile({
-      id: myUserInfo.id,
-      name: myUserInfo.name,
-      webSite: myUserInfo.webSite,
-      introduce: myUserInfo.introduce,
-      email: myUserInfo.email,
-      phone: myUserInfo.phone,
-      sex: myUserInfo.sex,
-    });
-  }, [myUserInfo]);
+    axios
+      .get(`${NEXT_SERVER}/v1/profile`, {
+        headers: {
+          Authorization: `Bearer ${userInfo.accessToken}`,
+        },
+      })
+      .then((response: { data: EditUserProfile }) => {
+        setUserProfile({
+          username: response.data.username,
+          name: response.data.name,
+          webSite: response.data.webSite,
+          introduce: response.data.introduce,
+          email: response.data.email,
+          phone: response.data.phone,
+          gender: response.data.gender
+        })
+      })
+  }, []);
 
   return (
     <>
       {/* //FIXME: 이 부분 css 해결이 안돼 ...... */}
       <div className={s.header}>
         <div className={cn(s.tit, s.profile)}>
-          <ProfileImage size="m" imageUrl={'/profile/winter.png'} />
+          <ProfileImage size="m" imageUrl={userInfo.profileImageUrl} />
         </div>
         <div className={s.content}>
-          <span className={s.name}>{myUserInfo.id}</span>
+          <span className={s.name}>{userInfo.username}</span>
           <div>
             <a className={s.changeProfile}>프로필 사진 바꾸기</a>
           </div>
@@ -190,7 +200,7 @@ const AccountEdit = () => {
       <div className={s.editbox}>
         <div className={s.tit}>성별</div>
         {/* FIXME: 셀렉트 박스형식으로 성별 선택하는거로 바뀌면 좋을듯   =>  셀렉트 박스로 해결  */}
-        <select value={userProfile.sex} name={'sex'} onChange={onChange}>
+        <select value={userProfile.gender} name={'sex'} onChange={onChange}>
           {selectBox.map((arr, key) => {
             return (
               <option value={arr} key={key}>
