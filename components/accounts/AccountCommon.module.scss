@@ -29,6 +29,7 @@
   font-size: 14px;
   color: rgb(33, 155, 226);
   font-weight: bold;
+  cursor: pointer;
 }
 
 .editbox .tit {
@@ -41,6 +42,18 @@
   font-size: 12px;
   font-weight: 400;
   color: rgb(160, 160, 160);
+}
+
+.submit {
+  & > button {
+    background-color:#0095f6;
+    color: #FFF;
+    padding: 5px 9px;
+    border: 0;
+    border-radius: 4px;
+    outline: 0;
+    font-weight: 600;
+  }
 }
 
 @media (min-width: 740px) {

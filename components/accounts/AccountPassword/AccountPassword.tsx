@@ -1,5 +1,5 @@
 import React from 'react';
-import s from '../AccountCommon.module.css';
+import s from '../AccountCommon.module.scss';
 import Link from 'next/link';
 
 import ProfileInput from 'components/ui/Input/ProfileInput';

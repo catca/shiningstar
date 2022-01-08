@@ -1,12 +1,12 @@
-import React from 'react';
-import s from '../AccountCommon.module.css';
+import React, { useEffect } from 'react';
+import s from '../AccountCommon.module.scss';
 
 import ProfileInput from 'components/ui/Input';
 import { ProfileImage } from 'components/profile';
 import { EditUserProfile, Gender } from 'types/accounts/types';
 
-import { useSelector } from 'react-redux';
-import { selectUser } from 'lib/redux/user/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser, updateImageUrl } from 'lib/redux/user/userSlice';
 import { accountEditMap } from 'lib/redux/accounts/accountsApis';
 
 import cn from 'classnames';
@@ -15,6 +15,7 @@ import { NEXT_SERVER } from 'config';
 
 const AccountEdit = () => {
   const { userInfo } = useSelector(selectUser);
+  const dispatch = useDispatch();
 
   const [userProfile, setUserProfile] = React.useState<EditUserProfile>({
     username: '',
@@ -36,10 +37,9 @@ const AccountEdit = () => {
       ...userProfile,
       [name]: value,
     });
-    console.log(userProfile);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     axios
       .get(`${NEXT_SERVER}/v1/profile`, {
         headers: {
@@ -59,6 +59,38 @@ const AccountEdit = () => {
       })
   }, []);
 
+  const handleChange = async (event: any) => {
+    const file = event.target.files[0];
+    if (event.target.files && event.target.files.length > 0) {
+      var formdata = new FormData();
+      formdata.append('file', file, userInfo.username);
+      axios
+        .post(`${NEXT_SERVER}/v1/profile/image`, formdata, {
+          headers: {
+            'Content-Type': `multipart/form-data`,
+            Authorization: `Bearer ${userInfo.accessToken}`,
+          },
+          onUploadProgress: (event) => {
+            console.log(
+              `Current progress:`,
+              Math.round((event.loaded * 100) / event.total),
+            );
+          },
+        })
+        .then((response) => {
+          dispatch(updateImageUrl(response.data.profileImageUrl));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }
+
+  const inputImage = () => {
+    let elementInputImage: HTMLElement | null = document.getElementById('inputImage');
+    elementInputImage?.click();
+  }
+
   return (
     <>
       {/* //FIXME: 이 부분 css 해결이 안돼 ...... */}
@@ -68,9 +100,17 @@ const AccountEdit = () => {
         </div>
         <div className={s.content}>
           <span className={s.name}>{userInfo.username}</span>
-          <div>
-            <a className={s.changeProfile}>프로필 사진 바꾸기</a>
+          <div onClick={inputImage}>
+            <div className={s.changeProfile}>프로필 사진 바꾸기</div>
           </div>
+          <form style={{ display: 'none' }}>
+            <input
+              type='file'
+              id='inputImage'
+              accept="image/jpeg,image/png,image/heic,image/heif"
+              onChange={handleChange}
+            />
+          </form>
         </div>
       </div>
 

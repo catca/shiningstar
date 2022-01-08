@@ -50,7 +50,10 @@ const NewPost: React.FC = () => {
     dispatch(setModal('newPost', false));
   };
 
-  const hiddenFileInput: any = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    dispatch(initPostImage());
+    document.body.style.overflow = "hidden";
+  }, []);
 
   const handleClick = (event: any) => {
     event.preventDefault();
@@ -113,10 +116,6 @@ const NewPost: React.FC = () => {
     setImageNumber((imageNumber) => imageNumber + 1);
   };
 
-  useEffect(() => {
-    dispatch(initPostImage());
-  }, []);
-
   function clickClopEvent(event: {
     target: any;
     currentTarget: {
@@ -134,10 +133,6 @@ const NewPost: React.FC = () => {
     if (imageControlRef.current?.contains(target)) return;
     setImageControl(false);
   }
-
-  useEffect(() => {
-    console.log('num', imageNumber, nextId.current);
-  }, [imageNumber]);
 
   const deleteImage = (e: any, deleteId: number) => {
     console.log('deleteId', deleteId);
@@ -173,15 +168,15 @@ const NewPost: React.FC = () => {
       formdata.append('file', file, images[j].name);
     }
     formdata.append('content', content);
-    /* key 확인하기 */
-    for (let key of formdata.keys()) {
-      console.log(key);
-    }
+    // /* key 확인하기 */
+    // for (let key of formdata.keys()) {
+    //   console.log(key);
+    // }
 
-    /* value 확인하기 */
-    for (let value of formdata.values()) {
-      console.log(value);
-    }
+    // /* value 확인하기 */
+    // for (let value of formdata.values()) {
+    //   console.log(value);
+    // }
     axios
       .post(`${NEXT_SERVER}/test/newPost`, formdata, {
         headers: {
@@ -197,15 +192,12 @@ const NewPost: React.FC = () => {
       })
       .then((response) => {
         console.log(response);
+        dispatch(setModal('newPost', false));
       })
       .catch((error) => {
         console.log(error);
       });
   };
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-  }, []);
 
   return (
     <>
@@ -490,7 +482,6 @@ const NewPost: React.FC = () => {
                             <input
                               accept="image/jpeg,image/png,image/heic,image/heif"
                               type="file"
-                              ref={hiddenFileInput}
                               onChange={handleChange}
                               style={{ display: 'none' }}
                             />
@@ -660,7 +651,6 @@ const NewPost: React.FC = () => {
                 accept="image/jpeg,image/png,image/heic,image/heif"
                 type="file"
                 id="input"
-                ref={hiddenFileInput}
                 onChange={handleChange}
                 style={{ display: 'none' }}
               />
