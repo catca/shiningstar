@@ -16,8 +16,6 @@ import { ProfileImage } from 'components/profile';
 import cn from 'classnames';
 import { ModalDataType } from 'types/modal/types';
 import { idInListChecker } from 'lib/common';
-import fetcher from 'lib/common/fetcher';
-import { NEXT_SERVER } from 'config';
 import { BaseUser3, Follows } from 'types/profile/types';
 import { fetchFollowers, fetchFollows } from 'lib/apis/profile';
 

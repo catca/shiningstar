@@ -44,7 +44,7 @@ apiRoute.post(async (req: any, res: any) => {
     name: user.name,
     content: req.body.content,
     boardImageUrl: boardImageUrl,
-    createDate: new Date(),
+    createdDate: new Date(),
     modifiedDate: new Date(),
   };
   const board = new Board(boardData);

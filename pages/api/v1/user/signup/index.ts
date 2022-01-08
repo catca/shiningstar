@@ -61,14 +61,15 @@ export default async function handler(
               subject: '[인스타그램 회원가입 이메일 인증]',
               text: `[이메일 인증] 인증 번호는 ${randomCode}입니다`,
             };
-            transporter.sendMail(mailOptions, (err: any, data: any) => {
-              if (err) {
-                console.error(err);
-                res.status(500).json({ success: false, err });
-              } else {
-                res.status(200).json({ success: true });
-              }
-            });
+            // transporter.sendMail(mailOptions, (err: any, data: any) => {
+            //   if (err) {
+            //     console.error(err);
+            //     res.status(500).json({ success: false, err });
+            //   } else {
+            //     res.status(200).json({ success: true });
+            //   }
+            // });
+            res.status(200).json({ success: true });
           });
         });
       });
