@@ -44,8 +44,6 @@ apiRoute.post(async (req: any, res: NextApiResponse) => {
         imageUrl: `/profile/${req.file.filename}`
       }
     })
-  console.log(req.file.filename);
-  console.log(req.user);
 
   return res.status(200).json({ profileImageUrl: `/profile/${req.file.filename}` });
 });

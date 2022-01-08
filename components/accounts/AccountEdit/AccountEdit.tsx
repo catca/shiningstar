@@ -91,6 +91,21 @@ const AccountEdit = () => {
     elementInputImage?.click();
   }
 
+  const submitUserProfile = () => {
+    axios
+      .post(`${NEXT_SERVER}/v1/profile`, userProfile, {
+        headers: {
+          Authorization: `Bearer ${userInfo.accessToken}`,
+        },
+      })
+      .then((response) => {
+
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
+
   return (
     <>
       {/* //FIXME: 이 부분 css 해결이 안돼 ...... */}
@@ -249,6 +264,15 @@ const AccountEdit = () => {
             );
           })}
         </select>
+      </div>
+      <div className={s.editbox} style={{ marginTop: '16px' }}>
+        <div className={s.tit}></div>
+        {/* FIXME: 셀렉트 박스형식으로 성별 선택하는거로 바뀌면 좋을듯   =>  셀렉트 박스로 해결  */}
+        <div className={s.content}>
+          <div className={s.submit}>
+            <button onClick={submitUserProfile}>제출</button>
+          </div>
+        </div>
       </div>
     </>
   );
