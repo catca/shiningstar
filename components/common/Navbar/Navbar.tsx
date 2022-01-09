@@ -111,11 +111,11 @@ const Navbar = () => {
                   <HomeIcon />
                 </a>
               </Link>
-              <Link href="/direct">
+              {/* <Link href="/direct">
                 <a>
                   <DirectIcon />
                 </a>
-              </Link>
+              </Link> */}
 
               <Link href="/explore">
                 <a>
@@ -123,9 +123,9 @@ const Navbar = () => {
                 </a>
               </Link>
 
-              <div onClick={() => dispatch(logout())}>
+              {/* <div onClick={() => dispatch(logout())}>
                 <FavoriteIcon />
-              </div>
+              </div> */}
 
               <div onClick={() => dispatch(setModal('newPost', true))}>
                 <div>
