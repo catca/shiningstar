@@ -10,4 +10,6 @@ export {
   SeeMoreIcon,
   EmoticonIcon,
   SearchIcon,
+  ProfileIcon,
+  SettingIcon
 } from './Icon';

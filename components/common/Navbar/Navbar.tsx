@@ -1,37 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import s from './Navbar.module.scss';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, selectUser } from 'lib/redux/user/userSlice';
-import { setModal } from 'lib/redux/modal/modalSlice';
+import { setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
 import ProfileImage from 'components/profile/ProfileImage';
 import UserSearchList from './SearchBox';
-import NewPost from 'components/modal/NewPost';
 
 import { getBase3UserProfile } from 'lib/redux/profile/profileApis';
 import { BaseUser3 } from 'types/profile/types';
 import { HomeIcon, DirectIcon, ExploreIcon, FavoriteIcon, NewPostIcon } from 'components/ui/Icon';
+import SelectBox from './SelectBox';
 
 const Navbar = () => {
   const { userInfo } = useSelector(selectUser);
-  const [userList, setUserList] = React.useState<BaseUser3[]>([]);
+  const [userList, setUserList] = useState<BaseUser3[]>([]);
   const dispatch = useDispatch();
 
-  const [onUserList, setOnUserList] = React.useState<boolean>(false);
-  const el = React.useRef<HTMLDivElement>();
-  const inputRef = React.useRef<any>();
+  const [onUserList, setOnUserList] = useState<boolean>(false);
+  const [onSelectBox, setOnSelectBox] = useState<boolean>(false);
+  const el = useRef<HTMLDivElement>(null);
+  const selectBoxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<any>();
+  const spanRef = useRef<any>();
 
   const fetchUserList = async () => {
     setUserList((await getBase3UserProfile()) as BaseUser3[]);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleCloseSearch = (e: any) => {
       if (!inputRef.current?.contains(e.target)) {
-        // 이 부분은 해결 못하겠다,,, 타입에러 어케하지 ㅠㅠ
         if (onUserList && (!el.current || !el.current.contains(e.target))) {
           setOnUserList(false);
         }
@@ -43,7 +45,21 @@ const Navbar = () => {
     };
   }, [onUserList]);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const handleCloseSelectBox = (e: any) => {
+      if (!inputRef.current?.contains(e.target)) {
+        if (onSelectBox && (!selectBoxRef.current || !selectBoxRef.current.contains(e.target))) {
+          setOnSelectBox(false);
+        }
+      }
+    };
+    window.addEventListener('click', handleCloseSelectBox);
+    return () => {
+      window.removeEventListener('click', handleCloseSelectBox);
+    };
+  }, [onSelectBox]);
+
+  useEffect(() => {
     fetchUserList();
   }, []);
 
@@ -109,17 +125,26 @@ const Navbar = () => {
               </div>
 
               {/* TODO:누르면 메뉴바 나오도록 */}
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Link href={`/${userInfo.username}`} >
-                  <a style={{ transform: 'translateY(-2px)' }}>
-                    <ProfileImage
-                      size={'nav'}
-                      border={true}
-                      borderColor={'black'}
-                      imageUrl={userInfo.profileImageUrl}
-                    />
-                  </a>
-                </Link>
+              <div>
+                <span
+                  ref={spanRef}
+                  onClick={() => {
+                    setOnSelectBox(true);
+                  }}
+                  style={{ display: 'flex', transform: 'translateY(-2px)' }}
+                >
+                  <ProfileImage
+                    size={'nav'}
+                    border={true}
+                    borderColor={'black'}
+                    imageUrl={userInfo.profileImageUrl}
+                  />
+                </span>
+                {onSelectBox &&
+                  <div ref={selectBoxRef}>
+                    <SelectBox />
+                  </div>
+                }
               </div>
             </div>
           </div>
