@@ -4,8 +4,8 @@ import Image from 'next/image';
 import s from './Navbar.module.scss';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { logout, selectUser } from 'lib/redux/user/userSlice';
-import { setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
+import { selectUser } from 'lib/redux/user/userSlice';
+import { setModal } from 'lib/redux/modal/modalSlice';
 
 import ProfileImage from 'components/profile/ProfileImage';
 import UserSearchList from './SearchBox';
@@ -102,11 +102,12 @@ const Navbar = () => {
                   <HomeIcon />
                 </a>
               </Link>
-              <Link href="/direct">
+
+              {/* <Link href="/direct">
                 <a>
                   <DirectIcon />
                 </a>
-              </Link>
+              </Link> */}
 
               <Link href="/explore">
                 <a>
@@ -114,9 +115,9 @@ const Navbar = () => {
                 </a>
               </Link>
 
-              <div onClick={() => dispatch(logout())}>
+              {/* <div>
                 <FavoriteIcon />
-              </div>
+              </div> */}
 
               <div onClick={() => dispatch(setModal('newPost', true))}>
                 <div>

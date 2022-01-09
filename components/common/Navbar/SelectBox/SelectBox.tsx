@@ -10,6 +10,7 @@ import { ProfileIcon, SettingIcon } from 'components/ui/Icon';
 
 const SelectBox: React.FC = () => {
   const { userInfo } = useSelector(selectUser);
+  const dispatch = useDispatch();
   return (
     <Container>
       <div>
@@ -41,7 +42,7 @@ const SelectBox: React.FC = () => {
           </Link>
           <Hr />
           <div>
-            <Box>
+            <Box onClick={() => dispatch(logout())}>
               <div>로그아웃</div>
             </Box>
             <div></div>
