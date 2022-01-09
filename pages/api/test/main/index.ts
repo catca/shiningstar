@@ -2,7 +2,6 @@ import { dbConnect } from 'lib/mongoDB/dbConnect';
 import User from 'lib/mongoDB/models/User';
 import Board from 'lib/mongoDB/models/Board';
 import Follow from 'lib/mongoDB/models/Follow';
-import { connectToDatabase } from 'lib/mongoDB/mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
@@ -10,7 +9,6 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   await dbConnect();
-  console.log('main', req.headers.authorization);
   const authorization = req.headers.authorization;
   let user;
   if (authorization?.slice(undefined, 6) === 'Bearer') {
@@ -66,6 +64,15 @@ export default async function handler(
         },
       },
       {
+        $lookup: {
+          from: 'profiles',
+          localField: 'username',
+          foreignField: 'username',
+          as: 'profile',
+        },
+      },
+      { $unwind: '$profile' },
+      {
         $project: {
           _id: 0,
           username: 1,
@@ -75,6 +82,7 @@ export default async function handler(
           modifiedDate: 1,
           location: 1,
           comment: '$comments',
+          profileImageUrl: '$profile.imageUrl',
           favoriteCnt: { $size: '$favorites' },
           commentCnt: { $size: '$comments' },
         },
@@ -92,6 +100,7 @@ export default async function handler(
             modifiedDate: '',
             location: '',
             comment: '',
+            profileImageUrl: '/instagramLogo.png',
             favoriteCnt: 0,
             commentCnt: 0,
           },

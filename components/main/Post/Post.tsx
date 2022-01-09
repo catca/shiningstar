@@ -66,7 +66,7 @@ const Post = ({ postData }: { postData: Board }) => {
                 <ProfileImage
                   border={false}
                   size={'board'}
-                  imageUrl={`/profile/${postData.username}.png`}
+                  imageUrl={postData.profileImageUrl}
                 />
               </div>
               <div>
