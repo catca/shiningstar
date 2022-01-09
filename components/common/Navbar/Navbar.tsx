@@ -4,15 +4,21 @@ import Image from 'next/image';
 import s from './Navbar.module.scss';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { selectUser } from 'lib/redux/user/userSlice';
-import { setModal } from 'lib/redux/modal/modalSlice';
+import { logout, selectUser } from 'lib/redux/user/userSlice';
+import { setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
 import ProfileImage from 'components/profile/ProfileImage';
 import UserSearchList from './SearchBox';
 
 import { getBase3UserProfile } from 'lib/redux/profile/profileApis';
 import { BaseUser3 } from 'types/profile/types';
-import { HomeIcon, DirectIcon, ExploreIcon, FavoriteIcon, NewPostIcon } from 'components/ui/Icon';
+import {
+  HomeIcon,
+  DirectIcon,
+  ExploreIcon,
+  FavoriteIcon,
+  NewPostIcon,
+} from 'components/ui/Icon';
 import SelectBox from './SelectBox';
 
 const Navbar = () => {
@@ -48,7 +54,10 @@ const Navbar = () => {
   useEffect(() => {
     const handleCloseSelectBox = (e: any) => {
       if (!inputRef.current?.contains(e.target)) {
-        if (onSelectBox && (!selectBoxRef.current || !selectBoxRef.current.contains(e.target))) {
+        if (
+          onSelectBox &&
+          (!selectBoxRef.current || !selectBoxRef.current.contains(e.target))
+        ) {
           setOnSelectBox(false);
         }
       }
@@ -102,12 +111,11 @@ const Navbar = () => {
                   <HomeIcon />
                 </a>
               </Link>
-
-              {/* <Link href="/direct">
+              <Link href="/direct">
                 <a>
                   <DirectIcon />
                 </a>
-              </Link> */}
+              </Link>
 
               <Link href="/explore">
                 <a>
@@ -115,9 +123,9 @@ const Navbar = () => {
                 </a>
               </Link>
 
-              {/* <div>
+              <div onClick={() => dispatch(logout())}>
                 <FavoriteIcon />
-              </div> */}
+              </div>
 
               <div onClick={() => dispatch(setModal('newPost', true))}>
                 <div>
@@ -132,8 +140,7 @@ const Navbar = () => {
                   onClick={() => {
                     setOnSelectBox(true);
                   }}
-                  style={{ display: 'flex', transform: 'translateY(-2px)' }}
-                >
+                  style={{ display: 'flex', transform: 'translateY(-2px)' }}>
                   <ProfileImage
                     size={'nav'}
                     border={true}
@@ -141,11 +148,11 @@ const Navbar = () => {
                     imageUrl={userInfo.profileImageUrl}
                   />
                 </span>
-                {onSelectBox &&
+                {onSelectBox && (
                   <div ref={selectBoxRef}>
                     <SelectBox />
                   </div>
-                }
+                )}
               </div>
             </div>
           </div>

@@ -14,20 +14,32 @@ const apiRoute = nextConnect({
   },
 });
 
-apiRoute.use(checkUser());
-
 apiRoute.get(async (req: any, res: NextApiResponse) => {
   await dbConnect();
   const { boardId } = req.query;
 
   BoardFavorite.aggregate(
     [
+      { $match: { boardId } },
       {
         $lookup: {
-          from: 'users',
+          from: 'profiles',
           localField: 'username',
           foreignField: 'username',
           as: 'user',
+        },
+      },
+      {
+        $unwind: '$user',
+      },
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          boardId: 1,
+          createDate: 1,
+          imageUrl: '$user.imageUrl',
+          name: '$user.name',
         },
       },
     ],
@@ -36,6 +48,8 @@ apiRoute.get(async (req: any, res: NextApiResponse) => {
     },
   );
 });
+
+apiRoute.use(checkUser());
 
 apiRoute.post(async (req: any, res: NextApiResponse) => {
   await dbConnect();

@@ -45,14 +45,14 @@ const NewPost: React.FC = () => {
       | React.MouseEvent<SVGSVGElement, MouseEvent>,
   ) => {
     e.preventDefault();
-    document.body.style.overflow = "unset";
+    document.body.style.overflow = 'unset';
     dispatch(initPostImage());
     dispatch(setModal('newPost', false));
   };
 
   useEffect(() => {
     dispatch(initPostImage());
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = 'hidden';
   }, []);
 
   const handleClick = (event: any) => {
@@ -121,8 +121,8 @@ const NewPost: React.FC = () => {
     currentTarget: {
       querySelector: (arg0: string) => {
         (): any;
-        new(): any;
-        querySelectorAll: { (arg0: string): any; new(): any };
+        new (): any;
+        querySelectorAll: { (arg0: string): any; new (): any };
       };
     };
   }) {
@@ -153,7 +153,7 @@ const NewPost: React.FC = () => {
 
   const changeContent = (e: any) => {
     setContent(e.target.value);
-  }
+  };
 
   const postContent = () => {
     var formdata = new FormData();
@@ -248,8 +248,8 @@ const NewPost: React.FC = () => {
                 {postState === 'newPost'
                   ? '새 게시물 만들기'
                   : postState === 'crop'
-                    ? '자르기'
-                    : '새 게시물 만들기'}
+                  ? '자르기'
+                  : '새 게시물 만들기'}
               </h1>
             </div>
             <div>
@@ -329,14 +329,16 @@ const NewPost: React.FC = () => {
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
                         style={{
-                          width: `${images.length * 94 + (images.length - 1) * 12 + 100
-                            }px`,
+                          width: `${
+                            images.length * 94 + (images.length - 1) * 12 + 100
+                          }px`,
                         }}>
                         <div
                           style={{
                             height: '94px',
-                            width: `${images.length * 94 + (images.length - 1) * 12
-                              }px`,
+                            width: `${
+                              images.length * 94 + (images.length - 1) * 12
+                            }px`,
                           }}>
                           <div
                             style={{ position: 'absolute', transform: 'none' }}>
@@ -357,9 +359,10 @@ const NewPost: React.FC = () => {
                                   style={{
                                     backgroundColor: 'rgba(0, 0, 0, 0)',
                                     height: '100%',
-                                    width: `${images.length * 94 +
+                                    width: `${
+                                      images.length * 94 +
                                       (images.length - 1) * 12
-                                      }px`,
+                                    }px`,
                                     display: 'flex',
                                   }}>
                                   {images.map((props, index) => {
@@ -393,10 +396,11 @@ const NewPost: React.FC = () => {
                                             deleteImage(e, props.id)
                                           }
                                           style={{
-                                            display: `${index + 1 === imageNumber
-                                              ? 'block'
-                                              : 'none'
-                                              }`,
+                                            display: `${
+                                              index + 1 === imageNumber
+                                                ? 'block'
+                                                : 'none'
+                                            }`,
                                           }}>
                                           <button
                                             type="button"
@@ -532,8 +536,9 @@ const NewPost: React.FC = () => {
                           src={props.croppedImage}
                           alt="Cropped"
                           style={{
-                            display: `${index + 1 === imageNumber ? 'block' : 'none'
-                              }`,
+                            display: `${
+                              index + 1 === imageNumber ? 'block' : 'none'
+                            }`,
                           }}
                         />
                       );
