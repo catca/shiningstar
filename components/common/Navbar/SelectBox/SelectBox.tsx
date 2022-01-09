@@ -101,7 +101,7 @@ const A = styled.a`
 const Box = styled.div`
   display: flex;
   padding: 8px 16px;
-  & > div:first-child {
+  & > div:first-of-type {
     display: flex;
     align-items: center;
   }

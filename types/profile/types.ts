@@ -19,6 +19,7 @@ export interface BaseUser9 extends BaseUser3 {
 export type Banner = 'main' | 'saved' | 'channel' | 'tagged';
 
 export interface Board extends BaseUser3 {
+  profileImageUrl: string | undefined;
   comment?: any;
   _id: string;
   boardImageUrl: string[];
