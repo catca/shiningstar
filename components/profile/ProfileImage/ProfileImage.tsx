@@ -54,7 +54,7 @@ const ProfileImage: React.FC<ImageProps> = ({
             size === 'l' && s.l,
           )}
           style={{
-            backgroundImage: `url(${imageUrl})`,
+            backgroundImage: `url(${imageUrl === '' ? '/profile/profileImage.jpg' : imageUrl}`,
           }}
         />
       </div>
