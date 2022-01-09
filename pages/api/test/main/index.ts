@@ -81,9 +81,19 @@ export default async function handler(
       },
     ],
     (err: any, board: any) => {
-      console.log('hello', board);
+      console.log('instagram', board);
       if (!board) {
-        return res.status(400).json({ status: 400, message: `get failed` });
+        return res.status(200).json([{
+          username: 'instagram',
+          boardImageUrl: ['/instagramLogo.png'],
+          content: "팔로워를 해보세요!",
+          createdDate: '',
+          modifiedDate: '',
+          location: '',
+          comment: '',
+          favoriteCnt: 0,
+          commentCnt: 0,
+        }]);
       }
       return res.status(200).json(board);
     },
