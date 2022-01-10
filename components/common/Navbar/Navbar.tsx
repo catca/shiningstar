@@ -20,11 +20,13 @@ import {
   NewPostIcon,
 } from 'components/ui/Icon';
 import SelectBox from './SelectBox';
+import { useRouter } from 'next/router';
 
 const Navbar = () => {
   const { userInfo } = useSelector(selectUser);
   const [userList, setUserList] = useState<BaseUser3[]>([]);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const [onUserList, setOnUserList] = useState<boolean>(false);
   const [onSelectBox, setOnSelectBox] = useState<boolean>(false);
@@ -108,7 +110,9 @@ const Navbar = () => {
             <div className={s.rightBanner}>
               <Link href="/">
                 <a>
-                  <HomeIcon />
+                  <HomeIcon
+                    on={router.asPath === '/' && !onSelectBox}
+                  />
                 </a>
               </Link>
               {/* <Link href="/direct">
@@ -119,7 +123,9 @@ const Navbar = () => {
 
               <Link href="/explore">
                 <a>
-                  <ExploreIcon />
+                  <ExploreIcon
+                    on={router.asPath === '/explore' && !onSelectBox}
+                  />
                 </a>
               </Link>
 
@@ -143,7 +149,11 @@ const Navbar = () => {
                   style={{ display: 'flex', transform: 'translateY(-2px)' }}>
                   <ProfileImage
                     size={'nav'}
-                    border={true}
+                    border={
+                      router.asPath !== '/'
+                      && router.asPath !== '/explore'
+                      || onSelectBox
+                    }
                     borderColor={'black'}
                     imageUrl={userInfo.profileImageUrl}
                   />

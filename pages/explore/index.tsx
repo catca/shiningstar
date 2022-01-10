@@ -28,7 +28,7 @@ const Explore = ({ boardData }: { boardData: Board[] }) => {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    dispatch(setBoardData(boardData));
+    // dispatch(setBoardData(boardData));
     dispatch(setBoardModal(false));
   }, []);
 
@@ -40,19 +40,19 @@ const Explore = ({ boardData }: { boardData: Board[] }) => {
       onClick: () => {
         var board = selectedBoard;
         // TODO: restapi 연결시 api로 삭제할 인덱스 보내는 함수 작성
-        if (board !== undefined) {
-          dispatch(
-            setSelectBoard({
-              ...board,
-              reply: board.reply.filter((arr, idx) => {
-                console.log(selectedReplyIdx, idx);
-                if (idx !== selectedReplyIdx) {
-                  return arr;
-                }
-              }),
-            }),
-          );
-        }
+        // if (board !== undefined) {
+        //   dispatch(
+        //     setSelectBoard({
+        //       ...board,
+        //       reply: board.reply.filter((arr, idx) => {
+        //         console.log(selectedReplyIdx, idx);
+        //         if (idx !== selectedReplyIdx) {
+        //           return arr;
+        //         }
+        //       }),
+        //     }),
+        //   );
+        // }
         dispatch(setModalInitial());
       },
     },
