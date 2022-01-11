@@ -11,5 +11,9 @@ export {
   EmoticonIcon,
   SearchIcon,
   ProfileIcon,
-  SettingIcon
+  SettingIcon,
+  AddIcon,
+  BackIcon,
+  ImageVideoIcon,
+  DeleteIcon,
 } from './Icon';
