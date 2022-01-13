@@ -38,9 +38,14 @@ export interface UserBoards {
 
 export interface Reply extends BaseUser3 {
   content: string;
-  createdDate: string;
-  modifiedDate: string;
+  createdDate: Date;
+  modifiedDate: Date;
   reReply: Reply[];
+}
+
+export interface PostReply {
+  username: string;
+  content: string;
 }
 
 export type BaseUser3 = {

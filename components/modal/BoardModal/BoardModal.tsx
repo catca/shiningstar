@@ -23,12 +23,20 @@ import ChatBubbleOutlineRoundedIcon from '@material-ui/icons/ChatBubbleOutlineRo
 import TelegramIcon from '@material-ui/icons/Telegram';
 import BookmarkBorderIcon from '@material-ui/icons/BookmarkBorder';
 
-import { formatNumber, idInListChecker, idNotInList } from 'lib/common';
+import { formatNumber } from 'lib/common';
 import cn from 'classnames';
 
-import { Reply } from 'types/profile/types';
+import { PostReply, Reply } from 'types/profile/types';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { selectProfile } from 'lib/redux/profile/profileSlice';
+import { NEXT_SERVER } from 'config';
+import fetcher from 'lib/common/fetcher';
+import {
+  fetchDeleteGood,
+  fetchGetComment,
+  fetchPostComment,
+  fetchPostGood,
+} from 'lib/apis/board';
 
 interface BoardModalProps {}
 
@@ -38,76 +46,111 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
 
-  const [reply, setReply] = React.useState<Reply>({
-    username: '익명',
-    name: '익명',
-    imageUrl: '/profile/winter.png',
+  const [postReply, setPostReply] = React.useState<PostReply>({
+    username: userInfo.username,
     content: '',
-    createdDate: new Date().toString(),
-    modifiedDate: new Date().toString(),
-    reReply: [],
   });
-
+  const [replys, setReplys] = React.useState<Reply[]>([]);
   const [favorite, setFavorite] = React.useState<number>(0);
   const [pressFavorite, setPressFavorite] = React.useState<boolean>(false);
   const textareaRef = React.useRef<any>(null);
 
   const onReplyHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setReply({
-      ...reply,
+    setPostReply({
+      ...postReply,
       content: e.target.value,
     });
   };
 
-  // const goodHandler = (user: string) => {
-  //   // TODO: rest api 통해서 좋아요 누르기 취소 기능 구현해야함
-  //   if (selectedBoard !== undefined) {
-  //     if (idInListChecker(selectedBoard.favorite, user)) {
-  //       // TODO: api 로직 다시 짜기
-  //       const newFav = idNotInList(selectedBoard.favorite, user);
+  const fetchFavoriteCheckHandler = async () => {
+    const data: { check: boolean } = await fetcher(
+      `${NEXT_SERVER}/v1/board/checkFavorite/${selectedBoard?._id}`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${userInfo.accessToken}` },
+      },
+    );
+    setPressFavorite(data.check);
+  };
 
-  //       setFavorite((f) => f - 1);
-  //       setPressFavorite(false);
-  //       dispatch(setSelectBoard({ ...selectedBoard, favorite: newFav }));
-  //     } else {
-  //       setFavorite((f) => f + 1);
-  //       setPressFavorite(true);
-  //       dispatch(
-  //         setSelectBoard({
-  //           ...selectedBoard,
-  //           favorite: [
-  //             ...selectedBoard.favorite,
-  //             {
-  //               idusername: userInfo.username,
-  //               name: userInfo.name,
-  //               imageUrl: '/profile/winter.png',
-  //             },
-  //           ],
-  //         }),
-  //       );
-  //     }
-  //     console.log(favorite);
-  //   }
-  // };
+  const goodHandler = async () => {
+    if (selectedBoard !== undefined) {
+      if (pressFavorite) {
+        const res = await fetchDeleteGood(
+          selectedBoard._id,
+          userInfo.accessToken,
+        );
+        if (!res.ok) {
+          alert('좋아요를 취소하지 못했습니다.');
+        } else {
+          setFavorite((f) => f - 1);
+          setPressFavorite(false);
+          dispatch(
+            setSelectBoard({
+              ...selectedBoard,
+              favoriteCnt: selectedBoard.favoriteCnt - 1,
+            }),
+          );
+        }
+      } else {
+        const res = await fetchPostGood(
+          selectedBoard._id,
+          userInfo.accessToken,
+        );
+        if (!res.ok) {
+          alert('좋아요를 누르지 못했습니다.');
+        } else {
+          setFavorite((f) => f + 1);
+          setPressFavorite(true);
+          dispatch(
+            setSelectBoard({
+              ...selectedBoard,
+              favoriteCnt: selectedBoard.favoriteCnt + 1,
+            }),
+          );
+        }
+      }
+    }
+  };
+  const fetchReplys = async () => {
+    if (selectedBoard !== undefined) {
+      const res = await fetchGetComment(selectedBoard._id);
+      if (!res.ok) {
+        alert('댓글을 불러오지 못했습니다');
+      } else {
+        const resJson = await res.json();
+        setReplys(resJson);
+      }
+    }
+  };
 
-  // const postReplyHandler = (reply: Reply) => {
-  //   //TODO: rest api post 과정 추가
-  //   // 현재는 테스트식으로 확인 가능하게 만든 로직임
+  const postReplyHandler = async (reply: PostReply) => {
+    //TODO: rest api post 과정 추가
 
-  //   var board = selectedBoard;
-  //   if (board !== undefined) {
-  //     dispatch(setSelectBoard({ ...board, reply: [...board.reply, reply] }));
-  //     setReply({
-  //       username: '익명',
-  //       name: '익명',
-  //       imageUrl: '/profile/winter.png',
-  //       content: '',
-  //       createdDate: new Date().toString(),
-  //       modifiedDate: new Date().toString(),
-  //       reReply: [],
-  //     });
-  //   }
-  // };
+    if (selectedBoard !== undefined) {
+      const res = await fetchPostComment(
+        selectedBoard._id,
+        userInfo.accessToken,
+        reply,
+      );
+      if (!res.ok) {
+        alert('댓글 작성에 실패했습니다');
+      } else {
+        dispatch(
+          setSelectBoard({
+            ...selectedBoard,
+            commentCnt: selectedBoard.commentCnt + 1,
+          }),
+        );
+        setPostReply({
+          username: userInfo.username,
+          content: '',
+        });
+
+        fetchReplys();
+      }
+    }
+  };
 
   const inputFocusing = () => {
     textareaRef.current.focus();
@@ -116,9 +159,8 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
   React.useEffect(() => {
     if (selectedBoard !== undefined) {
       setFavorite(selectedBoard.favoriteCnt);
-      // idInListChecker(selectedBoard.favorite, userInfo.username);
-      //   ? setPressFavorite(true)
-      //   : setPressFavorite(false);
+      fetchFavoriteCheckHandler();
+      fetchReplys();
     }
   }, [userInfo.username, selectedBoard]);
 
@@ -181,14 +223,14 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
                     {pressFavorite ? (
                       <a>
                         <FavoriteIcon
-                          // onClick={() => goodHandler(userInfo.username)}
+                          onClick={() => goodHandler()}
                           style={{ color: 'red', fontSize: '26px' }}
                         />
                       </a>
                     ) : (
                       <a>
                         <FavoriteBorderRoundedIcon
-                          // onClick={() => goodHandler(userInfo.username)}
+                          onClick={() => goodHandler()}
                           style={{ fontSize: '26px' }}
                         />
                       </a>
@@ -222,19 +264,19 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
               </div>
               <div className={s.comment}>
                 {/* TODO: 댓글 목록 map 으로 하기 */}
-                {/* {selectedBoard.comment.map((reply: Reply, idx: number) => {
+                {replys.map((reply: Reply, idx: number) => {
                   return (
                     <ReplyContent
                       reply={reply}
                       idx={idx}
                       key={idx}
                       onFocus={inputFocusing}
-                      editReReply={(name: string) =>
-                        setReply({ ...reply, content: name })
-                      }
+                      editReReply={(name: string) => {
+                        // setReply({ ...reply, content: name })
+                      }}
                     />
                   );
-                })} */}
+                })}
               </div>
               <div className={cn(s.footer, s.pcBlock)}>
                 <div className={s.footerIcon}>
@@ -242,14 +284,14 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
                     {pressFavorite ? (
                       <a>
                         <FavoriteIcon
-                          // onClick={() => goodHandler(userInfo.username)}
+                          onClick={() => goodHandler()}
                           style={{ color: 'red', fontSize: '26px' }}
                         />
                       </a>
                     ) : (
                       <a>
                         <FavoriteBorderRoundedIcon
-                          // onClick={() => goodHandler(userInfo.username)}
+                          onClick={() => goodHandler()}
                           style={{ fontSize: '26px' }}
                         />
                       </a>
@@ -289,15 +331,15 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
                     overflowY: 'hidden',
                     border: 'none',
                   }}
-                  rows={reply.content.length > 18 ? 2 : 1}
+                  rows={postReply.content.length > 18 ? 2 : 1}
                   cols={30}
                   placeholder="댓글 달기.."
-                  value={reply.content}
+                  value={postReply.content}
                   onChange={onReplyHandler}
                 />
                 <Button
-                  // onClick={() => postReplyHandler(reply)}
-                  disabled={reply.content.length === 0}
+                  onClick={() => postReplyHandler(postReply)}
+                  disabled={postReply.content.length === 0}
                   size="small"
                   style={{ color: '#2294ff' }}>
                   <b>게시</b>
