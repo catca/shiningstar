@@ -25,10 +25,11 @@ export default async function handler(
       Board.aggregate(
         [
           { $match: { username: username } },
+          { $addFields: { board_id: { $toString: '$_id' } } },
           {
             $lookup: {
               from: 'boardFavorites',
-              localField: '_id',
+              localField: 'board_id',
               foreignField: 'boardId',
               as: 'favorites',
             },
@@ -36,7 +37,7 @@ export default async function handler(
           {
             $lookup: {
               from: 'boardComments',
-              localField: '_id',
+              localField: 'board_id',
               foreignField: 'boardId',
               as: 'comments',
             },
