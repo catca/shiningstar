@@ -6,22 +6,27 @@ export interface FavoriteProps {
   createDate: Date;
 }
 
-const BoardFavSchema = new mongoose.Schema<FavoriteProps>({
-  username: {
-    type: String,
-    required: true,
-    unique: false,
+const BoardFavSchema = new mongoose.Schema<FavoriteProps>(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: false,
+    },
+    boardId: {
+      type: String,
+      required: true,
+      unique: false,
+    },
+    createDate: {
+      type: Date,
+      unique: false,
+    },
   },
-  boardId: {
-    type: String,
-    required: true,
-    unique: false,
+  {
+    versionKey: false,
   },
-  createDate: {
-    type: Date,
-    unique: false,
-  },
-});
+);
 
 export default mongoose.models.BoardFavorite ||
   mongoose.model('BoardFavorite', BoardFavSchema, 'boardFavorites');
