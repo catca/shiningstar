@@ -21,7 +21,7 @@ import Link from 'next/link';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { NEXT_SERVER } from 'config';
-import { EmoticonIcon } from 'components/ui/Icon';
+import { AddIcon, BackIcon, DeleteIcon, EmoticonIcon, ImageVideoIcon } from 'components/ui/Icon';
 
 interface ModalProps {
   modalData: ModalDataType[];
@@ -32,9 +32,7 @@ const NewPost: React.FC = () => {
   const imageControlRef = useRef<HTMLDivElement>(null);
   const [imageNumber, setImageNumber] = useState<number>(1);
   const [postState, setPostState] = useState<string>('newPost');
-  const [zoom, setZoom] = useState<number>(1);
   const [imageControl, setImageControl] = useState<boolean>(false);
-  const [text, setText] = useState<number>(0);
   const [content, setContent] = useState<string>('');
   const images = useSelector(selectNewPost);
   const { userInfo } = useSelector(selectUser);
@@ -116,16 +114,7 @@ const NewPost: React.FC = () => {
     setImageNumber((imageNumber) => imageNumber + 1);
   };
 
-  function clickClopEvent(event: {
-    target: any;
-    currentTarget: {
-      querySelector: (arg0: string) => {
-        (): any;
-        new (): any;
-        querySelectorAll: { (arg0: string): any; new (): any };
-      };
-    };
-  }) {
+  function clickClopEvent(event: { target: any; }) {
     var target = event.target;
 
     if (imageControl === false) return;
@@ -134,8 +123,7 @@ const NewPost: React.FC = () => {
     setImageControl(false);
   }
 
-  const deleteImage = (e: any, deleteId: number) => {
-    console.log('deleteId', deleteId);
+  const deleteImage = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, deleteId: number) => {
     e.preventDefault();
     if (images.length === 1) {
       setPostState(() => 'newPost');
@@ -151,7 +139,7 @@ const NewPost: React.FC = () => {
     dispatch(deletePostImage({ id: deleteId }));
   };
 
-  const changeContent = (e: any) => {
+  const changeContent = (e: { target: { value: React.SetStateAction<string>; }; }) => {
     setContent(e.target.value);
   };
 
@@ -191,7 +179,6 @@ const NewPost: React.FC = () => {
         },
       })
       .then((response) => {
-        console.log(response);
         dispatch(setModal('newPost', false));
       })
       .catch((error) => {
@@ -212,33 +199,9 @@ const NewPost: React.FC = () => {
               <div>
                 {postState !== 'newPost' && (
                   <button onClick={prevPostState}>
-                    <svg
-                      aria-label="돌아가기"
-                      color="#262626"
-                      fill="#262626"
-                      height="24"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="24"
-                      style={{ transform: 'translateX(-8px)' }}>
-                      <line
-                        fill="none"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        x1="2.909"
-                        x2="22.001"
-                        y1="12.004"
-                        y2="12.004"></line>
-                      <polyline
-                        fill="none"
-                        points="9.276 4.726 2.001 12.004 9.276 19.274"
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"></polyline>
-                    </svg>
+                    <div style={{ transform: 'translateX(-8px)' }}>
+                      <BackIcon />
+                    </div>
                   </button>
                 )}
               </div>
@@ -248,8 +211,8 @@ const NewPost: React.FC = () => {
                 {postState === 'newPost'
                   ? '새 게시물 만들기'
                   : postState === 'crop'
-                  ? '자르기'
-                  : '새 게시물 만들기'}
+                    ? '자르기'
+                    : '새 게시물 만들기'}
               </h1>
             </div>
             <div>
@@ -269,24 +232,7 @@ const NewPost: React.FC = () => {
             <div>
               {postState === 'newPost' ? (
                 <div className={s.contentPost}>
-                  <svg
-                    aria-label="이미지나 동영상과 같은 미디어를 나타내는 아이콘"
-                    color="#262626"
-                    fill="#262626"
-                    height="77"
-                    role="img"
-                    viewBox="0 0 97.6 77.3"
-                    width="96">
-                    <path
-                      d="M16.3 24h.3c2.8-.2 4.9-2.6 4.8-5.4-.2-2.8-2.6-4.9-5.4-4.8s-4.9 2.6-4.8 5.4c.1 2.7 2.4 4.8 5.1 4.8zm-2.4-7.2c.5-.6 1.3-1 2.1-1h.2c1.7 0 3.1 1.4 3.1 3.1 0 1.7-1.4 3.1-3.1 3.1-1.7 0-3.1-1.4-3.1-3.1 0-.8.3-1.5.8-2.1z"
-                      fill="currentColor"></path>
-                    <path
-                      d="M84.7 18.4L58 16.9l-.2-3c-.3-5.7-5.2-10.1-11-9.8L12.9 6c-5.7.3-10.1 5.3-9.8 11L5 51v.8c.7 5.2 5.1 9.1 10.3 9.1h.6l21.7-1.2v.6c-.3 5.7 4 10.7 9.8 11l34 2h.6c5.5 0 10.1-4.3 10.4-9.8l2-34c.4-5.8-4-10.7-9.7-11.1zM7.2 10.8C8.7 9.1 10.8 8.1 13 8l34-1.9c4.6-.3 8.6 3.3 8.9 7.9l.2 2.8-5.3-.3c-5.7-.3-10.7 4-11 9.8l-.6 9.5-9.5 10.7c-.2.3-.6.4-1 .5-.4 0-.7-.1-1-.4l-7.8-7c-1.4-1.3-3.5-1.1-4.8.3L7 49 5.2 17c-.2-2.3.6-4.5 2-6.2zm8.7 48c-4.3.2-8.1-2.8-8.8-7.1l9.4-10.5c.2-.3.6-.4 1-.5.4 0 .7.1 1 .4l7.8 7c.7.6 1.6.9 2.5.9.9 0 1.7-.5 2.3-1.1l7.8-8.8-1.1 18.6-21.9 1.1zm76.5-29.5l-2 34c-.3 4.6-4.3 8.2-8.9 7.9l-34-2c-4.6-.3-8.2-4.3-7.9-8.9l2-34c.3-4.4 3.9-7.9 8.4-7.9h.5l34 2c4.7.3 8.2 4.3 7.9 8.9z"
-                      fill="currentColor"></path>
-                    <path
-                      d="M78.2 41.6L61.3 30.5c-2.1-1.4-4.9-.8-6.2 1.3-.4.7-.7 1.4-.7 2.2l-1.2 20.1c-.1 2.5 1.7 4.6 4.2 4.8h.3c.7 0 1.4-.2 2-.5l18-9c2.2-1.1 3.1-3.8 2-6-.4-.7-.9-1.3-1.5-1.8zm-1.4 6l-18 9c-.4.2-.8.3-1.3.3-.4 0-.9-.2-1.2-.4-.7-.5-1.2-1.3-1.1-2.2l1.2-20.1c.1-.9.6-1.7 1.4-2.1.8-.4 1.7-.3 2.5.1L77 43.3c1.2.8 1.5 2.3.7 3.4-.2.4-.5.7-.9.9z"
-                      fill="currentColor"></path>
-                  </svg>
+                  <ImageVideoIcon />
                   <h2>사진과 동영상을 여기에 끌어다 놓으세요</h2>
                   <div className={s.inputButton}>
                     <button onClick={handleClick}>컴퓨터에서 선택</button>
@@ -329,16 +275,14 @@ const NewPost: React.FC = () => {
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
                         style={{
-                          width: `${
-                            images.length * 94 + (images.length - 1) * 12 + 100
-                          }px`,
+                          width: `${images.length * 94 + (images.length - 1) * 12 + 100
+                            }px`,
                         }}>
                         <div
                           style={{
                             height: '94px',
-                            width: `${
-                              images.length * 94 + (images.length - 1) * 12
-                            }px`,
+                            width: `${images.length * 94 + (images.length - 1) * 12
+                              }px`,
                           }}>
                           <div
                             style={{ position: 'absolute', transform: 'none' }}>
@@ -359,10 +303,9 @@ const NewPost: React.FC = () => {
                                   style={{
                                     backgroundColor: 'rgba(0, 0, 0, 0)',
                                     height: '100%',
-                                    width: `${
-                                      images.length * 94 +
+                                    width: `${images.length * 94 +
                                       (images.length - 1) * 12
-                                    }px`,
+                                      }px`,
                                     display: 'flex',
                                   }}>
                                   {images.map((props, index) => {
@@ -396,45 +339,16 @@ const NewPost: React.FC = () => {
                                             deleteImage(e, props.id)
                                           }
                                           style={{
-                                            display: `${
-                                              index + 1 === imageNumber
-                                                ? 'block'
-                                                : 'none'
-                                            }`,
+                                            display: `${index + 1 === imageNumber
+                                              ? 'block'
+                                              : 'none'
+                                              }`,
                                           }}>
                                           <button
                                             type="button"
                                             style={{ cursor: 'pointer' }}>
                                             <div>
-                                              <svg
-                                                aria-label="삭제"
-                                                color="#ffffff"
-                                                fill="#ffffff"
-                                                height="12"
-                                                role="img"
-                                                viewBox="0 0 24 24"
-                                                width="12">
-                                                <line
-                                                  fill="none"
-                                                  stroke="currentColor"
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth="2"
-                                                  x1="21"
-                                                  x2="3"
-                                                  y1="3"
-                                                  y2="21"></line>
-                                                <line
-                                                  fill="none"
-                                                  stroke="currentColor"
-                                                  strokeLinecap="round"
-                                                  strokeLinejoin="round"
-                                                  strokeWidth="2"
-                                                  x1="21"
-                                                  x2="3"
-                                                  y1="21"
-                                                  y2="3"></line>
-                                              </svg>
+                                              <DeleteIcon />
                                             </div>
                                           </button>
                                         </div>
@@ -468,28 +382,8 @@ const NewPost: React.FC = () => {
                               alignItems: 'center',
                               cursor: 'pointer',
                             }}>
-                            <svg
-                              aria-label="+ 아이콘"
-                              color="#8e8e8e"
-                              fill="#8e8e8e"
-                              height="22"
-                              role="img"
-                              viewBox="0 0 24 24"
-                              width="22">
-                              <path d="M21 11.3h-8.2V3c0-.4-.3-.8-.8-.8s-.8.4-.8.8v8.2H3c-.4 0-.8.3-.8.8s.3.8.8.8h8.2V21c0 .4.3.8.8.8s.8-.3.8-.8v-8.2H21c.4 0 .8-.3.8-.8s-.4-.7-.8-.7z"></path>
-                            </svg>
+                            <AddIcon />
                           </div>
-                          <form
-                            method="POST"
-                            role="presentation"
-                            style={{ display: 'none' }}>
-                            <input
-                              accept="image/jpeg,image/png,image/heic,image/heif"
-                              type="file"
-                              onChange={handleChange}
-                              style={{ display: 'none' }}
-                            />
-                          </form>
                         </div>
                       </div>
                     )}
@@ -536,9 +430,8 @@ const NewPost: React.FC = () => {
                           src={props.croppedImage}
                           alt="Cropped"
                           style={{
-                            display: `${
-                              index + 1 === imageNumber ? 'block' : 'none'
-                            }`,
+                            display: `${index + 1 === imageNumber ? 'block' : 'none'
+                              }`,
                           }}
                         />
                       );
@@ -570,7 +463,7 @@ const NewPost: React.FC = () => {
                             <a>
                               <ProfileImage
                                 size={'nav'}
-                                border={true}
+                                border={false}
                                 borderColor={'black'}
                                 imageUrl={userInfo.profileImageUrl}
                               />
@@ -656,6 +549,9 @@ const NewPost: React.FC = () => {
                 accept="image/jpeg,image/png,image/heic,image/heif"
                 type="file"
                 id="input"
+                onClick={(event) => {
+                  event.target.value = null
+                }}
                 onChange={handleChange}
                 style={{ display: 'none' }}
               />
