@@ -59,7 +59,7 @@ export function setBanner(banner: Banner): AppThunk {
   return (dispatch: any) => {
     try {
       dispatch(SET_BANNER(banner));
-    } catch (error) {}
+    } catch (error) { }
   };
 }
 

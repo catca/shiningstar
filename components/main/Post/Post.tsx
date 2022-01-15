@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { ProfileImage } from 'components/profile';
@@ -9,11 +9,19 @@ import Swipe from 'react-easy-swipe';
 
 import { Board } from 'types/profile/types';
 import { FavoriteIcon, CommentIcon, DirectIcon, MarkIcon, EmoticonIcon, SeeMoreIcon } from 'components/ui/Icon';
+import { fetchDeleteGood, fetchPostGood } from 'lib/apis/board';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser } from 'lib/redux/user/userSlice';
 
-const Post = ({ postData }: { postData: Board }) => {
+import FavoriteBorderRoundedIcon from '@material-ui/icons/FavoriteBorderRounded';
+
+const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value: any) => void }) => {
   const [imgCount, setImgCount] = useState(1);
   const [seeMore, setSeeMore] = useState(false);
   const [positionx, setPositionx] = useState(0);
+  const { userInfo } = useSelector(selectUser);
+  const dispatch = useDispatch();
+  const positionX = useRef<number>(0)
   const prevImg = () => {
     setImgCount((imgCount) => imgCount - 1);
   };
@@ -27,20 +35,22 @@ const Post = ({ postData }: { postData: Board }) => {
   //   console.log(positionX);
   // }, [positionX]);
 
-  const onSwipeMove = (position: { x: any; y: any }, event: any) => {
-    console.log(position.x);
+  const onSwipeMove = (position: { x: number; y: number }) => {
     if (postData.boardImageUrl.length == 1) {
       return;
     }
     if (imgCount == 1 && position.x < 0) {
+      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
     if (imgCount > 1 && imgCount < postData.boardImageUrl.length) {
+      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
     if (imgCount == postData.boardImageUrl.length && position.x > 0) {
+      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
@@ -48,14 +58,56 @@ const Post = ({ postData }: { postData: Board }) => {
   const onSwipeEnd = () => {
     if (positionx < -20) {
       setPositionx(() => 0);
+      positionX.current = 0;
       setImgCount((imgCount) => imgCount + 1);
     }
     if (positionx > 20) {
       setPositionx(() => 0);
+      positionX.current = 0;
       setImgCount((imgCount) => imgCount - 1);
     }
     setPositionx(() => 0);
+    positionX.current = 0;
   };
+
+  const [favorite, setFavorite] = React.useState<number>(0);
+  const [pressFavorite, setPressFavorite] = React.useState<boolean>(false);
+  const goodHandler = async () => {
+    if (pressFavorite) {
+      const res = await fetchDeleteGood(
+        postData._id,
+        userInfo.accessToken,
+      );
+      if (!res.ok) {
+        alert('좋아요를 취소하지 못했습니다.');
+      } else {
+        setFavorite((f) => f - 1);
+        setPressFavorite(false);
+        // setPostData({
+        //   ...selectedBoard,
+        //   favoriteCnt: selectedBoard.favoriteCnt - 1,
+        // }),
+      }
+    } else {
+      const res = await fetchPostGood(
+        postData._id,
+        userInfo.accessToken,
+      );
+      if (!res.ok) {
+        alert('좋아요를 누르지 못했습니다.');
+      } else {
+        setFavorite((f) => f + 1);
+        setPressFavorite(true);
+        // dispatch(
+        //   setSelectBoard({
+        //     ...selectedBoard,
+        //     favoriteCnt: selectedBoard.favoriteCnt + 1,
+        //   }),
+        // );
+      }
+    }
+  };
+
   return (
     <Article>
       <div>
@@ -71,7 +123,7 @@ const Post = ({ postData }: { postData: Board }) => {
               </div>
               <div>
                 <span>
-                  <Link href="/">{postData.username}</Link>
+                  <Link href={`/${postData.username}`}>{postData.username}</Link>
                 </span>
               </div>
             </Header>
@@ -90,7 +142,7 @@ const Post = ({ postData }: { postData: Board }) => {
           <div>
             <PostImage>
               <Swipe onSwipeEnd={onSwipeEnd} onSwipeMove={onSwipeMove}>
-                <ImgDiv imgCount={imgCount} positionx={positionx}>
+                <ImgDiv imgCount={imgCount} positionx={positionX.current}>
                   {postData.boardImageUrl.map((imageUrl, index) => {
                     return <Img key={index} src={imageUrl} alt="" />;
                   })}
@@ -135,8 +187,10 @@ const Post = ({ postData }: { postData: Board }) => {
             <div>
               <IconSection imgLength={postData.boardImageUrl.length}>
                 <span>
-                  <button>
-                    <FavoriteIcon />
+                  <button onClick={() => goodHandler()}>
+                    <FavoriteIcon
+                      on={pressFavorite}
+                    />
                   </button>
                 </span>
                 <span>

@@ -74,7 +74,7 @@ export default async function handler(
       { $unwind: '$profile' },
       {
         $project: {
-          _id: 0,
+          _id: 1,
           username: 1,
           boardImageUrl: 1,
           content: 1,
