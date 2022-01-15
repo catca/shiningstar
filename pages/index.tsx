@@ -6,7 +6,7 @@ import { GetStaticProps } from 'next';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { getTotalBoards } from 'lib/redux/profile/profileApis';
-import { selectProfile } from 'lib/redux/profile/profileSlice';
+import { selectProfile, setUserData } from 'lib/redux/profile/profileSlice';
 import { setBoardData } from 'lib/redux/profile/profileSlice';
 import { Board } from 'types/profile/types';
 import { Container } from 'components/ui/Container';
@@ -33,6 +33,7 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
       }).then(response => {
         console.log(response.data);
         setMainData(response.data);
+        // dispatch(setUserData(response.data));
       })
     }
   }, [userInfo]);
@@ -49,7 +50,7 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
               <div>
                 {/* <div>스토리</div> */}
                 {mainData.map((boardData, index) => {
-                  return <Post key={index} postData={boardData} />;
+                  return <Post key={index} postData={boardData} setPostData={setMainData} />;
                 })}
               </div>
               <div>
