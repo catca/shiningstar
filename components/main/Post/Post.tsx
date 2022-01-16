@@ -22,6 +22,19 @@ const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value:
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
   const positionX = useRef<number>(0)
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [text, setText] = useState("");
+  const [textAreaHeight, setTextAreaHeight] = useState("auto");
+
+  useEffect(() => {
+    setTextAreaHeight(`${textAreaRef.current!.scrollHeight}px`);
+  }, [text]);
+
+  const onChangeHandler = (event: { target: { value: string } }) => {
+    setTextAreaHeight("auto");
+    setText(event.target.value);
+  };
+
   const prevImg = () => {
     setImgCount((imgCount) => imgCount - 1);
   };
@@ -31,9 +44,6 @@ const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value:
   const postSeeMore = () => {
     setSeeMore(() => true);
   };
-  // useEffect(() => {
-  //   console.log(positionX);
-  // }, [positionX]);
 
   const onSwipeMove = (position: { x: number; y: number }) => {
     if (postData.boardImageUrl.length == 1) {
@@ -289,9 +299,16 @@ const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value:
                       <EmoticonIcon />
                     </IconButton>
                     <textarea
+                      ref={textAreaRef}
+                      rows={1}
+                      style={{
+                        height: textAreaHeight,
+                      }}
+                      onChange={onChangeHandler}
                       placeholder="댓글 달기..."
                       autoComplete="off"
-                      autoCorrect="off"></textarea>
+                      autoCorrect="off"
+                    />
                     <PostButton>게시</PostButton>
                   </form>
                 </div>
@@ -580,12 +597,13 @@ const CommentSection = styled.section`
     display: flex;
     align-items: center;
     & > textarea {
+      box-sizing: border-box;
       display: flex;
       flex-grow: 1;
       border: none;
       resize: none;
-      height: 18px;
       color: #262626;
+      min-heigth: 18px;
       max-height: 80px;
       line-height: 18px;
       &:focus {
