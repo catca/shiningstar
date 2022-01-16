@@ -13,8 +13,6 @@ import { fetchDeleteGood, fetchPostGood } from 'lib/apis/board';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
 
-import FavoriteBorderRoundedIcon from '@material-ui/icons/FavoriteBorderRounded';
-
 const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value: any) => void }) => {
   const [imgCount, setImgCount] = useState(1);
   const [seeMore, setSeeMore] = useState(false);

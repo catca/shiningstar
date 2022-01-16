@@ -38,8 +38,6 @@ const Crop = ({ image, id }: CropProps) => {
       image,
       croppedAreaPixels
     );
-    // id 수정 필요
-    console.log('id3', id);
     dispatch(updateCroppedImage({ id: id, croppedImage: croppedImage }));
   }
 
@@ -101,7 +99,9 @@ const Crop = ({ image, id }: CropProps) => {
                       max={2}
                       step={0.1}
                       value={zoom}
-                      onChange={(e) => setZoom(parseFloat(e.target.value))}
+                      onChange={(e: { target: { value: string } }) => {
+                        setZoom(parseFloat(e.target.value))
+                      }}
                     />
                   </div>
                 </div>

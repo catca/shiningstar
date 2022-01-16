@@ -46,6 +46,7 @@ const BoardBox: React.FC<BoardBoxProps> = ({ size, board }) => {
       }}
       onMouseOver={(e) => onMouseOver(e)}
       onMouseLeave={(e) => onMouseLeave(e)}>
+      {/* 이미지 url에 한글 들어가 있을 경우 화면에 보이지 않음 */}
       <Image
         className={s.image}
         src={board.boardImageUrl[0]}

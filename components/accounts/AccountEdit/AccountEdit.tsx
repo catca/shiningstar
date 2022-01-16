@@ -78,7 +78,7 @@ const AccountEdit = () => {
           },
         })
         .then((response) => {
-          dispatch(updateImageUrl(response.data.profileImageUrl));
+          dispatch(updateImageUrl(response.data));
         })
         .catch((error) => {
           console.log(error);
@@ -108,7 +108,6 @@ const AccountEdit = () => {
 
   return (
     <>
-      {/* //FIXME: 이 부분 css 해결이 안돼 ...... */}
       <div className={s.header}>
         <div className={cn(s.tit, s.profile)}>
           <ProfileImage size="m" imageUrl={userInfo.profileImageUrl} />

@@ -22,12 +22,12 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
       <h4>유저 목록</h4>
       {userList.map((user) => {
         return (
-          <Link href={`/${user.id}`} key={user.name}>
+          <Link href={`/${user.username}`} key={user.name}>
             <a className={s.userBox} onClick={closeModal}>
               <ProfileImage imageUrl={user.imageUrl} size="m" />
               <div>
                 <span>
-                  <b>{user.id}</b>
+                  <b>{user.username}</b>
                 </span>
                 <span style={{ color: 'rgb(120,120,120)', fontSize: '14px' }}>
                   {user.name}

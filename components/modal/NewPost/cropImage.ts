@@ -17,7 +17,7 @@ export default async function getCroppedImg(imageSrc: string, pixelCrop: { width
     const canvas = document.createElement('canvas')
     canvas.width = 614
     canvas.height = 614
-    const ctx = canvas.getContext('2d')
+    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d')
 
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, 614, 614)

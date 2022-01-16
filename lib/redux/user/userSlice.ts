@@ -66,10 +66,8 @@ export const setUser = (data: LoginData) => {
         `${NEXT_SERVER}/v1/user/login`,
         data,
       );
-      console.log(response.data);
       dispatch(SET_USER(response.data));
     } catch (error: any) {
-      console.log(error.response.data);
       dispatch(SET_ERROR(error.response.data.message));
     }
   };
@@ -87,9 +85,9 @@ export const clearError = () => {
   };
 };
 
-export const updateImageUrl = (data: string) => {
+export const updateImageUrl = (data: any) => {
   return async (dispatch: any) => {
-    dispatch(UPDATE_IMAGE_URL(data));
+    dispatch(UPDATE_IMAGE_URL(data.profileImageUrl));
   };
 };
 

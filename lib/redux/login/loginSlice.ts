@@ -17,7 +17,7 @@ export const loginSlice = createSlice({
   name: 'login',
   initialState,
   reducers: {
-    SET_LOGIN: (state, action: PayloadAction<string>) => {},
+    SET_LOGIN: (state, action: PayloadAction<string>) => { },
   },
 });
 

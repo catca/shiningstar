@@ -7,12 +7,7 @@ interface NewPostSliceProps {
   exist: boolean;
   image: string;
   croppedImage: string;
-  croppedAreaPixel: {
-    width: number | unknown,
-    height: number | unknown,
-    x: number,
-    y: number
-  }
+  croppedAreaPixel: any;
 }
 
 interface UpdateImage {
