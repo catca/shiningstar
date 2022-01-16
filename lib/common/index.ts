@@ -73,8 +73,8 @@ export const timeConvert = (time: number | string | any) => {
   if (days < 7) return `${Math.floor(days)}일 전`;
   const weeks = days / 7;
   if (new Date().getFullYear() - dateTime.getFullYear() == 0) {
-    return `${dateTime.getMonth() + 1}월 ${dateTime.getDay()}일`;
+    return `${dateTime.getMonth() + 1}월 ${dateTime.getDate()}일`;
   } else {
-    return `${dateTime.getFullYear() + 1}년 ${dateTime.getMonth() + 1}월 ${dateTime.getDay()}일`;
+    return `${dateTime.getFullYear()}년 ${dateTime.getMonth() + 1}월 ${dateTime.getDate()}일`;
   }
 }
