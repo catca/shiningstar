@@ -6,9 +6,11 @@ import { ProfileImage } from 'components/profile';
 
 import styled from '@emotion/styled';
 import UserSearchList from './UserSearchList';
+import { SearchIcon } from 'components/ui/Icon';
 
 const SearchBox: React.FC = () => {
   const [onUserList, setOnUserList] = useState<boolean>(false);
+  const [inputFocus, setInputFocus] = useState<boolean>(false);
   const el = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -17,6 +19,7 @@ const SearchBox: React.FC = () => {
       if (!inputRef.current?.contains(e.target)) {
         if (onUserList && (!el.current || !el.current.contains(e.target))) {
           setOnUserList(false);
+          setInputFocus(false);
         }
       }
     };
@@ -26,37 +29,75 @@ const SearchBox: React.FC = () => {
     };
   }, [onUserList]);
 
+  useEffect(() => {
+    console.log(inputFocus);
+  }, [inputFocus])
+
   return (
-    <div>
+    <Container onClick={() => setInputFocus(true)}>
       <Input
         ref={inputRef}
         onClick={() => {
           setOnUserList(true);
         }}
         type="text"
-        placeholder="검색"
+        placeholder={inputFocus ? "검색" : undefined}
       />
+      {inputFocus ? null :
+        <SearchIconWrapper>
+          <div>
+            <SearchIcon />
+          </div>
+          <span>
+            검색
+          </span>
+        </SearchIconWrapper>
+      }
       {onUserList && (
         <div ref={el}>
           <UserSearchList
-            userList={[]}
             closeModal={() => setOnUserList(false)}
           />
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 
 export default SearchBox;
 
+const Container = styled.div`
+  position: relative;
+`;
+
 const Input = styled.input`
   display: inline-block;
-  background-color: #f8f8f8;
-  border: 1px solid #e3e3e3;
-  width: 208px;
-  height: 24px;
-  border-radius: 5%;
-  text-align: center;
-  font-size: 14px;
+  background-color: #EFEFEF;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  width: 268px;
+  height: 36px;
+  border-radius: 8px;
+  font-size: 16px;
+  padding: 3px 16px;
+`;
+
+const SearchIconWrapper = styled.div`
+  display: flex;
+  position: absolute;
+  height: 36px;
+  padding: 0 16px;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  align-items: center;
+  & > span {
+    color: #8e8e8e;
+    height: 22px;
+    line-height: 18px;
+  }
+  & > div {
+    margin-right: 12px
+  }
 `;

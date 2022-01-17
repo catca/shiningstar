@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
 import s from './UserSearchList.module.css';
@@ -8,15 +8,17 @@ import { BaseUser3 } from 'types/profile/types';
 import styled from '@emotion/styled';
 
 interface UserSearchListProps {
-  userList: BaseUser3[];
   closeModal: () => void;
 }
 
-const UserSearchList: React.FC<UserSearchListProps> = ({
-  userList,
-  closeModal,
-}) => {
-  const router = useRouter();
+interface UserProps {
+  username: string;
+  name: string;
+  imageUrl: string;
+}
+
+const UserSearchList: React.FC<UserSearchListProps> = ({ closeModal }) => {
+  const [userList, setUserList] = useState<UserProps[]>([])
 
   return (
     <Container>
