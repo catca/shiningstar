@@ -1,8 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/dist/client/router';
-import s from './UserSearchList.module.css';
-import { ProfileImage } from 'components/profile';
 
 import styled from '@emotion/styled';
 import UserSearchList from './UserSearchList';
@@ -11,55 +7,77 @@ import { SearchIcon } from 'components/ui/Icon';
 const SearchBox: React.FC = () => {
   const [onUserList, setOnUserList] = useState<boolean>(false);
   const [inputFocus, setInputFocus] = useState<boolean>(false);
+  const [inputText, setInputText] = useState<string>("");
   const el = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const deleteIconRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleCloseSearch = (e: any) => {
-      if (!inputRef.current?.contains(e.target)) {
-        if (onUserList && (!el.current || !el.current.contains(e.target))) {
+    const handleCloseSearch = (e: CustomEvent<MouseEvent>) => {
+      if (!inputRef.current?.contains(e.target as Element)) {
+        if (onUserList && (!el.current || !el.current.contains(e.target as Element))) {
           setOnUserList(false);
           setInputFocus(false);
+          setInputText("");
         }
       }
     };
-    window.addEventListener('click', handleCloseSearch);
+    window.addEventListener('click', (handleCloseSearch) as EventListener);
     return () => {
-      window.removeEventListener('click', handleCloseSearch);
+      window.removeEventListener('click', (handleCloseSearch) as EventListener);
     };
   }, [onUserList]);
 
-  useEffect(() => {
-    console.log(inputFocus);
-  }, [inputFocus])
+  const deleteInputText = () => {
+    setOnUserList(false);
+    setInputFocus(false);
+    setInputText("");
+  }
+
+  const inputClick = (e: CustomEvent<MouseEvent>) => {
+    if (deleteIconRef.current?.contains(e.target as Element)) return;
+    setInputFocus(true);
+    setOnUserList(true);
+    if (null !== inputRef.current) {
+      inputRef.current.focus();
+    }
+  }
 
   return (
-    <Container onClick={() => setInputFocus(true)}>
-      <Input
-        ref={inputRef}
-        onClick={() => {
-          setOnUserList(true);
-        }}
-        type="text"
-        placeholder={inputFocus ? "검색" : undefined}
-      />
-      {inputFocus ? null :
-        <SearchIconWrapper>
-          <div>
-            <SearchIcon />
-          </div>
-          <span>
-            검색
-          </span>
-        </SearchIconWrapper>
-      }
-      {onUserList && (
-        <div ref={el}>
-          <UserSearchList
-            closeModal={() => setOnUserList(false)}
+    <Container onClick={(e) => inputClick(e)}>
+      <div>
+        <Input
+          ref={inputRef}
+          type="text"
+          placeholder={inputFocus ? "검색" : undefined}
+          value={inputText}
+          onChange={(e: { target: { value: string } }) => setInputText(e.target.value)}
+        />
+        {inputFocus ? null :
+          <SearchIconWrapper>
+            <div>
+              <SearchIcon />
+            </div>
+            <span>
+              검색
+            </span>
+          </SearchIconWrapper>
+        }
+        {inputFocus &&
+          <DeleteIcon
+            ref={deleteIconRef}
+            onClick={() => deleteInputText()}
+            style={{ backgroundImage: `url(/instagramIcon.png)` }}
           />
-        </div>
-      )}
+        }
+        {onUserList && (
+          <div ref={el}>
+            <UserSearchList
+              closeModal={() => setOnUserList(false)}
+            />
+          </div>
+        )}
+      </div>
     </Container>
   );
 };
@@ -67,7 +85,10 @@ const SearchBox: React.FC = () => {
 export default SearchBox;
 
 const Container = styled.div`
-  position: relative;
+  cursor: text;
+  & > div {
+    position: relative;
+  }
 `;
 
 const Input = styled.input`
@@ -100,4 +121,17 @@ const SearchIconWrapper = styled.div`
   & > div {
     margin-right: 12px
   }
+`;
+
+const DeleteIcon = styled.div`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  background-position: -318px -333px;
+  height: 20px;
+  width: 20px;
+  background-repeat: no-repeat;
+  cursor: default;
 `;
