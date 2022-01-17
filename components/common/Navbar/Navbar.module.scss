@@ -1,6 +1,7 @@
 .paper {
+  box-sizing: border-box;
   width: 100%;
-  height: 54px;
+  height: 60px;
   position: fixed;
   border-bottom: 1px solid rgba(var(--b6a, 219, 219, 219), 1);
   text-align: center;

@@ -8,7 +8,6 @@ import { logout, selectUser } from 'lib/redux/user/userSlice';
 import { setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
 import ProfileImage from 'components/profile/ProfileImage';
-import UserSearchList from './SearchBox';
 
 import { getBase3UserProfile } from 'lib/redux/profile/profileApis';
 import { BaseUser3 } from 'types/profile/types';
@@ -21,6 +20,7 @@ import {
 } from 'components/ui/Icon';
 import SelectBox from './SelectBox';
 import { useRouter } from 'next/router';
+import { SearchBox } from './SearchBox';
 
 const Navbar = () => {
   const { userInfo } = useSelector(selectUser);
@@ -38,20 +38,6 @@ const Navbar = () => {
   const fetchUserList = async () => {
     setUserList((await getBase3UserProfile()) as BaseUser3[]);
   };
-
-  useEffect(() => {
-    const handleCloseSearch = (e: any) => {
-      if (!inputRef.current?.contains(e.target)) {
-        if (onUserList && (!el.current || !el.current.contains(e.target))) {
-          setOnUserList(false);
-        }
-      }
-    };
-    window.addEventListener('click', handleCloseSearch);
-    return () => {
-      window.removeEventListener('click', handleCloseSearch);
-    };
-  }, [onUserList]);
 
   useEffect(() => {
     const handleCloseSelectBox = (e: any) => {
@@ -87,25 +73,7 @@ const Navbar = () => {
                 alt={'mainlogo'}></Image>
             </a>
           </Link>
-          <div>
-            <input
-              ref={inputRef}
-              onClick={() => {
-                setOnUserList(true);
-              }}
-              className={s.input}
-              type="text"
-              placeholder="검색"
-            />
-            {onUserList && (
-              <div ref={el}>
-                <UserSearchList
-                  userList={userList}
-                  closeModal={() => setOnUserList(false)}
-                />
-              </div>
-            )}
-          </div>
+          <SearchBox />
           <div className={s.right}>
             <div className={s.rightBanner}>
               <Link href="/">
