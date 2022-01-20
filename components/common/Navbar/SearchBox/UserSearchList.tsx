@@ -3,48 +3,60 @@ import Link from 'next/link';
 import { ProfileImage } from 'components/profile';
 
 import styled from '@emotion/styled';
+import { BaseUser3 } from 'types/profile/types';
 
 interface UserSearchListProps {
   closeModal: () => void;
+  inputText: string;
+  userList: BaseUser3[];
+  setUserList: (value: BaseUser3[]) => void;
 }
 
-interface UserProps {
-  username: string;
-  name: string;
-  imageUrl: string;
-}
-
-const UserSearchList: React.FC<UserSearchListProps> = ({ closeModal }) => {
-  const [userList, setUserList] = useState<UserProps[]>([])
+const UserSearchList: React.FC<UserSearchListProps> = ({
+  closeModal,
+  inputText,
+  userList,
+  setUserList
+}) => {
+  const clickUser = () => {
+    closeModal();
+    setUserList([]);
+  }
 
   return (
     <Container>
       <div>
         <Rhombus />
         <Wrapper>
-          <Title>
-            <h4>최근 검색 항목</h4>
-            <button>모두 지우기</button>
-          </Title>
-          {userList.map((user) => {
-            return (
-              <Link href={`/${user.username}`} key={user.name}>
-                <a onClick={closeModal}>
-                  <UserBox>
-                    <ProfileImage imageUrl={user.imageUrl} size="m" />
-                    <div>
-                      <span>
-                        <b>{user.username}</b>
-                      </span>
-                      <span style={{ color: 'rgb(120,120,120)', fontSize: '14px' }}>
-                        {user.name}
-                      </span>
-                    </div>
-                  </UserBox>
-                </a>
-              </Link>
-            );
-          })}
+          {inputText !== '' ?
+            <>
+              {userList.map((user) => {
+                return (
+                  <Link href={`/${user.username}`} key={user.name}>
+                    <a onClick={clickUser}>
+                      <UserBox>
+                        <ProfileImage imageUrl={user.imageUrl} size="m" />
+                        <div>
+                          <span>
+                            <b>{user.username}</b>
+                          </span>
+                          <span style={{ color: 'rgb(120,120,120)', fontSize: '14px' }}>
+                            {user.name}
+                          </span>
+                        </div>
+                      </UserBox>
+                    </a>
+                  </Link>
+                );
+              })}
+            </>
+            :
+            <Title>
+              <h4>최근 검색 항목</h4>
+              <button>모두 지우기</button>
+            </Title>
+          }
+
         </Wrapper>
       </div>
     </Container>

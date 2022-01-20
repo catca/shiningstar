@@ -3,11 +3,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import UserSearchList from './UserSearchList';
 import { SearchIcon } from 'components/ui/Icon';
+import axios from 'axios';
+import { NEXT_SERVER } from 'config';
+import { BaseUser3 } from 'types/profile/types';
 
 const SearchBox: React.FC = () => {
+  const [userList, setUserList] = useState<BaseUser3[]>([]);
   const [onUserList, setOnUserList] = useState<boolean>(false);
+  const [offModal, setOffModal] = useState<boolean>(false);
   const [inputFocus, setInputFocus] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>("");
+  const [timer, setTimer] = useState<NodeJS.Timeout>();
   const el = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const deleteIconRef = useRef<HTMLDivElement>(null);
@@ -34,7 +40,7 @@ const SearchBox: React.FC = () => {
     setInputText("");
   }
 
-  const inputClick = (e: CustomEvent<MouseEvent>) => {
+  const inputClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (deleteIconRef.current?.contains(e.target as Element)) return;
     setInputFocus(true);
     setOnUserList(true);
@@ -42,6 +48,37 @@ const SearchBox: React.FC = () => {
       inputRef.current.focus();
     }
   }
+
+  const searchUser = (e: { target: { value: string; }; }) => {
+    setInputText(e.target.value);
+    if (timer) {
+      clearTimeout(timer);
+    }
+    if (!e.target.value) return;
+    const newTimer = setTimeout(() => {
+      axios.get(`${NEXT_SERVER}/v1/profiles/${e.target.value}`)
+        .then((response) => {
+          setUserList(() => response.data);
+        })
+    }, 300);
+    setTimer(newTimer);
+  }
+
+  useEffect(() => {
+    console.log(onUserList, inputFocus, inputText);
+  }, [onUserList, inputFocus, inputText])
+
+  useEffect(() => {
+    if (setOffModal) {
+      setInputText("");
+      setOnUserList(false);
+      setOffModal(false);
+      setInputFocus(false);
+      if (null !== inputRef.current) {
+        inputRef.current.blur();
+      }
+    }
+  }, [offModal])
 
   return (
     <Container onClick={(e) => inputClick(e)}>
@@ -51,7 +88,7 @@ const SearchBox: React.FC = () => {
           type="text"
           placeholder={inputFocus ? "검색" : undefined}
           value={inputText}
-          onChange={(e: { target: { value: string } }) => setInputText(e.target.value)}
+          onChange={searchUser}
         />
         {inputFocus ? null :
           <SearchIconWrapper>
@@ -73,7 +110,10 @@ const SearchBox: React.FC = () => {
         {onUserList && (
           <div ref={el}>
             <UserSearchList
-              closeModal={() => setOnUserList(false)}
+              userList={userList}
+              setUserList={(value) => setUserList(value)}
+              inputText={inputText}
+              closeModal={() => setOffModal(true)}
             />
           </div>
         )}
