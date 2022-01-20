@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ProfileImage } from 'components/profile';
 
 import styled from '@emotion/styled';
 import { BaseUser3 } from 'types/profile/types';
+import axios from 'axios';
+import { NEXT_SERVER } from 'config';
+import { selectUser } from 'lib/redux/user/userSlice';
+import { useSelector } from 'react-redux';
 
 interface UserSearchListProps {
   closeModal: () => void;
@@ -18,10 +22,43 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
   userList,
   setUserList
 }) => {
-  const clickUser = () => {
+  const { userInfo } = useSelector(selectUser);
+  const [searchHistories, setSearchHistories] = useState<BaseUser3[]>([]);
+  const clickUser = (username: string) => {
     closeModal();
     setUserList([]);
+    if (username === userInfo.username) {
+      return;
+    } else {
+      axios
+        .put(`${NEXT_SERVER}/v1/profiles`,
+          {
+            searched: username
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${userInfo.accessToken}`,
+            }
+          })
+        .then((response) => {
+
+        })
+    }
   }
+
+  useEffect(() => {
+    axios
+      .get(`${NEXT_SERVER}/v1/profiles`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.accessToken}`,
+          }
+        })
+      .then((response) => {
+        console.log(response.data);
+        setSearchHistories(response.data);
+      })
+  }, [])
 
   return (
     <Container>
@@ -33,7 +70,7 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
               {userList.map((user) => {
                 return (
                   <Link href={`/${user.username}`} key={user.name}>
-                    <a onClick={clickUser}>
+                    <a onClick={() => clickUser(user.username)}>
                       <UserBox>
                         <ProfileImage imageUrl={user.imageUrl} size="m" />
                         <div>
@@ -51,10 +88,31 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
               })}
             </>
             :
-            <Title>
-              <h4>최근 검색 항목</h4>
-              <button>모두 지우기</button>
-            </Title>
+            <>
+              <Title>
+                <h4>최근 검색 항목</h4>
+                <button>모두 지우기</button>
+              </Title>
+              {searchHistories.map((user) => {
+                return (
+                  <Link href={`/${user.username}`} key={user.name}>
+                    <a onClick={() => clickUser(user.username)}>
+                      <UserBox>
+                        <ProfileImage imageUrl={user.imageUrl} size="m" />
+                        <div>
+                          <span>
+                            <b>{user.username}</b>
+                          </span>
+                          <span style={{ color: 'rgb(120,120,120)', fontSize: '14px' }}>
+                            {user.name}
+                          </span>
+                        </div>
+                      </UserBox>
+                    </a>
+                  </Link>
+                );
+              })}
+            </>
           }
 
         </Wrapper>
