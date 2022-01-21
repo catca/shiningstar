@@ -6,8 +6,11 @@ import { SearchIcon } from 'components/ui/Icon';
 import axios from 'axios';
 import { NEXT_SERVER } from 'config';
 import { BaseUser3 } from 'types/profile/types';
+import { selectUser } from 'lib/redux/user/userSlice';
+import { useSelector } from 'react-redux';
 
 const SearchBox: React.FC = () => {
+  const { userInfo } = useSelector(selectUser);
   const [userList, setUserList] = useState<BaseUser3[]>([]);
   const [onUserList, setOnUserList] = useState<boolean>(false);
   const [offModal, setOffModal] = useState<boolean>(false);
@@ -56,7 +59,12 @@ const SearchBox: React.FC = () => {
     }
     if (!e.target.value) return;
     const newTimer = setTimeout(() => {
-      axios.get(`${NEXT_SERVER}/v1/profiles/${e.target.value}`)
+      axios.get(`${NEXT_SERVER}/v1/profiles/${e.target.value}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userInfo.accessToken}`,
+          }
+        })
         .then((response) => {
           setUserList(() => response.data);
         })

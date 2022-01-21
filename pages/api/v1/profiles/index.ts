@@ -26,7 +26,7 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
 		searched: req.body.searched,
 	}
 	const searchHistory = new SearchHistory(data);
-	const searcher = await SearchHistory.findOne({ searcher: req.user.username })
+	const searcher = await SearchHistory.findOne({ searcher: req.user.username, searched: req.body.searched })
 	if (searcher) {
 		return res.status(200).json({ success: true });
 	} else {
@@ -50,7 +50,6 @@ apiRoute.get(async (req: any, res: NextApiResponse) => {
 	if (!req.user) {
 		return res.status(405).json({ status: 405, message: 'user doesnt exist' });
 	}
-	console.log(req.user.username);
 
 	SearchHistory.aggregate(
 		[
@@ -58,7 +57,7 @@ apiRoute.get(async (req: any, res: NextApiResponse) => {
 			{
 				$lookup: {
 					from: 'profiles',
-					localField: 'searcher',
+					localField: 'searched',
 					foreignField: 'username',
 					as: 'profile',
 				},
@@ -78,6 +77,18 @@ apiRoute.get(async (req: any, res: NextApiResponse) => {
 			return res.status(200).json(searchHistories);
 		},
 	);
+});
+
+apiRoute.delete(async (req: any, res: NextApiResponse) => {
+	await dbConnect();
+
+	if (!req.user) {
+		return res.status(405).json({ status: 405, message: 'user doesnt exist' });
+	}
+
+	const data = await SearchHistory.deleteMany({ searcher: req.user.username });
+
+	res.status(200).json(data);
 });
 
 export default apiRoute;

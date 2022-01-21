@@ -7,10 +7,15 @@ import { logout, selectUser } from 'lib/redux/user/userSlice';
 
 import styled from '@emotion/styled';
 import { ProfileIcon, SettingIcon } from 'components/ui/Icon';
+import router from 'next/router';
 
 const SelectBox: React.FC = () => {
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
+  const clickLogout = () => {
+    router.push('/');
+    dispatch(logout());
+  }
   return (
     <Container>
       <div>
@@ -42,7 +47,7 @@ const SelectBox: React.FC = () => {
           </Link>
           <Hr />
           <div>
-            <Box onClick={() => dispatch(logout())}>
+            <Box onClick={clickLogout}>
               <div>로그아웃</div>
             </Box>
             <div></div>
