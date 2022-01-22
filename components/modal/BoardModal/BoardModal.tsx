@@ -38,9 +38,9 @@ import {
   fetchPostGood,
 } from 'lib/apis/board';
 
-interface BoardModalProps { }
+interface BoardModalProps {}
 
-const BoardModal: React.FC<BoardModalProps> = ({ }) => {
+const BoardModal: React.FC<BoardModalProps> = ({}) => {
   const { selectedBoard } = useSelector(selectModal);
   const { userData } = useSelector(selectProfile);
   const { userInfo } = useSelector(selectUser);

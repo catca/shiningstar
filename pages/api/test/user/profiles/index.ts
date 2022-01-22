@@ -10,7 +10,6 @@ export default async function handler(
   const { db } = await connectToDatabase();
 
   await dbConnect();
-
   if (req.method === 'GET') {
     Profile.find(
       {},

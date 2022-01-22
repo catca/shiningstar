@@ -4,7 +4,6 @@ import { NEXT_SERVER } from 'config';
 import type {
   Profile,
   Board,
-  MyUserInfo,
   BaseUser3,
   UserBoards,
 } from 'types/profile/types';
@@ -25,11 +24,9 @@ export async function getProfileIds() {
   const userInfo: BaseUser3[] = await fetcher(
     `${NEXT_SERVER}/test/user/profiles`,
   );
-
   const paths = userInfo.map((arr) => {
     return arr.username;
   });
-
   // const paths: string[] = testUserData.map((arr) => {
   //   return arr.username.toString();
   // });

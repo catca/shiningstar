@@ -5,6 +5,7 @@ import Board from 'lib/mongoDB/models/Board';
 import BoardFavorite from 'lib/mongoDB/models/BoardFavorite';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { checkUser } from 'lib/middlewares';
+import Follow from 'lib/mongoDB/models/Follow';
 
 const apiRoute = nextConnect({
   onNoMatch: (req: NextApiRequest, res: NextApiResponse) => {
@@ -14,10 +15,11 @@ const apiRoute = nextConnect({
   },
 });
 
+apiRoute.use(checkUser());
+
 apiRoute.get(async (req: any, res: NextApiResponse) => {
   await dbConnect();
   const { boardId } = req.query;
-
   BoardFavorite.aggregate(
     [
       { $match: { boardId } },
@@ -30,7 +32,30 @@ apiRoute.get(async (req: any, res: NextApiResponse) => {
         },
       },
       {
+        $lookup: {
+          from: 'follows',
+          localField: 'username',
+          foreignField: 'follow',
+          as: 'follow',
+        },
+      },
+      {
         $unwind: '$user',
+      },
+      {
+        $addFields: {
+          followChecks: {
+            $size: {
+              $filter: {
+                input: '$follow',
+                as: 'f',
+                cond: {
+                  $eq: ['$$f.follower', req.user.username],
+                },
+              },
+            },
+          },
+        },
       },
       {
         $project: {
@@ -40,16 +65,19 @@ apiRoute.get(async (req: any, res: NextApiResponse) => {
           createDate: 1,
           imageUrl: '$user.imageUrl',
           name: '$user.name',
+          followCheck: { $cond: [{ $eq: ['$followChecks', 0] }, false, true] },
         },
       },
     ],
     (err: any, boardFavs: any) => {
-      return res.status(200).json(boardFavs);
+      if (!err) {
+        return res.status(200).json(boardFavs);
+      } else {
+        return res.status(500).json({ status: 500, message: 'get failed' });
+      }
     },
   );
 });
-
-apiRoute.use(checkUser());
 
 apiRoute.post(async (req: any, res: NextApiResponse) => {
   await dbConnect();

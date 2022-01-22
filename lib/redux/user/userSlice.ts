@@ -54,8 +54,8 @@ export const userSlice = createSlice({
       };
     },
     UPDATE_IMAGE_URL: (state, action: PayloadAction<string>) => {
-      state.userInfo.profileImageUrl = action.payload
-    }
+      state.userInfo.profileImageUrl = action.payload;
+    },
   },
 });
 
@@ -91,7 +91,8 @@ export const updateImageUrl = (data: any) => {
   };
 };
 
-export const { SET_USER, SET_ERROR, LOGOUT, CLEAR_ERROR, UPDATE_IMAGE_URL } = userSlice.actions;
+export const { SET_USER, SET_ERROR, LOGOUT, CLEAR_ERROR, UPDATE_IMAGE_URL } =
+  userSlice.actions;
 export const selectUser = (state: RootState) => state.user;
 
 export default userSlice.reducer;
