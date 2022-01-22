@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-import { GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { getAllBoard } from 'lib/redux/explore/exploreApis';
@@ -19,16 +19,16 @@ import { Modal } from 'components/modal';
 import { BoardContainer } from 'components/profile';
 
 import { ModalDataType } from 'types/modal/types';
-import type { Board } from 'types/profile/types';
+import type { Board, UserBoards } from 'types/profile/types';
 
-const Explore = ({ boardData }: { boardData: Board[] }) => {
+const Explore = ({ boardData }: { boardData: UserBoards }) => {
   const { selectedBoard, selectedReplyIdx, showModal, showBoardModal } =
     useSelector(selectModal);
 
   const dispatch = useDispatch();
 
   React.useEffect(() => {
-    // dispatch(setBoardData(boardData));
+    dispatch(setBoardData(boardData));
     dispatch(setBoardModal(false));
   }, []);
 
@@ -70,7 +70,7 @@ const Explore = ({ boardData }: { boardData: Board[] }) => {
         <meta />
       </Head>
       <Container modalOn={showBoardModal}>
-        <BoardContainer className={'pt'} />
+        {/* <BoardContainer className={'pt'} /> */}
       </Container>
       {showBoardModal && <BoardModal />}
       {showModal.reply && <Modal modalData={replyModal} />}
@@ -80,8 +80,9 @@ const Explore = ({ boardData }: { boardData: Board[] }) => {
 
 export default Explore;
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  const boardData = (await getAllBoard()) as Board[];
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const boardData = (await getAllBoard()) as UserBoards;
+
   return {
     props: {
       boardData,
