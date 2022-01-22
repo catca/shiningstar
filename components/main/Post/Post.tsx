@@ -12,8 +12,10 @@ import { FavoriteIcon, CommentIcon, DirectIcon, MarkIcon, EmoticonIcon, SeeMoreI
 import { fetchDeleteGood, fetchPostGood } from 'lib/apis/board';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
+import { NEXT_SERVER } from 'config';
+import fetcher from 'lib/common/fetcher';
 
-const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value: any) => void }) => {
+const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData: Board, setMainData: (value: any) => void }) => {
   const [imgCount, setImgCount] = useState(1);
   const [seeMore, setSeeMore] = useState(false);
   const [positionx, setPositionx] = useState(0);
@@ -91,10 +93,10 @@ const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value:
       } else {
         setFavorite((f) => f - 1);
         setPressFavorite(false);
-        // setPostData({
-        //   ...selectedBoard,
-        //   favoriteCnt: selectedBoard.favoriteCnt - 1,
-        // }),
+        // 데이터 변화 시 postData 값 사라짐
+        // setMainData(mainData.map(data => {
+        //   data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt - 1 } : data
+        // }));
       }
     } else {
       const res = await fetchPostGood(
@@ -106,15 +108,27 @@ const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value:
       } else {
         setFavorite((f) => f + 1);
         setPressFavorite(true);
-        // dispatch(
-        //   setSelectBoard({
-        //     ...selectedBoard,
-        //     favoriteCnt: selectedBoard.favoriteCnt + 1,
-        //   }),
-        // );
+        // setMainData(mainData.map(data => {
+        //   data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt + 1 } : data
+        // }));
       }
     }
   };
+
+  const fetchFavoriteCheckHandler = async () => {
+    const data: { check: boolean } = await fetcher(
+      `${NEXT_SERVER}/v1/board/checkFavorite/${postData._id}`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${userInfo.accessToken}` },
+      },
+    );
+    setPressFavorite(data.check);
+  };
+
+  useEffect(() => {
+    fetchFavoriteCheckHandler();
+  }, [])
 
   return (
     <Article>
@@ -264,25 +278,29 @@ const Post = ({ postData, setPostData }: { postData: Board, setPostData: (value:
                   <ReplyWrapper>
                     {postData.commentCnt > 2 && (
                       <ReplyCounter>
-                        <Link href={'/'}>
+                        <div>
                           댓글 {postData.commentCnt}개 모두 보기
-                        </Link>
+                        </div>
                       </ReplyCounter>
                     )}
                     {postData.comment ? postData.comment.map((reply: any, index: number) => {
-                      return (
-                        <div key={index}>
-                          <div>
-                            <NameSpan>
-                              <Link href={`/${reply.username}`}>{reply.username}</Link>
-                            </NameSpan>
-                            &nbsp;
-                            <span>
-                              <span>{reply.content}</span>
-                            </span>
+                      if (index > 1) {
+                        return;
+                      } else {
+                        return (
+                          <div key={index}>
+                            <div>
+                              <NameSpan>
+                                <Link href={`/${reply.username}`}>{reply.username}</Link>
+                              </NameSpan>
+                              &nbsp;
+                              <span>
+                                <span>{reply.content}</span>
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      );
+                        );
+                      }
                     }) : null}
                   </ReplyWrapper>
                 </div>
@@ -553,8 +571,10 @@ const ReplyWrapper = styled.div`
 
 const ReplyCounter = styled.div`
   margin-bottom: 4px;
-  & > a {
+  & > div {
+    display: inline;
     color: #8e8e8e;
+    cursor: pointer;
   }
 `;
 

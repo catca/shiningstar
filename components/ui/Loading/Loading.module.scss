@@ -1,5 +1,5 @@
 $max: 12;
-$angle: 360/$max;
+$angle: calc(360 / $max);
 $size: 20px;
 $fill: #000;
 
@@ -18,14 +18,14 @@ $fill: #000;
 }
 
 .gCircle {
-  transform-origin: $size/2 $size/2;
+  transform-origin: calc($size / 2) calc($size / 2);
   
   fill: $fill;
   animation: opacity 1.2s linear infinite;
   
   @for $item from 1 through $max {
     &:nth-child(#{$max}n + #{$item}){
-      animation-delay: -#{$item/10}s;
+      animation-delay: -#{calc($item / 10)}s;
       transform: transform($item) scale(.9);
     }
   }

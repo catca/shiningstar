@@ -49,8 +49,15 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
             <Section>
               <div>
                 {/* <div>스토리</div> */}
-                {mainData.map((boardData, index) => {
-                  return <Post key={index} postData={boardData} setPostData={setMainData} />;
+                {mainData.map((postData, index) => {
+                  return (
+                    <Post
+                      key={index}
+                      postData={postData}
+                      setMainData={setMainData}
+                      mainData={mainData}
+                    />
+                  );
                 })}
               </div>
               <div>

@@ -1,20 +1,26 @@
 /* eslint-disable @next/next/link-passhref */
 import React from 'react';
+import styled from '@emotion/styled';
 import Link from 'next/link';
+import router from 'next/router';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, selectUser } from 'lib/redux/user/userSlice';
-
-import styled from '@emotion/styled';
 import { ProfileIcon, SettingIcon } from 'components/ui/Icon';
-import router from 'next/router';
 
-const SelectBox: React.FC = () => {
+interface SelectBoxProps {
+  closeModal: () => void;
+}
+
+const SelectBox: React.FC<SelectBoxProps> = ({ closeModal }) => {
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
   const clickLogout = () => {
     router.push('/');
     dispatch(logout());
+  }
+  const clickLink = () => {
+    closeModal();
   }
   return (
     <Container>
@@ -22,7 +28,7 @@ const SelectBox: React.FC = () => {
         <Rhombus />
         <Wrapper>
           <Link href={`/${userInfo.username}`}>
-            <A>
+            <A onClick={clickLink}>
               <Box>
                 <div style={{ marginRight: '12px' }}>
                   <ProfileIcon />
@@ -34,7 +40,7 @@ const SelectBox: React.FC = () => {
             </A>
           </Link>
           <Link href={'/accounts/edit'}>
-            <A>
+            <A onClick={clickLink}>
               <Box>
                 <div style={{ marginRight: '12px' }}>
                   <SettingIcon />

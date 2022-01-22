@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { ProfileImage } from 'components/profile';
-
 import styled from '@emotion/styled';
-import { BaseUser3 } from 'types/profile/types';
 import axios from 'axios';
+import router from 'next/router';
+
+import { ProfileImage } from 'components/profile';
+import { BaseUser3 } from 'types/profile/types';
 import { NEXT_SERVER } from 'config';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { useSelector } from 'react-redux';
 import { DeleteIcon } from 'components/ui/Icon';
 import { Loading } from 'components/ui/Loading';
-import router from 'next/router';
 
 interface UserSearchListProps {
   listLoading: boolean;

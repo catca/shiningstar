@@ -4,13 +4,9 @@ import Image from 'next/image';
 import s from './Navbar.module.scss';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { logout, selectUser } from 'lib/redux/user/userSlice';
-import { setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
-
+import { selectUser } from 'lib/redux/user/userSlice';
+import { setModal } from 'lib/redux/modal/modalSlice';
 import ProfileImage from 'components/profile/ProfileImage';
-
-import { getBase3UserProfile } from 'lib/redux/profile/profileApis';
-import { BaseUser3 } from 'types/profile/types';
 import {
   HomeIcon,
   DirectIcon,
@@ -24,20 +20,13 @@ import { SearchBox } from './SearchBox';
 
 const Navbar = () => {
   const { userInfo } = useSelector(selectUser);
-  const [userList, setUserList] = useState<BaseUser3[]>([]);
   const dispatch = useDispatch();
   const router = useRouter();
-
-  const [onUserList, setOnUserList] = useState<boolean>(false);
+  const [offModal, setOffModal] = useState<boolean>(false);
   const [onSelectBox, setOnSelectBox] = useState<boolean>(false);
-  const el = useRef<HTMLDivElement>(null);
   const selectBoxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<any>();
   const spanRef = useRef<any>();
-
-  const fetchUserList = async () => {
-    setUserList((await getBase3UserProfile()) as BaseUser3[]);
-  };
 
   useEffect(() => {
     const handleCloseSelectBox = (e: any) => {
@@ -57,8 +46,11 @@ const Navbar = () => {
   }, [onSelectBox]);
 
   useEffect(() => {
-    fetchUserList();
-  }, []);
+    if (offModal) {
+      setOnSelectBox(false);
+      setOffModal(false);
+    }
+  }, [offModal]);
 
   return (
     <>
@@ -97,7 +89,7 @@ const Navbar = () => {
                 </a>
               </Link>
 
-              {/* <div onClick={() => dispatch(logout())}>
+              {/* <div>
                 <FavoriteIcon />
               </div> */}
 
@@ -128,7 +120,9 @@ const Navbar = () => {
                 </span>
                 {onSelectBox && (
                   <div ref={selectBoxRef}>
-                    <SelectBox />
+                    <SelectBox
+                      closeModal={() => setOffModal(true)}
+                    />
                   </div>
                 )}
               </div>
