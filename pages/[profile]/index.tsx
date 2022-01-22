@@ -11,6 +11,7 @@ import {
 import {
   initialBanner,
   setBoardData,
+  setIsFollow,
   setUserData,
 } from 'lib/redux/profile/profileSlice';
 import {
@@ -29,6 +30,8 @@ import { ParsedUrlQuery } from 'querystring';
 
 import { Profile, UserBoards } from 'types/profile/types';
 import { ModalDataType } from 'types/modal/types';
+import { followChecker } from 'lib/apis/user';
+import { selectUser } from 'lib/redux/user/userSlice';
 
 const UserProfile = ({
   bannerList,
@@ -42,6 +45,7 @@ const UserProfile = ({
   boardData: UserBoards;
 }) => {
   const { selectedBoard, showBoardModal, showModal } = useSelector(selectModal);
+  const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
 
   // FIXME:이 부분 좀 어떻게하면 자연스럽게할지 고민해보자
@@ -50,13 +54,21 @@ const UserProfile = ({
     check = Object.values(showModal).includes(true);
     return check || showBoardModal;
   };
+  const fetchIsFollow = async () => {
+    const checker = await followChecker(
+      userData.username,
+      userInfo.accessToken,
+    );
 
+    dispatch(setIsFollow(checker.check));
+  };
   React.useEffect(() => {
     dispatch(initialBanner());
     dispatch(setBoardModal(false));
     dispatch(setUserData(userData));
     dispatch(setModalInitial());
     dispatch(setBoardData(boardData));
+    fetchIsFollow();
   }, [profile]);
 
   const followerModal: ModalDataType[] = [{ name: '팔로워', link: undefined }];
@@ -157,6 +169,5 @@ export const getStaticProps: GetStaticProps = async (context) => {
       profile,
       boardData: (await getUserBoard(profile)) as UserBoards,
     },
-    revalidate: 1,
   };
 };
