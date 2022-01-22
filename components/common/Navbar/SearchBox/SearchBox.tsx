@@ -73,10 +73,6 @@ const SearchBox: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log(onUserList, inputFocus, inputText);
-  }, [onUserList, inputFocus, inputText])
-
-  useEffect(() => {
     if (setOffModal) {
       setInputText("");
       setOnUserList(false);

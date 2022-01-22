@@ -63,19 +63,8 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
     }
   }
 
-  const clickSearchHistories = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, username: string) => {
-    console.log(e.currentTarget, deleteIconRef.current?.parentNode)
-    if (null !== deleteIconRef.current) {
-      if (e.currentTarget?.contains(deleteIconRef.current.parentElement)) {
-        console.log('제대로 찍으셨어요')
-        return;
-      }
-    }
-    closeModal();
-    setUserList([]);
-  }
-
-  const deleteUser = (username: string) => {
+  const deleteUser = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, username: string) => {
+    e.stopPropagation();
     axios
       .delete(`${NEXT_SERVER}/v1/profiles/${username}`,
         {
@@ -84,10 +73,8 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
           }
         })
       .then((response) => {
-        setSearchHistories(
-          searchHistories.filter((user) => {
-            user.username !== username
-          }));
+        setSearchHistories(() =>
+          searchHistories.filter((user) => user.username !== username));
       })
   }
 
@@ -151,7 +138,7 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
                 searchHistories.map((user) => {
                   return (
                     <div
-                      onClick={(e) => clickSearchHistories(e, user.username)}
+                      onClick={(e) => clickUser(e, user.username)}
                       key={user.name}
                     >
                       <UserBox>
@@ -169,7 +156,7 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
                         <IconWrapper>
                           <Button
                             ref={deleteIconRef}
-                            onClick={() => deleteUser(user.username)}
+                            onClick={(e) => deleteUser(e, user.username)}
                           >
                             <DeleteIcon searchBox={true} />
                           </Button>

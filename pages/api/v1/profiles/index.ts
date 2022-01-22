@@ -28,6 +28,10 @@ apiRoute.put(async (req: any, res: NextApiResponse) => {
 	const searchHistory = new SearchHistory(data);
 	const searcher = await SearchHistory.findOne({ searcher: req.user.username, searched: req.body.searched })
 	if (searcher) {
+		await SearchHistory.findOneAndUpdate(
+			{ searcher: req.user.username, searched: req.body.searched },
+			{ searcher: req.user.username, searched: req.body.searched }
+		)
 		return res.status(200).json({ success: true });
 	} else {
 		searchHistory.save(
@@ -69,11 +73,12 @@ apiRoute.get(async (req: any, res: NextApiResponse) => {
 					username: '$searched',
 					name: '$profile.name',
 					imageUrl: '$profile.imageUrl',
+					updatedAt: 1,
 				},
 			},
+			{ $sort: { updatedAt: -1 } }
 		],
 		(err: any, searchHistories: any) => {
-			console.log(searchHistories);
 			return res.status(200).json(searchHistories);
 		},
 	);

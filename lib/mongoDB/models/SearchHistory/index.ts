@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export interface SearchHistoryProps {
   searcher: string;
   searched: string;
-  createDate: Date;
+  createdDate: Date;
 }
 
 const SearchHistorySchema = new mongoose.Schema<SearchHistoryProps>({
@@ -17,11 +17,9 @@ const SearchHistorySchema = new mongoose.Schema<SearchHistoryProps>({
     required: true,
     unique: false,
   },
-  createDate: {
-    type: Date,
-    unique: false,
-  },
-});
+},
+  { timestamps: true }
+);
 
 export default mongoose.models.SearchHistory ||
   mongoose.model('SearchHistory', SearchHistorySchema, 'searchHistories');
