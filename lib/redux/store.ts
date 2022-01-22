@@ -1,7 +1,6 @@
 import { combineReducers, configureStore, Action } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import loginSlice from './login/loginSlice';
 import modalSlice from './modal/modalSlice';
 import profileSlice from './profile/profileSlice';
 import userSlice from './user/userSlice';
@@ -22,7 +21,6 @@ const persistConfig = {
 const rootReducer = combineReducers({
   profile: profileSlice,
   modal: modalSlice,
-  login: loginSlice,
   user: userSlice,
   newPost: newPostSlice,
 });
