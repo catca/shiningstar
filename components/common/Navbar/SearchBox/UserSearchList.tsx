@@ -9,9 +9,11 @@ import { NEXT_SERVER } from 'config';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { useSelector } from 'react-redux';
 import { DeleteIcon } from 'components/ui/Icon';
+import { Loading } from 'components/ui/Loading';
 import router from 'next/router';
 
 interface UserSearchListProps {
+  listLoading: boolean;
   closeModal: () => void;
   inputText: string;
   userList: BaseUser3[];
@@ -19,6 +21,7 @@ interface UserSearchListProps {
 }
 
 const UserSearchList: React.FC<UserSearchListProps> = ({
+  listLoading,
   closeModal,
   inputText,
   userList,
@@ -26,7 +29,8 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
 }) => {
   const { userInfo } = useSelector(selectUser);
   const [searchHistories, setSearchHistories] = useState<BaseUser3[]>([]);
-  const deleteIconRef = useRef<HTMLButtonElement>(null);
+  const deleteIconRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     axios
@@ -38,6 +42,7 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
         })
       .then((response) => {
         setSearchHistories(response.data);
+        setLoading(() => false);
       })
   }, [])
 
@@ -63,19 +68,8 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
     }
   }
 
-  const clickSearchHistories = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, username: string) => {
-    console.log(e.currentTarget, deleteIconRef.current?.parentNode)
-    if (null !== deleteIconRef.current) {
-      if (e.currentTarget?.contains(deleteIconRef.current.parentElement)) {
-        console.log('제대로 찍으셨어요')
-        return;
-      }
-    }
-    closeModal();
-    setUserList([]);
-  }
-
-  const deleteUser = (username: string) => {
+  const deleteUser = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, username: string) => {
+    e.stopPropagation();
     axios
       .delete(`${NEXT_SERVER}/v1/profiles/${username}`,
         {
@@ -84,10 +78,8 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
           }
         })
       .then((response) => {
-        setSearchHistories(
-          searchHistories.filter((user) => {
-            user.username !== username
-          }));
+        setSearchHistories(() =>
+          searchHistories.filter((user) => user.username !== username));
       })
   }
 
@@ -104,11 +96,6 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
       });
   }
 
-  useEffect(() => {
-    console.log(searchHistories);
-  }, [searchHistories]);
-
-
   return (
     <Container>
       <div>
@@ -116,47 +103,16 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
         <Wrapper>
           {inputText !== '' ?
             <>
-              {userList.map((user) => {
-                return (
-                  <div
-                    onClick={(e) => clickUser(e, user.username)}
-                    key={user.name}
-                  >
-                    <UserBox>
-                      <ImageWrapper>
-                        <ProfileImage imageUrl={user.imageUrl} size="m" />
-                      </ImageWrapper>
-                      <ProfileIntro>
-                        <span>
-                          <b>{user.username}</b>
-                        </span>
-                        <span style={{ color: 'rgb(120,120,120)', fontSize: '14px' }}>
-                          {user.name}
-                        </span>
-                      </ProfileIntro>
-                    </UserBox>
-                  </div>
-                );
-              })}
-            </>
-            :
-            <>
-              <Title>
-                <h4>최근 검색 항목</h4>
-                {searchHistories.length > 0 &&
-                  <button onClick={deleteUsers}>모두 지우기</button>
-                }
-              </Title>
-              {searchHistories.length > 0 ?
-                searchHistories.map((user) => {
+              {userList.length > 0 ?
+                userList.map((user) => {
                   return (
                     <div
-                      onClick={(e) => clickSearchHistories(e, user.username)}
-                      key={user.name}
+                      onClick={(e) => clickUser(e, user.username)}
+                      key={user.username}
                     >
                       <UserBox>
                         <ImageWrapper>
-                          <ProfileImage imageUrl={user.imageUrl} size="m" />
+                          <ProfileImage imageUrl={user.imageUrl ? user.imageUrl : ''} size="search" />
                         </ImageWrapper>
                         <ProfileIntro>
                           <span>
@@ -166,24 +122,71 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
                             {user.name}
                           </span>
                         </ProfileIntro>
-                        <IconWrapper>
-                          <Button
-                            ref={deleteIconRef}
-                            onClick={() => deleteUser(user.username)}
-                          >
-                            <DeleteIcon searchBox={true} />
-                          </Button>
-                        </IconWrapper>
                       </UserBox>
                     </div>
                   );
                 })
                 :
-                <NoHistory>
-                  <div>
-                    최근 검색 내역 없음.
-                  </div>
-                </NoHistory>
+                <NoUser>
+                  {listLoading ?
+                    <Loading />
+                    :
+                    <div>
+                      검색 결과 없음
+                    </div>
+                  }
+                </NoUser>
+              }
+            </>
+            :
+            <>
+              <Title>
+                <h4>최근 검색 항목</h4>
+                {searchHistories.length > 0 &&
+                  <button onClick={deleteUsers}>모두 지우기</button>
+                }
+              </Title>
+              {loading ?
+                <NoUser>
+                  <Loading />
+                </NoUser>
+                :
+                searchHistories.length > 0 ?
+                  searchHistories.map((user) => {
+                    return (
+                      <div
+                        onClick={(e) => clickUser(e, user.username)}
+                        key={user.username}
+                      >
+                        <UserBox>
+                          <ImageWrapper>
+                            <ProfileImage imageUrl={user.imageUrl} size="search" />
+                          </ImageWrapper>
+                          <ProfileIntro>
+                            <span>
+                              <b>{user.username}</b>
+                            </span>
+                            <span style={{ color: 'rgb(120,120,120)', fontSize: '14px' }}>
+                              {user.name}
+                            </span>
+                          </ProfileIntro>
+                          <div
+                            ref={deleteIconRef}
+                            onClick={(e) => deleteUser(e, user.username)}
+                            style={{ display: 'flex', width: '32px', height: '32px', justifyContent: 'center', alignItems: 'center' }}
+                          >
+                            <DeleteIcon searchBox={true} />
+                          </div>
+                        </UserBox>
+                      </div>
+                    );
+                  })
+                  :
+                  <NoUser>
+                    <div>
+                      최근 검색 목록 없음.
+                    </div>
+                  </NoUser>
               }
             </>
           }
@@ -216,12 +219,12 @@ const UserBox = styled.div`
   padding: 8px 16px;
   cursor: pointer;
   &:hover {
-    background-color: #fefefe;
+    background-color: #f4f4f4;
   }
 `;
 
 const ImageWrapper = styled.div`
-  padding-right: 8px;
+  padding-right: 12px;
 `;
 
 
@@ -246,6 +249,9 @@ const Button = styled.button`
   height: 32px;
   background-color: #FFF;
   padding: 0;
+  &:hover {
+    background-color: #F4F4F4;
+  }
 `;
 
 const Rhombus = styled.div`
@@ -279,7 +285,7 @@ const Wrapper = styled.div`
 const Title = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 4px 16px 0;
+  margin: 4px 16px 6px;
   max-height: 24px;
   & > h4 {
     display: block;
@@ -298,7 +304,7 @@ const Title = styled.div`
   }
 `;
 
-const NoHistory = styled.div`
+const NoUser = styled.div`
   display: flex;
   width: 100%;
   height: 100%;

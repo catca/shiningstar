@@ -8,6 +8,7 @@ import { NEXT_SERVER } from 'config';
 import { BaseUser3 } from 'types/profile/types';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { useSelector } from 'react-redux';
+import { Loading } from 'components/ui/Loading';
 
 const SearchBox: React.FC = () => {
   const { userInfo } = useSelector(selectUser);
@@ -17,17 +18,24 @@ const SearchBox: React.FC = () => {
   const [inputFocus, setInputFocus] = useState<boolean>(false);
   const [inputText, setInputText] = useState<string>("");
   const [timer, setTimer] = useState<NodeJS.Timeout>();
+  const [loading, setLoading] = useState<boolean>(false);
   const el = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const deleteIconRef = useRef<HTMLDivElement>(null);
+
+  const deleteInputText = () => {
+    setOnUserList(false);
+    setInputFocus(false);
+    setLoading(false);
+    setInputText("");
+    setUserList([]);
+  }
 
   useEffect(() => {
     const handleCloseSearch = (e: CustomEvent<MouseEvent>) => {
       if (!inputRef.current?.contains(e.target as Element)) {
         if (onUserList && (!el.current || !el.current.contains(e.target as Element))) {
-          setOnUserList(false);
-          setInputFocus(false);
-          setInputText("");
+          deleteInputText();
         }
       }
     };
@@ -36,12 +44,6 @@ const SearchBox: React.FC = () => {
       window.removeEventListener('click', (handleCloseSearch) as EventListener);
     };
   }, [onUserList]);
-
-  const deleteInputText = () => {
-    setOnUserList(false);
-    setInputFocus(false);
-    setInputText("");
-  }
 
   const inputClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (deleteIconRef.current?.contains(e.target as Element)) return;
@@ -58,6 +60,7 @@ const SearchBox: React.FC = () => {
       clearTimeout(timer);
     }
     if (!e.target.value) return;
+    setLoading(() => true);
     const newTimer = setTimeout(() => {
       axios.get(`${NEXT_SERVER}/v1/profiles/${e.target.value}`,
         {
@@ -67,26 +70,27 @@ const SearchBox: React.FC = () => {
         })
         .then((response) => {
           setUserList(() => response.data);
+          setLoading(() => false);
         })
     }, 300);
     setTimer(newTimer);
   }
 
   useEffect(() => {
-    console.log(onUserList, inputFocus, inputText);
-  }, [onUserList, inputFocus, inputText])
-
-  useEffect(() => {
-    if (setOffModal) {
-      setInputText("");
-      setOnUserList(false);
-      setOffModal(false);
-      setInputFocus(false);
+    if (offModal) {
+      deleteInputText();
       if (null !== inputRef.current) {
         inputRef.current.blur();
       }
     }
   }, [offModal])
+
+  useEffect(() => {
+    if (!inputText) {
+      setLoading(() => false);
+      setUserList([]);
+    }
+  }, [inputText]);
 
   return (
     <Container onClick={(e) => inputClick(e)}>
@@ -109,6 +113,11 @@ const SearchBox: React.FC = () => {
           </SearchIconWrapper>
         }
         {inputFocus &&
+          loading ?
+          <LoadingWrapper>
+            <Loading />
+          </LoadingWrapper>
+          :
           <DeleteIcon
             ref={deleteIconRef}
             onClick={() => deleteInputText()}
@@ -118,6 +127,7 @@ const SearchBox: React.FC = () => {
         {onUserList && (
           <div ref={el}>
             <UserSearchList
+              listLoading={loading}
               userList={userList}
               setUserList={(value) => setUserList(value)}
               inputText={inputText}
@@ -178,6 +188,18 @@ const DeleteIcon = styled.div`
   transform: translateY(-50%);
   z-index: 3;
   background-position: -318px -333px;
+  height: 20px;
+  width: 20px;
+  background-repeat: no-repeat;
+  cursor: default;
+`;
+
+const LoadingWrapper = styled.div`
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
   height: 20px;
   width: 20px;
   background-repeat: no-repeat;
