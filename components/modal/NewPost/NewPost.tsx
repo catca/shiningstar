@@ -549,7 +549,7 @@ const NewPost: React.FC = () => {
                 accept="image/jpeg,image/png,image/heic,image/heif"
                 type="file"
                 id="input"
-                onClick={(event) => {
+                onClick={(event: any) => {
                   event.target.value = null
                 }}
                 onChange={handleChange}

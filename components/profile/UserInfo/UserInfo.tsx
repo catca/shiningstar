@@ -13,12 +13,11 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import MoreHorizSharpIcon from '@material-ui/icons/MoreHorizSharp';
 
 import { formatNumber } from 'lib/common';
-import { selectLogin } from 'lib/redux/login/loginSlice';
 import { selectUser } from 'lib/redux/user/userSlice';
 
-interface UserInfoProps {}
+interface UserInfoProps { }
 
-const UserInfo: React.FC<UserInfoProps> = ({}) => {
+const UserInfo: React.FC<UserInfoProps> = ({ }) => {
   const { login, userInfo } = useSelector(selectUser);
   const { userData } = useSelector(selectProfile);
   const dispatch = useDispatch();
