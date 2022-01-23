@@ -7,9 +7,9 @@ import Link from 'next/link';
 import { postFormatNumber, timeConvert } from 'lib/common';
 import Swipe from 'react-easy-swipe';
 
-import { Board } from 'types/profile/types';
+import { Board, PostReply } from 'types/profile/types';
 import { FavoriteIcon, CommentIcon, DirectIcon, MarkIcon, EmoticonIcon, SeeMoreIcon } from 'components/ui/Icon';
-import { fetchDeleteGood, fetchPostGood } from 'lib/apis/board';
+import { fetchDeleteGood, fetchPostComment, fetchPostGood } from 'lib/apis/board';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { NEXT_SERVER } from 'config';
@@ -17,15 +17,15 @@ import fetcher from 'lib/common/fetcher';
 import { setBoardModal, setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
 const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData: Board, setMainData: (value: any) => void }) => {
-  const [imgCount, setImgCount] = useState(1);
-  const [seeMore, setSeeMore] = useState(false);
-  const [positionx, setPositionx] = useState(0);
   const { userInfo } = useSelector(selectUser);
+  const [imgCount, setImgCount] = useState<number>(1);
+  const [seeMore, setSeeMore] = useState<boolean>(false);
+  const [positionx, setPositionx] = useState<number>(0);
   const dispatch = useDispatch();
   const positionX = useRef<number>(0)
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [text, setText] = useState("");
-  const [textAreaHeight, setTextAreaHeight] = useState("auto");
+  const [text, setText] = useState<string>("");
+  const [textAreaHeight, setTextAreaHeight] = useState<string>("auto");
 
   useEffect(() => {
     setTextAreaHeight(`${textAreaRef.current!.scrollHeight}px`);
@@ -124,6 +124,26 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       },
     );
     setPressFavorite(data.check);
+  };
+
+  const postReplyHandler = async (text: string) => {
+    //TODO: rest api post 과정 추가
+    const reply = {
+      username: userInfo.username,
+      content: text
+    }
+    if (postData !== undefined) {
+      const res = await fetchPostComment(
+        postData._id,
+        userInfo.accessToken,
+        reply,
+      );
+      if (!res.ok) {
+        alert('댓글 작성에 실패했습니다');
+      } else {
+        setText("");
+      }
+    }
   };
 
   useEffect(() => {
@@ -337,7 +357,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                       autoComplete="off"
                       autoCorrect="off"
                     />
-                    <PostButton>게시</PostButton>
+                    <PostButton onClick={() => postReplyHandler(text)}>게시</PostButton>
                   </form>
                 </div>
               </CommentSection>
