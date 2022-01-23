@@ -19,7 +19,7 @@ import axios from 'axios';
 import { NEXT_SERVER } from 'config';
 import { useState } from 'react';
 
-const Main = ({ boardData }: { boardData: Board[] }) => {
+const Main = () => {
   const { login, userInfo } = useSelector(selectUser);
   const [mainData, setMainData] = useState([]);
   const dispatch = useDispatch();
@@ -76,15 +76,6 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
 };
 
 export default Main;
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {
-      boardData: (await getTotalBoards()) as Board[],
-    },
-    revalidate: 1,
-  };
-};
 
 const Section = styled.section`
   max-width: 935px;
