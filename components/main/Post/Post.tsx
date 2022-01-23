@@ -93,10 +93,9 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       } else {
         setFavorite((f) => f - 1);
         setPressFavorite(false);
-        // 데이터 변화 시 postData 값 사라짐
-        // setMainData(mainData.map(data => {
-        //   data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt - 1 } : data
-        // }));
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt - 1 } : data
+        }));
       }
     } else {
       const res = await fetchPostGood(
@@ -108,9 +107,9 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       } else {
         setFavorite((f) => f + 1);
         setPressFavorite(true);
-        // setMainData(mainData.map(data => {
-        //   data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt + 1 } : data
-        // }));
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt + 1 } : data
+        }));
       }
     }
   };
