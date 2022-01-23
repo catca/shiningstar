@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { NEXT_SERVER } from 'config';
 import fetcher from 'lib/common/fetcher';
-import { setBoardModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
+import { setBoardModal, setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
 const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData: Board, setMainData: (value: any) => void }) => {
   const [imgCount, setImgCount] = useState(1);
@@ -130,9 +130,14 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
     fetchFavoriteCheckHandler();
   }, [])
 
-  const openModal = () => {
+  const openBoardModal = () => {
     dispatch(setSelectBoard(postData));
     dispatch(setBoardModal(true));
+  }
+
+  const openFavoriteModal = async () => {
+    await dispatch(setSelectBoard(postData));
+    dispatch(setModal('favorite', true));
   }
 
   return (
@@ -221,7 +226,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                   </button>
                 </span>
                 <span>
-                  <button onClick={openModal}>
+                  <button onClick={openBoardModal}>
                     <CommentIcon />
                   </button>
                 </span>
@@ -237,7 +242,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                 </span>
               </IconSection>
               <FavoriteSection>
-                <div>
+                <div onClick={openFavoriteModal}>
                   좋아요&nbsp;
                   <span>{postFormatNumber(postData.favoriteCnt)}</span>개
                 </div>
@@ -283,7 +288,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                   <ReplyWrapper>
                     {postData.commentCnt > 2 && (
                       <ReplyCounter>
-                        <div onClick={openModal}>
+                        <div onClick={openBoardModal}>
                           댓글 {postData.commentCnt}개 모두 보기
                         </div>
                       </ReplyCounter>
@@ -311,7 +316,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                 </div>
               </WriteWrapper>
               <TimeWrapper>
-                <time onClick={openModal}>
+                <time onClick={openBoardModal}>
                   {timeConvert(postData.createdDate)}
                 </time>
               </TimeWrapper>
