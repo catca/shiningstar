@@ -18,9 +18,12 @@ import { LoginPage } from './login';
 import axios from 'axios';
 import { NEXT_SERVER } from 'config';
 import { useState } from 'react';
+import { BoardModal } from 'components/modal';
+import { selectModal } from 'lib/redux/modal/modalSlice';
 
 const Main = () => {
   const { login, userInfo } = useSelector(selectUser);
+  const { selectedBoard, showBoardModal, showModal } = useSelector(selectModal);
   const [mainData, setMainData] = useState([]);
   const dispatch = useDispatch();
 
@@ -71,6 +74,7 @@ const Main = () => {
       ) : (
         <LoginPage />
       )}
+      {showBoardModal && <BoardModal />}
     </>
   );
 };

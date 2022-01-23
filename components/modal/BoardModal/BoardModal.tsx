@@ -1,6 +1,5 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import s from '../CommonModal.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -38,9 +37,9 @@ import {
   fetchPostGood,
 } from 'lib/apis/board';
 
-interface BoardModalProps {}
+interface BoardModalProps { }
 
-const BoardModal: React.FC<BoardModalProps> = ({}) => {
+const BoardModal: React.FC<BoardModalProps> = ({ }) => {
   const { selectedBoard } = useSelector(selectModal);
   const { userData } = useSelector(selectProfile);
   const { userInfo } = useSelector(selectUser);
@@ -55,7 +54,11 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
   const [pressFavorite, setPressFavorite] = React.useState<boolean>(false);
   const textareaRef = React.useRef<any>(null);
 
-  const onReplyHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+  }, [])
+
+  const onReplyHandler = (e: { target: { value: string } }) => {
     setPostReply({
       ...postReply,
       content: e.target.value,
@@ -156,7 +159,7 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
     textareaRef.current.focus();
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedBoard !== undefined) {
       setFavorite(selectedBoard.favoriteCnt);
       fetchFavoriteCheckHandler();
@@ -171,6 +174,7 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
           <div
             className={s.outerContainer}
             onClick={() => {
+              document.body.style.overflow = 'unset';
               dispatch(setBoardModal(false));
             }}>
             <CloseSharpIcon className={s.out} fontSize="large" />

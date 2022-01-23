@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { NEXT_SERVER } from 'config';
 import fetcher from 'lib/common/fetcher';
+import { setBoardModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
 const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData: Board, setMainData: (value: any) => void }) => {
   const [imgCount, setImgCount] = useState(1);
@@ -129,6 +130,11 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
     fetchFavoriteCheckHandler();
   }, [])
 
+  const openModal = () => {
+    dispatch(setSelectBoard(postData));
+    dispatch(setBoardModal(true));
+  }
+
   return (
     <Article>
       <div>
@@ -215,7 +221,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                   </button>
                 </span>
                 <span>
-                  <button>
+                  <button onClick={openModal}>
                     <CommentIcon />
                   </button>
                 </span>
@@ -277,7 +283,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                   <ReplyWrapper>
                     {postData.commentCnt > 2 && (
                       <ReplyCounter>
-                        <div>
+                        <div onClick={openModal}>
                           댓글 {postData.commentCnt}개 모두 보기
                         </div>
                       </ReplyCounter>
@@ -305,7 +311,9 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                 </div>
               </WriteWrapper>
               <TimeWrapper>
-                <time>{timeConvert(postData.createdDate)}</time>
+                <time onClick={openModal}>
+                  {timeConvert(postData.createdDate)}
+                </time>
               </TimeWrapper>
               <CommentSection>
                 <div>
@@ -597,6 +605,7 @@ const TimeWrapper = styled.div`
   & > time {
     line-height: 18px;
     color: #8e8e8e;
+    cursor: pointer;
   }
 `;
 
