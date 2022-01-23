@@ -18,11 +18,16 @@ import { LoginPage } from './login';
 import axios from 'axios';
 import { NEXT_SERVER } from 'config';
 import { useState } from 'react';
+import { BoardModal, Modal } from 'components/modal';
+import { selectModal } from 'lib/redux/modal/modalSlice';
+import { ModalDataType } from 'types/modal/types';
 
-const Main = ({ boardData }: { boardData: Board[] }) => {
+const Main = () => {
   const { login, userInfo } = useSelector(selectUser);
+  const { selectedBoard, showBoardModal, showModal } = useSelector(selectModal);
   const [mainData, setMainData] = useState([]);
   const dispatch = useDispatch();
+  const favoriteModal: ModalDataType[] = [{ name: '좋아요', link: undefined }];
 
   useEffect(() => {
     if (userInfo.accessToken) {
@@ -71,20 +76,13 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
       ) : (
         <LoginPage />
       )}
+      {showBoardModal && <BoardModal />}
+      {showModal.favorite && <Modal modalData={favoriteModal} />}
     </>
   );
 };
 
 export default Main;
-
-export const getStaticProps: GetStaticProps = async () => {
-  return {
-    props: {
-      boardData: (await getTotalBoards()) as Board[],
-    },
-    revalidate: 1,
-  };
-};
 
 const Section = styled.section`
   max-width: 935px;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/dist/client/router';
 import s from '../CommonModal.module.scss';
@@ -37,6 +37,7 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
       | React.MouseEvent<SVGSVGElement, MouseEvent>,
   ) => {
     e.preventDefault();
+    document.body.style.overflow = 'unset';
     dispatch(setModalInitial());
   };
 
@@ -63,9 +64,13 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchData();
   }, [modalData, userData]);
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+  }, [])
 
   return (
     <>
