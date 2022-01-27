@@ -58,6 +58,11 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
     document.body.style.overflow = 'hidden';
   }, [])
 
+  useEffect(() => {
+    console.log(selectedBoard);
+  }, [selectedBoard])
+
+
   const onReplyHandler = (e: { target: { value: string } }) => {
     setPostReply({
       ...postReply,
@@ -182,10 +187,10 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
           <div className={s.innerContainer}>
             <div className={cn(s.header, s.mobileFlex)}>
               <div>
-                <ProfileImage size="board" imageUrl={userData.imageUrl} />
-                <Link href={`/${userData.username}`}>
+                <ProfileImage size="board" imageUrl={selectedBoard.profileImageUrl} />
+                <Link href={`/${selectedBoard.username}`}>
                   <a id={s.profileId}>
-                    <b>{userData.username}</b>
+                    <b>{selectedBoard.username}</b>
                   </a>
                 </Link>
               </div>
@@ -212,10 +217,10 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
             <div className={s.content}>
               <div className={cn(s.header, s.pcFlex)}>
                 <div>
-                  <ProfileImage size="board" imageUrl={userData.imageUrl} />
-                  <Link href={`/${userData.username}`}>
+                  <ProfileImage size="board" imageUrl={selectedBoard.profileImageUrl} />
+                  <Link href={`/${selectedBoard.username}`}>
                     <a id={s.profileId}>
-                      <b>{userData.username}</b>
+                      <b>{selectedBoard.username}</b>
                     </a>
                   </Link>
                 </div>

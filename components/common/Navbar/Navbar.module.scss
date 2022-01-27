@@ -7,6 +7,8 @@
   text-align: center;
   z-index: 10;
   background-color: white;
+  display: flex;
+  align-items: center;
 }
 
 .mainlogo {
@@ -17,9 +19,9 @@
 
 .navigator {
   display: flex;
+  flex-grow: 1;
   margin: auto auto;
   padding: 0 4px 0px 20px;
-  padding-top: 12px;
   justify-content: space-between;
   align-items: center;
 }
