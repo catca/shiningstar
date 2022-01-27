@@ -51,9 +51,9 @@ const LoginForm: React.FC = () => {
       <MainWrapper>
         <H1
           style={{
-            backgroundImage: `url(/instagramIcon.png)`,
+            backgroundImage: `url(/stargram.png)`,
             backgroundRepeat: 'no-repeat',
-            backgroundPosition: '0 -130px',
+            backgroundPosition: '-63px 0',
           }}></H1>
         <div>
           <Form onSubmit={handleSubmit(OnSubmit)}>
@@ -239,7 +239,7 @@ const DownloadWrapper = styled.div`
 
 const H1 = styled.h1`
   display: block;
-  width: 175px;
+  width: 245px;
   min-height: 51px;
   overflow: hidden;
   white-space: nowrap;

@@ -73,9 +73,9 @@ const Navbar = () => {
                 <Link href="/">
                   <a className={s.mainlogo}>
                     <Image
-                      src={'/instagram.png'}
+                      src={'/stargram.png'}
                       width={'103px'}
-                      height={'29px'}
+                      height={'20px'}
                       alt={'mainlogo'}></Image>
                   </a>
                 </Link>

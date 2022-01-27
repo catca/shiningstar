@@ -21,8 +21,8 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
   const [imgCount, setImgCount] = useState<number>(1);
   const [seeMore, setSeeMore] = useState<boolean>(false);
   const [positionx, setPositionx] = useState<number>(0);
+  const [endSwipe, setEndSwipe] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const positionX = useRef<number>(0)
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [text, setText] = useState<string>("");
   const [textAreaHeight, setTextAreaHeight] = useState<string>("auto");
@@ -47,38 +47,32 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
   };
 
   const onSwipeMove = (position: { x: number; y: number }) => {
+    setEndSwipe(false);
     if (postData.boardImageUrl.length == 1) {
       return;
     }
     if (imgCount == 1 && position.x < 0) {
-      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
     if (imgCount > 1 && imgCount < postData.boardImageUrl.length) {
-      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
     if (imgCount == postData.boardImageUrl.length && position.x > 0) {
-      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
   };
   const onSwipeEnd = () => {
     if (positionx < -20) {
-      setPositionx(() => 0);
-      positionX.current = 0;
       setImgCount((imgCount) => imgCount + 1);
     }
     if (positionx > 20) {
-      setPositionx(() => 0);
-      positionX.current = 0;
       setImgCount((imgCount) => imgCount - 1);
     }
     setPositionx(() => 0);
-    positionX.current = 0;
+    setEndSwipe(true);
   };
 
   const [favorite, setFavorite] = React.useState<number>(0);
@@ -194,7 +188,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
           <div>
             <PostImage>
               <Swipe onSwipeEnd={onSwipeEnd} onSwipeMove={onSwipeMove}>
-                <ImgDiv imgCount={imgCount} positionx={positionX.current}>
+                <ImgDiv imgCount={imgCount} positionx={positionx} endSwipe={endSwipe}>
                   {postData.boardImageUrl.map((imageUrl, index) => {
                     return <Img key={index} src={imageUrl} alt="" />;
                   })}
@@ -452,6 +446,7 @@ type ImgCount = {
   imgCount: number;
   positionx?: number;
   index?: number;
+  endSwipe?: boolean;
 };
 
 const ImageCounter = styled.div<ImgCount>`
@@ -476,12 +471,9 @@ const ImgDiv = styled.div<ImgCount>`
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform 0.3s;
+  transition: transform ${({ endSwipe }) => (endSwipe ? "0.2s" : "0s")};
   transform: translateX(
-    ${({ imgCount, positionx }) =>
-    positionx
-      ? `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`
-      : `${-100 * (imgCount - 1)}%`}
+    ${({ imgCount, positionx }) => `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`}
   );
 `;
 
