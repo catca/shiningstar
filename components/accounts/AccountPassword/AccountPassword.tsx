@@ -38,8 +38,8 @@ const AccountPassword = () => {
       .catch((err) => {
         alert('비밀번호 변경을 실패하였습니다.');
         console.log(err.response.data);
-      })
-  }
+      });
+  };
 
   return (
     <>

@@ -21,7 +21,13 @@ import Link from 'next/link';
 import styled from '@emotion/styled';
 import axios from 'axios';
 import { NEXT_SERVER } from 'config';
-import { AddIcon, BackIcon, DeleteIcon, EmoticonIcon, ImageVideoIcon } from 'components/ui/Icon';
+import {
+  AddIcon,
+  BackIcon,
+  DeleteIcon,
+  EmoticonIcon,
+  ImageVideoIcon,
+} from 'components/ui/Icon';
 
 interface ModalProps {
   modalData: ModalDataType[];
@@ -114,7 +120,7 @@ const NewPost: React.FC = () => {
     setImageNumber((imageNumber) => imageNumber + 1);
   };
 
-  function clickClopEvent(event: { target: any; }) {
+  function clickClopEvent(event: { target: any }) {
     var target = event.target;
 
     if (imageControl === false) return;
@@ -123,7 +129,10 @@ const NewPost: React.FC = () => {
     setImageControl(false);
   }
 
-  const deleteImage = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, deleteId: number) => {
+  const deleteImage = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    deleteId: number,
+  ) => {
     e.preventDefault();
     if (images.length === 1) {
       setPostState(() => 'newPost');
@@ -139,7 +148,9 @@ const NewPost: React.FC = () => {
     dispatch(deletePostImage({ id: deleteId }));
   };
 
-  const changeContent = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+  const changeContent = (e: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
     setContent(e.target.value);
   };
 
@@ -211,8 +222,8 @@ const NewPost: React.FC = () => {
                 {postState === 'newPost'
                   ? '새 게시물 만들기'
                   : postState === 'crop'
-                    ? '자르기'
-                    : '새 게시물 만들기'}
+                  ? '자르기'
+                  : '새 게시물 만들기'}
               </h1>
             </div>
             <div>
@@ -275,14 +286,16 @@ const NewPost: React.FC = () => {
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
                         style={{
-                          width: `${images.length * 94 + (images.length - 1) * 12 + 100
-                            }px`,
+                          width: `${
+                            images.length * 94 + (images.length - 1) * 12 + 100
+                          }px`,
                         }}>
                         <div
                           style={{
                             height: '94px',
-                            width: `${images.length * 94 + (images.length - 1) * 12
-                              }px`,
+                            width: `${
+                              images.length * 94 + (images.length - 1) * 12
+                            }px`,
                           }}>
                           <div
                             style={{ position: 'absolute', transform: 'none' }}>
@@ -303,9 +316,10 @@ const NewPost: React.FC = () => {
                                   style={{
                                     backgroundColor: 'rgba(0, 0, 0, 0)',
                                     height: '100%',
-                                    width: `${images.length * 94 +
+                                    width: `${
+                                      images.length * 94 +
                                       (images.length - 1) * 12
-                                      }px`,
+                                    }px`,
                                     display: 'flex',
                                   }}>
                                   {images.map((props, index) => {
@@ -339,10 +353,11 @@ const NewPost: React.FC = () => {
                                             deleteImage(e, props.id)
                                           }
                                           style={{
-                                            display: `${index + 1 === imageNumber
-                                              ? 'block'
-                                              : 'none'
-                                              }`,
+                                            display: `${
+                                              index + 1 === imageNumber
+                                                ? 'block'
+                                                : 'none'
+                                            }`,
                                           }}>
                                           <button
                                             type="button"
@@ -430,8 +445,9 @@ const NewPost: React.FC = () => {
                           src={props.croppedImage}
                           alt="Cropped"
                           style={{
-                            display: `${index + 1 === imageNumber ? 'block' : 'none'
-                              }`,
+                            display: `${
+                              index + 1 === imageNumber ? 'block' : 'none'
+                            }`,
                           }}
                         />
                       );
@@ -550,7 +566,7 @@ const NewPost: React.FC = () => {
                 type="file"
                 id="input"
                 onClick={(event: any) => {
-                  event.target.value = null
+                  event.target.value = null;
                 }}
                 onChange={handleChange}
                 style={{ display: 'none' }}

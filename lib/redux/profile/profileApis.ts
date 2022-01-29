@@ -21,25 +21,21 @@ export async function getProfileData(pages: string) {
 }
 
 export async function getProfileIds() {
-  const userInfo: BaseUser3[] = await fetcher(
+  const userInfo = await fetcher<BaseUser3[]>(
     `${NEXT_SERVER}/test/user/profiles`,
   );
-  const paths = userInfo.map((arr) => {
+  return userInfo.map((arr) => {
     return arr.username;
   });
-  // const paths: string[] = testUserData.map((arr) => {
-  //   return arr.username.toString();
-  // });
-  return paths;
 }
 
 // 유저 팔로우 api
-export async function fetchFollow(userId: string, userInfo: BaseUser3[]) {
-  return await fetcher(`${NEXT_SERVER}/v1/user/${userId}`, {
-    method: 'POST',
-    body: JSON.stringify(userInfo),
-  });
-}
+// export async function fetchFollow(userId: string, userInfo: BaseUser3[]) {
+//   return await fetcher(`${NEXT_SERVER}/v1/user/${userId}`, {
+//     method: 'POST',
+//     body: JSON.stringify(userInfo),
+//   });
+// }
 
 export async function getBase3UserProfile() {
   const userList: BaseUser3[] = await fetcher<BaseUser3[]>(

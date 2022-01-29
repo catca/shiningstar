@@ -32,6 +32,7 @@ import { Profile, UserBoards } from 'types/profile/types';
 import { ModalDataType } from 'types/modal/types';
 import { followChecker } from 'lib/apis/user';
 import { selectUser } from 'lib/redux/user/userSlice';
+import { connectToDatabase } from 'lib/mongoDB/mongodb';
 
 const UserProfile = ({
   bannerList,
@@ -54,14 +55,14 @@ const UserProfile = ({
     check = Object.values(showModal).includes(true);
     return check || showBoardModal;
   };
-  const fetchIsFollow = async () => {
+  const fetchIsFollow = React.useCallback(async () => {
     const checker = await followChecker(
       userData.username,
       userInfo.accessToken,
     );
 
     dispatch(setIsFollow(checker.check));
-  };
+  }, [dispatch, userData.username, userInfo.accessToken]);
   React.useEffect(() => {
     dispatch(initialBanner());
     dispatch(setBoardModal(false));
@@ -69,7 +70,7 @@ const UserProfile = ({
     dispatch(setModalInitial());
     dispatch(setBoardData(boardData));
     fetchIsFollow();
-  }, [profile]);
+  }, [boardData, dispatch, fetchIsFollow, profile, userData]);
 
   const followerModal: ModalDataType[] = [{ name: '팔로워', link: undefined }];
   const follwingModal: ModalDataType[] = [{ name: '팔로우', link: undefined }];
@@ -142,11 +143,22 @@ interface IParams extends ParsedUrlQuery {
 export const getStaticPaths: GetStaticPaths = async () => {
   // TODO: 백엔드 연동시 추후에 api로 가져오기
   const arr = (await getProfileIds()) as string[];
+  // const res = await fetch('http://localhost:3000/api/test/user/profiles');
+  // const arr: any[] = await res.json();
+  // const { db } = await connectToDatabase();
+
+  // const res = db.collection('users').find({}).toArray();
+  // console.log(res);
   const paths = arr.map((profile) => {
     return {
       params: { profile },
     };
   });
+  // const paths = [
+  //   { params: { profile: 'winter' } },
+  //   { params: { profile: 'karina' } },
+  //   { params: { profile: 'irene' } },
+  // ];
   return {
     paths,
     fallback: false,
@@ -169,5 +181,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       profile,
       boardData: (await getUserBoard(profile)) as UserBoards,
     },
+    revalidate: 1,
   };
 };

@@ -3,10 +3,11 @@ export default async function fetcher<T>(
   init?: RequestInit,
 ): Promise<T> {
   const response = await fetch(url, init);
-
   if (!response.ok) {
     //TODO: error handling
-    throw new Error('ERROR!');
+    throw new Error(`${response.status}`);
+    // throw new Error(`status: ${response.status}`);
+    // throw new Error('ERROR!');
   }
 
   try {

@@ -13,60 +13,56 @@ export default async function handler(
   const { username } = req.query;
 
   if (req.method === 'GET') {
-    Profile.aggregate(
-      [
-        {
-          $match: { username: username },
-        },
-        {
-          $lookup: {
-            from: 'follows',
-            localField: 'username',
-            foreignField: 'follow',
-            as: 'follows',
-          },
-        },
-        {
-          $lookup: {
-            from: 'follows',
-            localField: 'username',
-            foreignField: 'follower',
-            as: 'followers',
-          },
-        },
-        {
-          $lookup: {
-            from: 'boards',
-            localField: 'username',
-            foreignField: 'username',
-            as: 'boards',
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            username: 1,
-            name: 1,
-            webSite: 1,
-            phone: 1,
-            introduce: 1,
-            imageUrl: 1,
-            gender: 1,
-            email: 1,
-            followingCnt: { $size: '$follows' },
-            followerCnt: { $size: '$followers' },
-            boardCnt: { $size: '$boards' },
-          },
-        },
-      ],
-      (err: any, profile: any) => {
-        if (!profile) {
-          return res.status(400).json({ status: 400, message: `get failed` });
-        } else {
-          return res.status(200).json(profile[0]);
-        }
+    const profile = await Profile.aggregate([
+      {
+        $match: { username: username },
       },
-    );
+      {
+        $lookup: {
+          from: 'follows',
+          localField: 'username',
+          foreignField: 'follow',
+          as: 'follows',
+        },
+      },
+      {
+        $lookup: {
+          from: 'follows',
+          localField: 'username',
+          foreignField: 'follower',
+          as: 'followers',
+        },
+      },
+      {
+        $lookup: {
+          from: 'boards',
+          localField: 'username',
+          foreignField: 'username',
+          as: 'boards',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          name: 1,
+          webSite: 1,
+          phone: 1,
+          introduce: 1,
+          imageUrl: 1,
+          gender: 1,
+          email: 1,
+          followingCnt: { $size: '$follows' },
+          followerCnt: { $size: '$followers' },
+          boardCnt: { $size: '$boards' },
+        },
+      },
+    ]);
+    if (profile.length > 0) {
+      return res.status(200).json(profile[0]);
+    } else {
+      return res.status(400).json({ status: 400, message: `get failed` });
+    }
   } else if (req.method === 'PATCH') {
     //TODO: 자기정보 수정 api 짜기
     const userInfo = req.body;

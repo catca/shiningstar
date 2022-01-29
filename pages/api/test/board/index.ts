@@ -1,6 +1,5 @@
 import { dbConnect } from 'lib/mongoDB/dbConnect';
 import Board from 'lib/mongoDB/models/Board';
-import { connectToDatabase } from 'lib/mongoDB/mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
