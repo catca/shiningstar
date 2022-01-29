@@ -1,6 +1,5 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import s from '../CommonModal.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -38,9 +37,9 @@ import {
   fetchPostGood,
 } from 'lib/apis/board';
 
-interface BoardModalProps {}
+interface BoardModalProps { }
 
-const BoardModal: React.FC<BoardModalProps> = ({}) => {
+const BoardModal: React.FC<BoardModalProps> = ({ }) => {
   const { selectedBoard } = useSelector(selectModal);
   const { userData } = useSelector(selectProfile);
   const { userInfo } = useSelector(selectUser);
@@ -55,7 +54,16 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
   const [pressFavorite, setPressFavorite] = React.useState<boolean>(false);
   const textareaRef = React.useRef<any>(null);
 
-  const onReplyHandler = (e: ChangeEvent<HTMLTextAreaElement>) => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+  }, [])
+
+  useEffect(() => {
+    console.log(selectedBoard);
+  }, [selectedBoard])
+
+
+  const onReplyHandler = (e: { target: { value: string } }) => {
     setPostReply({
       ...postReply,
       content: e.target.value,
@@ -156,7 +164,7 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
     textareaRef.current.focus();
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedBoard !== undefined) {
       setFavorite(selectedBoard.favoriteCnt);
       fetchFavoriteCheckHandler();
@@ -171,6 +179,7 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
           <div
             className={s.outerContainer}
             onClick={() => {
+              document.body.style.overflow = 'unset';
               dispatch(setBoardModal(false));
             }}>
             <CloseSharpIcon className={s.out} fontSize="large" />
@@ -178,10 +187,10 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
           <div className={s.innerContainer}>
             <div className={cn(s.header, s.mobileFlex)}>
               <div>
-                <ProfileImage size="board" imageUrl={userData.imageUrl} />
-                <Link href={`/${userData.username}`}>
+                <ProfileImage size="board" imageUrl={selectedBoard.profileImageUrl} />
+                <Link href={`/${selectedBoard.username}`}>
                   <a id={s.profileId}>
-                    <b>{userData.username}</b>
+                    <b>{selectedBoard.username}</b>
                   </a>
                 </Link>
               </div>
@@ -208,10 +217,10 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
             <div className={s.content}>
               <div className={cn(s.header, s.pcFlex)}>
                 <div>
-                  <ProfileImage size="board" imageUrl={userData.imageUrl} />
-                  <Link href={`/${userData.username}`}>
+                  <ProfileImage size="board" imageUrl={selectedBoard.profileImageUrl} />
+                  <Link href={`/${selectedBoard.username}`}>
                     <a id={s.profileId}>
-                      <b>{userData.username}</b>
+                      <b>{selectedBoard.username}</b>
                     </a>
                   </Link>
                 </div>

@@ -7,24 +7,25 @@ import Link from 'next/link';
 import { postFormatNumber, timeConvert } from 'lib/common';
 import Swipe from 'react-easy-swipe';
 
-import { Board } from 'types/profile/types';
+import { Board, PostReply } from 'types/profile/types';
 import { FavoriteIcon, CommentIcon, DirectIcon, MarkIcon, EmoticonIcon, SeeMoreIcon } from 'components/ui/Icon';
-import { fetchDeleteGood, fetchPostGood } from 'lib/apis/board';
+import { fetchDeleteGood, fetchPostComment, fetchPostGood } from 'lib/apis/board';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
 import { NEXT_SERVER } from 'config';
 import fetcher from 'lib/common/fetcher';
+import { setBoardModal, setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
 const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData: Board, setMainData: (value: any) => void }) => {
-  const [imgCount, setImgCount] = useState(1);
-  const [seeMore, setSeeMore] = useState(false);
-  const [positionx, setPositionx] = useState(0);
   const { userInfo } = useSelector(selectUser);
+  const [imgCount, setImgCount] = useState<number>(1);
+  const [seeMore, setSeeMore] = useState<boolean>(false);
+  const [positionx, setPositionx] = useState<number>(0);
+  const [endSwipe, setEndSwipe] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const positionX = useRef<number>(0)
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [text, setText] = useState("");
-  const [textAreaHeight, setTextAreaHeight] = useState("auto");
+  const [text, setText] = useState<string>("");
+  const [textAreaHeight, setTextAreaHeight] = useState<string>("auto");
 
   useEffect(() => {
     setTextAreaHeight(`${textAreaRef.current!.scrollHeight}px`);
@@ -46,38 +47,32 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
   };
 
   const onSwipeMove = (position: { x: number; y: number }) => {
+    setEndSwipe(false);
     if (postData.boardImageUrl.length == 1) {
       return;
     }
     if (imgCount == 1 && position.x < 0) {
-      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
     if (imgCount > 1 && imgCount < postData.boardImageUrl.length) {
-      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
     if (imgCount == postData.boardImageUrl.length && position.x > 0) {
-      positionX.current = position.x;
       setPositionx(() => position.x);
       return;
     }
   };
   const onSwipeEnd = () => {
     if (positionx < -20) {
-      setPositionx(() => 0);
-      positionX.current = 0;
       setImgCount((imgCount) => imgCount + 1);
     }
     if (positionx > 20) {
-      setPositionx(() => 0);
-      positionX.current = 0;
       setImgCount((imgCount) => imgCount - 1);
     }
     setPositionx(() => 0);
-    positionX.current = 0;
+    setEndSwipe(true);
   };
 
   const [favorite, setFavorite] = React.useState<number>(0);
@@ -93,10 +88,9 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       } else {
         setFavorite((f) => f - 1);
         setPressFavorite(false);
-        // 데이터 변화 시 postData 값 사라짐
-        // setMainData(mainData.map(data => {
-        //   data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt - 1 } : data
-        // }));
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt - 1 } : data
+        }));
       }
     } else {
       const res = await fetchPostGood(
@@ -108,9 +102,9 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       } else {
         setFavorite((f) => f + 1);
         setPressFavorite(true);
-        // setMainData(mainData.map(data => {
-        //   data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt + 1 } : data
-        // }));
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt + 1 } : data
+        }));
       }
     }
   };
@@ -126,9 +120,39 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
     setPressFavorite(data.check);
   };
 
+  const postReplyHandler = async (text: string) => {
+    //TODO: rest api post 과정 추가
+    const reply = {
+      username: userInfo.username,
+      content: text
+    }
+    if (postData !== undefined) {
+      const res = await fetchPostComment(
+        postData._id,
+        userInfo.accessToken,
+        reply,
+      );
+      if (!res.ok) {
+        alert('댓글 작성에 실패했습니다');
+      } else {
+        setText("");
+      }
+    }
+  };
+
   useEffect(() => {
     fetchFavoriteCheckHandler();
   }, [])
+
+  const openBoardModal = () => {
+    dispatch(setSelectBoard(postData));
+    dispatch(setBoardModal(true));
+  }
+
+  const openFavoriteModal = async () => {
+    await dispatch(setSelectBoard(postData));
+    dispatch(setModal('favorite', true));
+  }
 
   return (
     <Article>
@@ -164,7 +188,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
           <div>
             <PostImage>
               <Swipe onSwipeEnd={onSwipeEnd} onSwipeMove={onSwipeMove}>
-                <ImgDiv imgCount={imgCount} positionx={positionX.current}>
+                <ImgDiv imgCount={imgCount} positionx={positionx} endSwipe={endSwipe}>
                   {postData.boardImageUrl.map((imageUrl, index) => {
                     return <Img key={index} src={imageUrl} alt="" />;
                   })}
@@ -216,7 +240,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                   </button>
                 </span>
                 <span>
-                  <button>
+                  <button onClick={openBoardModal}>
                     <CommentIcon />
                   </button>
                 </span>
@@ -232,7 +256,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                 </span>
               </IconSection>
               <FavoriteSection>
-                <div>
+                <div onClick={openFavoriteModal}>
                   좋아요&nbsp;
                   <span>{postFormatNumber(postData.favoriteCnt)}</span>개
                 </div>
@@ -278,7 +302,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                   <ReplyWrapper>
                     {postData.commentCnt > 2 && (
                       <ReplyCounter>
-                        <div>
+                        <div onClick={openBoardModal}>
                           댓글 {postData.commentCnt}개 모두 보기
                         </div>
                       </ReplyCounter>
@@ -306,7 +330,9 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                 </div>
               </WriteWrapper>
               <TimeWrapper>
-                <time>{timeConvert(postData.createdDate)}</time>
+                <time onClick={openBoardModal}>
+                  {timeConvert(postData.createdDate)}
+                </time>
               </TimeWrapper>
               <CommentSection>
                 <div>
@@ -325,7 +351,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                       autoComplete="off"
                       autoCorrect="off"
                     />
-                    <PostButton>게시</PostButton>
+                    <PostButton onClick={() => postReplyHandler(text)}>게시</PostButton>
                   </form>
                 </div>
               </CommentSection>
@@ -420,6 +446,7 @@ type ImgCount = {
   imgCount: number;
   positionx?: number;
   index?: number;
+  endSwipe?: boolean;
 };
 
 const ImageCounter = styled.div<ImgCount>`
@@ -444,12 +471,9 @@ const ImgDiv = styled.div<ImgCount>`
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform 0.3s;
+  transition: transform ${({ endSwipe }) => (endSwipe ? "0.2s" : "0s")};
   transform: translateX(
-    ${({ imgCount, positionx }) =>
-    positionx
-      ? `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`
-      : `${-100 * (imgCount - 1)}%`}
+    ${({ imgCount, positionx }) => `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`}
   );
 `;
 
@@ -598,6 +622,7 @@ const TimeWrapper = styled.div`
   & > time {
     line-height: 18px;
     color: #8e8e8e;
+    cursor: pointer;
   }
 `;
 

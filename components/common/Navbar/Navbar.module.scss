@@ -7,19 +7,21 @@
   text-align: center;
   z-index: 10;
   background-color: white;
+  display: flex;
+  align-items: center;
 }
 
 .mainlogo {
   text-align: left;
-  width: 180px;
+  width: 200px;
   padding-top: 2px;
 }
 
 .navigator {
   display: flex;
+  flex-grow: 1;
   margin: auto auto;
   padding: 0 4px 0px 20px;
-  padding-top: 12px;
   justify-content: space-between;
   align-items: center;
 }
@@ -39,13 +41,14 @@
 .input {
   display: none;
 }
+
 @media (min-width: 740px) {
   .navigator {
     display: flex;
     max-width: 940px;
     margin: auto auto;
-    padding: 0 8px 0px 16px;
-    padding-top: 14px;
+    // padding: 0 8px 0px 16px;
+    // padding-top: 14px;
     justify-content: space-between;
     align-items: center;
   }
@@ -63,6 +66,13 @@
 
   .rightBanner {
     width: 180px;
+  }
+  .mainlogo {
+    width: 180px;
+  }
+
+  .searchIconWrapper {
+    display: none;
   }
 }
 @media (min-width:1040px) {

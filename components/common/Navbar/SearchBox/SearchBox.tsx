@@ -10,7 +10,11 @@ import { selectUser } from 'lib/redux/user/userSlice';
 import { useSelector } from 'react-redux';
 import { Loading } from 'components/ui/Loading';
 
-const SearchBox: React.FC = () => {
+interface SearchBoxProps {
+  media: boolean;
+}
+
+const SearchBox: React.FC<SearchBoxProps> = ({ media }) => {
   const { userInfo } = useSelector(selectUser);
   const [userList, setUserList] = useState<BaseUser3[]>([]);
   const [onUserList, setOnUserList] = useState<boolean>(false);
@@ -93,7 +97,7 @@ const SearchBox: React.FC = () => {
   }, [inputText]);
 
   return (
-    <Container onClick={(e) => inputClick(e)}>
+    <Container media={media} onClick={(e) => inputClick(e)}>
       <div>
         <Input
           ref={inputRef}
@@ -142,10 +146,17 @@ const SearchBox: React.FC = () => {
 
 export default SearchBox;
 
-const Container = styled.div`
+type ContainerProps = {
+  media: boolean;
+}
+
+const Container = styled.div<ContainerProps>`
   cursor: text;
   & > div {
     position: relative;
+  }
+  @media (max-width: 740px) {
+    display: ${props => props.media ? 'block' : 'none'};
   }
 `;
 
