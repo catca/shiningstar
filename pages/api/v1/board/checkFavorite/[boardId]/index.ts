@@ -16,8 +16,6 @@ const apiRoute = nextConnect({
 apiRoute.use(checkUser());
 
 apiRoute.post(async (req: any, res: NextApiResponse) => {
-  await dbConnect();
-
   const { boardId } = req.query;
 
   if (!req.user) {
