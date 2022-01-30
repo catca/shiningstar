@@ -174,7 +174,7 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
                             onClick={(e) => deleteUser(e, user.username)}
                             style={{ display: 'flex', width: '32px', height: '32px', justifyContent: 'center', alignItems: 'center' }}
                           >
-                            <DeleteIcon searchBox={true} />
+                            <DeleteIcon type={'searchBox'} />
                           </div>
                         </UserBox>
                       </div>

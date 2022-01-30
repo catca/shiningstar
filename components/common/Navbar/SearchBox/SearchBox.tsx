@@ -117,16 +117,17 @@ const SearchBox: React.FC<SearchBoxProps> = ({ media }) => {
           </SearchIconWrapper>
         }
         {inputFocus &&
-          loading ?
-          <LoadingWrapper>
-            <Loading />
-          </LoadingWrapper>
-          :
-          <DeleteIcon
-            ref={deleteIconRef}
-            onClick={() => deleteInputText()}
-            style={{ backgroundImage: `url(/instagramIcon.png)` }}
-          />
+          (loading ?
+            <LoadingWrapper>
+              <Loading />
+            </LoadingWrapper>
+            :
+            <DeleteIcon
+              ref={deleteIconRef}
+              onClick={() => deleteInputText()}
+              style={{ backgroundImage: `url(/instagramIcon.png)` }}
+            />
+          )
         }
         {onUserList && (
           <div ref={el}>

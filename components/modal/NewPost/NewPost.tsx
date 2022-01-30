@@ -45,7 +45,7 @@ const NewPost: React.FC = () => {
   const dispatch = useDispatch();
   const closeModal = (
     e:
-      | React.MouseEvent<HTMLDivElement, MouseEvent>
+      | React.MouseEvent<HTMLDivElement | HTMLButtonElement, MouseEvent>
       | React.MouseEvent<SVGSVGElement, MouseEvent>,
   ) => {
     e.preventDefault();
@@ -75,7 +75,6 @@ const NewPost: React.FC = () => {
 
   const handleChange = async (event: any) => {
     const fileUploaded = event.target.files[0];
-    console.log(fileUploaded);
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       let imageDataUrl: any = await readFile(file);
@@ -208,13 +207,19 @@ const NewPost: React.FC = () => {
           <div className={s.headerPost}>
             <div>
               <div>
-                {postState !== 'newPost' && (
+                {postState === 'newPost' ?
+                  <button onClick={closeModal}>
+                    <div style={{ transform: 'translate(-8px, 2px)' }} className={s.deleteIconWrapper}>
+                      <DeleteIcon type={'newPost'} />
+                    </div>
+                  </button>
+                  :
                   <button onClick={prevPostState}>
                     <div style={{ transform: 'translateX(-8px)' }}>
                       <BackIcon />
                     </div>
                   </button>
-                )}
+                }
               </div>
             </div>
             <div>
@@ -222,8 +227,8 @@ const NewPost: React.FC = () => {
                 {postState === 'newPost'
                   ? '새 게시물 만들기'
                   : postState === 'crop'
-                  ? '자르기'
-                  : '새 게시물 만들기'}
+                    ? '자르기'
+                    : '새 게시물 만들기'}
               </h1>
             </div>
             <div>
@@ -232,7 +237,9 @@ const NewPost: React.FC = () => {
                   <button onClick={nextPostState}>다음</button>
                 ) : postState === 'content' ? (
                   <button onClick={postContent}>공유하기</button>
-                ) : null}
+                ) :
+                  <button></button>
+                }
               </div>
             </div>
           </div>
@@ -286,16 +293,14 @@ const NewPost: React.FC = () => {
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
                         style={{
-                          width: `${
-                            images.length * 94 + (images.length - 1) * 12 + 100
-                          }px`,
+                          width: `${images.length * 94 + (images.length - 1) * 12 + 100
+                            }px`,
                         }}>
                         <div
                           style={{
                             height: '94px',
-                            width: `${
-                              images.length * 94 + (images.length - 1) * 12
-                            }px`,
+                            width: `${images.length * 94 + (images.length - 1) * 12
+                              }px`,
                           }}>
                           <div
                             style={{ position: 'absolute', transform: 'none' }}>
@@ -316,10 +321,9 @@ const NewPost: React.FC = () => {
                                   style={{
                                     backgroundColor: 'rgba(0, 0, 0, 0)',
                                     height: '100%',
-                                    width: `${
-                                      images.length * 94 +
+                                    width: `${images.length * 94 +
                                       (images.length - 1) * 12
-                                    }px`,
+                                      }px`,
                                     display: 'flex',
                                   }}>
                                   {images.map((props, index) => {
@@ -353,17 +357,16 @@ const NewPost: React.FC = () => {
                                             deleteImage(e, props.id)
                                           }
                                           style={{
-                                            display: `${
-                                              index + 1 === imageNumber
-                                                ? 'block'
-                                                : 'none'
-                                            }`,
+                                            display: `${index + 1 === imageNumber
+                                              ? 'block'
+                                              : 'none'
+                                              }`,
                                           }}>
                                           <button
                                             type="button"
                                             style={{ cursor: 'pointer' }}>
                                             <div>
-                                              <DeleteIcon />
+                                              <DeleteIcon type={'postImage'} />
                                             </div>
                                           </button>
                                         </div>
@@ -445,9 +448,8 @@ const NewPost: React.FC = () => {
                           src={props.croppedImage}
                           alt="Cropped"
                           style={{
-                            display: `${
-                              index + 1 === imageNumber ? 'block' : 'none'
-                            }`,
+                            display: `${index + 1 === imageNumber ? 'block' : 'none'
+                              }`,
                           }}
                         />
                       );
@@ -499,6 +501,7 @@ const NewPost: React.FC = () => {
                       <div style={{ width: '100%' }}>
                         <form>
                           <textarea
+                            className={s.contentTextarea}
                             name="content"
                             id="content"
                             key="content"
@@ -509,18 +512,6 @@ const NewPost: React.FC = () => {
                             autoCorrect="none"
                             spellCheck="false"
                             maxLength={2500}
-                            style={{
-                              boxSizing: 'border-box',
-                              border: 'none',
-                              resize: 'none',
-                              padding: '0 16px',
-                              width: '100%',
-                              height: '168px',
-                              outline: 'none',
-                              overflow: 'auto',
-                              lineHeight: '16px',
-                              fontSize: '16px',
-                            }}
                           />
                         </form>
                       </div>

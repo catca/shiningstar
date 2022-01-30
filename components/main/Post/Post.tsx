@@ -136,6 +136,9 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
         alert('댓글 작성에 실패했습니다');
       } else {
         setText("");
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, comment: [...data.comment, reply] } : data
+        }));
       }
     }
   };
