@@ -135,9 +135,12 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       if (!res.ok) {
         alert('댓글 작성에 실패했습니다');
       } else {
-        setText("");
+        setText(() => "");
         setMainData(mainData.map(data => {
-          return data._id === postData._id ? { ...data, comment: [...data.comment, reply] } : data
+          return data._id === postData._id ? { ...data, comment: [...data.comment, { ...reply, type: 'front' }] } : data
+        }));
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, commentCnt: postData.commentCnt + 1 } : data
         }));
       }
     }
@@ -349,6 +352,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
                       style={{
                         height: textAreaHeight,
                       }}
+                      value={text}
                       onChange={onChangeHandler}
                       placeholder="댓글 달기..."
                       autoComplete="off"
@@ -366,7 +370,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
   );
 };
 
-export default Post;
+export default React.memo(Post);
 
 const buttonStyle = css`
   border: 0;
