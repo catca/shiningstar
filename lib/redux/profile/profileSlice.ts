@@ -1,29 +1,38 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk, RootState } from '../store';
-import type { Banner, Board, UserData } from 'types/profile/types';
+import type { Banner, Board, Profile, UserBoards } from 'types/profile/types';
 import { getProfileData } from './profileApis';
 
 interface ProfileSliceProps {
   currentBanner: Banner;
-  userData: UserData;
-  boardData: Board[];
+  userData: Profile;
+  boardData: UserBoards;
+  isFollow: boolean;
 }
 
 const initialState: ProfileSliceProps = {
   currentBanner: 'main',
   userData: {
-    id: '',
+    username: '',
     imageUrl: '',
     name: '',
-    board: 0,
-    follower: [],
-    following: [],
+    boardCnt: 0,
+    followerCnt: 0,
+    followingCnt: 0,
     webSite: '',
     email: '',
     phone: '',
     introduce: '',
   },
-  boardData: [],
+  boardData: {
+    writer: {
+      username: '',
+      imageUrl: '',
+      name: '',
+    },
+    boards: [],
+  },
+  isFollow: false,
 };
 
 export const profileSlice = createSlice({
@@ -33,16 +42,20 @@ export const profileSlice = createSlice({
     SET_BANNER: (state, action: PayloadAction<Banner>) => {
       state.currentBanner = action.payload;
     },
-    SET_USER_DATA: (state, action: PayloadAction<UserData>) => {
+    SET_USER_DATA: (state, action: PayloadAction<Profile>) => {
       state.userData = action.payload;
     },
-    SET_BOARD_DATA: (state, action: PayloadAction<Board[]>) => {
+    SET_BOARD_DATA: (state, action: PayloadAction<UserBoards>) => {
       state.boardData = action.payload;
+    },
+
+    SET_ISFOLLOW: (state, action: PayloadAction<boolean>) => {
+      state.isFollow = action.payload;
     },
   },
 });
 
-export const { SET_BANNER, SET_USER_DATA, SET_BOARD_DATA } =
+export const { SET_BANNER, SET_USER_DATA, SET_BOARD_DATA, SET_ISFOLLOW } =
   profileSlice.actions;
 export const selectProfile = (state: RootState) => state.profile;
 
@@ -62,14 +75,19 @@ export function initialBanner(): AppThunk {
   };
 }
 
-export function setBoardData(data: Board[]): AppThunk {
+export function setBoardData(data: UserBoards): AppThunk {
   return (dispatch: any) => {
     dispatch(SET_BOARD_DATA(data));
   };
 }
 
-export function setUserData(data: UserData): AppThunk {
+export function setUserData(data: Profile): AppThunk {
   return (dispatch: any) => {
     dispatch(SET_USER_DATA(data));
+  };
+}
+export function setIsFollow(check: boolean): AppThunk {
+  return (dispatch: any) => {
+    dispatch(SET_ISFOLLOW(check));
   };
 }

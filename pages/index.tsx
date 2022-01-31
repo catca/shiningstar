@@ -1,27 +1,45 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { GetStaticProps } from 'next';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
-import { getUserBoard } from 'lib/redux/profile/profileApis';
-import { selectProfile } from 'lib/redux/profile/profileSlice';
-import { setBoardData } from 'lib/redux/profile/profileSlice';
-import { Board } from 'types/profile/types';
 import { Container } from 'components/ui/Container';
 import Footer from 'components/main/Footer';
 import styled from '@emotion/styled';
 import Post from 'components/main/Post';
 import { LoginPage } from './login';
 
-const Main = ({ boardData }: { boardData: Board[] }) => {
-  const { login } = useSelector(selectUser);
+import axios from 'axios';
+import { NEXT_SERVER } from 'config';
+import { useState } from 'react';
+import { BoardModal, Modal } from 'components/modal';
+import { selectModal } from 'lib/redux/modal/modalSlice';
+import { ModalDataType } from 'types/modal/types';
+
+const Main = ({ }) => {
+  const { login, userInfo } = useSelector(selectUser);
+  const { showBoardModal, showModal } = useSelector(selectModal);
+  const [mainData, setMainData] = useState([]);
   const dispatch = useDispatch();
+  const favoriteModal: ModalDataType[] = [{ name: '좋아요', link: undefined }];
 
   useEffect(() => {
-    dispatch(setBoardData(boardData));
-  }, []);
+    if (userInfo.accessToken) {
+      axios
+        .get(`${NEXT_SERVER}/test/main`, {
+          headers: {
+            Authorization: `Bearer ${userInfo.accessToken}`,
+          },
+        })
+        .then((response) => {
+          setMainData(response.data);
+          // dispatch(setUserData(response.data));
+        });
+    }
+  }, [userInfo]);
+
   return (
     <>
       <Head>
@@ -29,45 +47,42 @@ const Main = ({ boardData }: { boardData: Board[] }) => {
         <meta name="description" content="instagram" />
       </Head>
       {login ? (
-        <Container>
-          <main>
-            <Section>
-              <div>
-                {/* <div>스토리</div> */}
-                {console.log(boardData)}
-                {boardData.map((boardData, index) => {
-                  return <Post key={index} postData={boardData} />;
-                })}
-              </div>
-              <div>
-                {/* <div>나</div> */}
-                {/* <div>추천</div> */}
-                <Footer />
-              </div>
-            </Section>
-          </main>
-        </Container>
+        mainData.length > 1 ?
+          <Container>
+            <main>
+              <Section>
+                <div>
+                  {mainData.map((postData, index) => {
+                    return (
+                      <Post
+                        key={index}
+                        postData={postData}
+                        setMainData={setMainData}
+                        mainData={mainData}
+                      />
+                    );
+                  })}
+                </div>
+                <div>
+                  <Footer />
+                </div>
+              </Section>
+            </main>
+          </Container>
+          :
+          <div style={{ position: 'relative', backgroundColor: '#fff', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 200 }}>
+            <img alt='loadingLogo' src='/stargram.png' width='280px' height='40px' />
+          </div>
       ) : (
         <LoginPage />
       )}
+      {showBoardModal && <BoardModal />}
+      {showModal.favorite && <Modal modalData={favoriteModal} />}
     </>
   );
 };
 
 export default Main;
-
-export const getStaticProps: GetStaticProps = async () => {
-  // TODO: 백엔드 연동시 추후에 api로 가져오기
-  // const userData = (await getProfileData(profile)) as UserData;
-  // const boardData = (await getUserBoard(profile)) as Board[];
-
-  return {
-    props: {
-      boardData: (await getUserBoard('winter')) as Board[],
-    },
-    revalidate: 1,
-  };
-};
 
 const Section = styled.section`
   max-width: 935px;

@@ -40,11 +40,13 @@ const BoardBox: React.FC<BoardBoxProps> = ({ size, board }) => {
     <div
       className={cn(s.imagebox)}
       onClick={() => {
+        console.log(board);
         dispatch(setSelectBoard(board));
         dispatch(setBoardModal(true));
       }}
       onMouseOver={(e) => onMouseOver(e)}
       onMouseLeave={(e) => onMouseLeave(e)}>
+      {/* 이미지 url에 한글 들어가 있을 경우 화면에 보이지 않음 */}
       <Image
         className={s.image}
         src={board.boardImageUrl[0]}
@@ -66,11 +68,11 @@ const BoardBox: React.FC<BoardBoxProps> = ({ size, board }) => {
           <div className={s.flex}>
             <div>
               <FavoriteIcon fontSize="small" />
-              <span>{formatNumber(board.favorite.length)}</span>
+              <span>{formatNumber(board.favoriteCnt)}</span>
             </div>
             <div>
               <ModeCommentIcon fontSize="small" />
-              <span>{formatNumber(board.reply.length)}</span>
+              <span>{formatNumber(board.commentCnt)}</span>
             </div>
           </div>
         </div>

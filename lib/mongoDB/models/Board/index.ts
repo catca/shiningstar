@@ -1,7 +1,18 @@
 import mongoose from 'mongoose';
 
-const BoardSchema = new mongoose.Schema({
-  id: {
+export interface BoardProps {
+  username: string;
+  name: string;
+  imageUrl: string;
+  boardImageUrl: string[];
+  content: string;
+  location: string;
+  createdDate: Date;
+  modifiedDate: Date;
+}
+
+const BoardSchema = new mongoose.Schema<BoardProps>({
+  username: {
     type: String,
     required: [true, 'Please add a id'],
     unique: true,
@@ -17,25 +28,23 @@ const BoardSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    required: true,
     unique: false,
   },
   boardImageUrl: {
-    type: Array,
+    type: [String],
     required: true,
     unique: false,
   },
-  title: {
+  content: {
     type: String,
     required: true,
     unique: false,
   },
-  favorite: {
-    type: Array,
-    required: true,
+  location: {
+    type: String,
     unique: false,
   },
-  createDate: {
+  createdDate: {
     type: Date,
     required: true,
     unique: false,
@@ -45,11 +54,7 @@ const BoardSchema = new mongoose.Schema({
     required: true,
     unique: false,
   },
-  reply: {
-    type: Array,
-    required: true,
-  },
 });
 
 export default mongoose.models.Board ||
-  mongoose.model('Board', BoardSchema, 'board');
+  mongoose.model('Board', BoardSchema, 'boards');

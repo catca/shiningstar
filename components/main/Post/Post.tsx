@@ -1,21 +1,41 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { ProfileImage } from 'components/profile';
 import Link from 'next/link';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
-import { postFormatNumber } from 'lib/common';
-import ExploreIcon from '@material-ui/icons/Explore';
+import { postFormatNumber, timeConvert } from 'lib/common';
 import Swipe from 'react-easy-swipe';
 
-import { Board } from 'types/profile/types';
+import { Board, PostReply } from 'types/profile/types';
+import { FavoriteIcon, CommentIcon, DirectIcon, MarkIcon, EmoticonIcon, SeeMoreIcon } from 'components/ui/Icon';
+import { fetchDeleteGood, fetchPostComment, fetchPostGood } from 'lib/apis/board';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser } from 'lib/redux/user/userSlice';
+import { NEXT_SERVER } from 'config';
+import fetcher from 'lib/common/fetcher';
+import { setBoardModal, setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
 
-const Post = ({ postData }: { postData: Board }) => {
-  const [imgCount, setImgCount] = useState(1);
-  const [seeMore, setSeeMore] = useState(false);
-  const [positionx, setPositionx] = useState(0);
+const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData: Board, setMainData: (value: any) => void }) => {
+  const { userInfo } = useSelector(selectUser);
+  const [imgCount, setImgCount] = useState<number>(1);
+  const [seeMore, setSeeMore] = useState<boolean>(false);
+  const [positionx, setPositionx] = useState<number>(0);
+  const [endSwipe, setEndSwipe] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [text, setText] = useState<string>("");
+  const [textAreaHeight, setTextAreaHeight] = useState<string>("auto");
+
+  useEffect(() => {
+    setTextAreaHeight(`${textAreaRef.current!.scrollHeight}px`);
+  }, [text]);
+
+  const onChangeHandler = (event: { target: { value: string } }) => {
+    setTextAreaHeight("auto");
+    setText(event.target.value);
+  };
+
   const prevImg = () => {
     setImgCount((imgCount) => imgCount - 1);
   };
@@ -25,12 +45,9 @@ const Post = ({ postData }: { postData: Board }) => {
   const postSeeMore = () => {
     setSeeMore(() => true);
   };
-  // useEffect(() => {
-  //   console.log(positionX);
-  // }, [positionX]);
 
-  const onSwipeMove = (position: { x: any; y: any }, event: any) => {
-    console.log(position.x);
+  const onSwipeMove = (position: { x: number; y: number }) => {
+    setEndSwipe(false);
     if (postData.boardImageUrl.length == 1) {
       return;
     }
@@ -49,15 +66,100 @@ const Post = ({ postData }: { postData: Board }) => {
   };
   const onSwipeEnd = () => {
     if (positionx < -20) {
-      setPositionx(() => 0);
       setImgCount((imgCount) => imgCount + 1);
     }
     if (positionx > 20) {
-      setPositionx(() => 0);
       setImgCount((imgCount) => imgCount - 1);
     }
     setPositionx(() => 0);
+    setEndSwipe(true);
   };
+
+  const [favorite, setFavorite] = React.useState<number>(0);
+  const [pressFavorite, setPressFavorite] = React.useState<boolean>(false);
+  const goodHandler = async () => {
+    if (pressFavorite) {
+      const res = await fetchDeleteGood(
+        postData._id,
+        userInfo.accessToken,
+      );
+      if (!res.ok) {
+        alert('좋아요를 취소하지 못했습니다.');
+      } else {
+        setFavorite((f) => f - 1);
+        setPressFavorite(false);
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt - 1 } : data
+        }));
+      }
+    } else {
+      const res = await fetchPostGood(
+        postData._id,
+        userInfo.accessToken,
+      );
+      if (!res.ok) {
+        alert('좋아요를 누르지 못했습니다.');
+      } else {
+        setFavorite((f) => f + 1);
+        setPressFavorite(true);
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt + 1 } : data
+        }));
+      }
+    }
+  };
+
+  const fetchFavoriteCheckHandler = async () => {
+    const data: { check: boolean } = await fetcher(
+      `${NEXT_SERVER}/v1/board/checkFavorite/${postData._id}`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${userInfo.accessToken}` },
+      },
+    );
+    setPressFavorite(data.check);
+  };
+
+  const postReplyHandler = async (text: string) => {
+    //TODO: rest api post 과정 추가
+    const reply = {
+      username: userInfo.username,
+      content: text
+    }
+    if (postData !== undefined) {
+      const res = await fetchPostComment(
+        postData._id,
+        userInfo.accessToken,
+        reply,
+      );
+      if (!res.ok) {
+        alert('댓글 작성에 실패했습니다');
+      } else {
+        setText(() => "");
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, comment: [...data.comment, { ...reply, type: 'front' }] } : data
+        }));
+        setMainData(mainData.map(data => {
+          return data._id === postData._id ? { ...data, commentCnt: postData.commentCnt + 1 } : data
+        }));
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchFavoriteCheckHandler();
+  }, [])
+
+  const openBoardModal = () => {
+    dispatch(setSelectBoard(postData));
+    dispatch(setBoardModal(true));
+  }
+
+  const openFavoriteModal = async () => {
+    await dispatch(setSelectBoard(postData));
+    dispatch(setModal('favorite', true));
+  }
+
   return (
     <Article>
       <div>
@@ -68,12 +170,12 @@ const Post = ({ postData }: { postData: Board }) => {
                 <ProfileImage
                   border={false}
                   size={'board'}
-                  imageUrl={`/profile/${postData.id}.png`}
+                  imageUrl={postData.profileImageUrl}
                 />
               </div>
               <div>
                 <span>
-                  <Link href="/">{postData.id}</Link>
+                  <Link href={`/${postData.username}`}>{postData.username}</Link>
                 </span>
               </div>
             </Header>
@@ -81,7 +183,7 @@ const Post = ({ postData }: { postData: Board }) => {
               <button>
                 <div>
                   <div>
-                    <MoreHorizIcon />
+                    <SeeMoreIcon />
                   </div>
                 </div>
               </button>
@@ -92,7 +194,7 @@ const Post = ({ postData }: { postData: Board }) => {
           <div>
             <PostImage>
               <Swipe onSwipeEnd={onSwipeEnd} onSwipeMove={onSwipeMove}>
-                <ImgDiv imgCount={imgCount} positionx={positionx}>
+                <ImgDiv imgCount={imgCount} positionx={positionx} endSwipe={endSwipe}>
                   {postData.boardImageUrl.map((imageUrl, index) => {
                     return <Img key={index} src={imageUrl} alt="" />;
                   })}
@@ -137,30 +239,32 @@ const Post = ({ postData }: { postData: Board }) => {
             <div>
               <IconSection imgLength={postData.boardImageUrl.length}>
                 <span>
-                  <button>
-                    <FavoriteBorderIcon />
+                  <button onClick={() => goodHandler()}>
+                    <FavoriteIcon
+                      on={pressFavorite}
+                    />
+                  </button>
+                </span>
+                <span>
+                  <button onClick={openBoardModal}>
+                    <CommentIcon />
                   </button>
                 </span>
                 <span>
                   <button>
-                    <FavoriteBorderIcon />
+                    <DirectIcon />
                   </button>
                 </span>
                 <span>
                   <button>
-                    <FavoriteBorderIcon />
-                  </button>
-                </span>
-                <span>
-                  <button>
-                    <FavoriteBorderIcon />
+                    <MarkIcon />
                   </button>
                 </span>
               </IconSection>
               <FavoriteSection>
-                <div>
+                <div onClick={openFavoriteModal}>
                   좋아요&nbsp;
-                  <span>{postFormatNumber(postData.favorite.length)}</span>개
+                  <span>{postFormatNumber(postData.favoriteCnt)}</span>개
                 </div>
               </FavoriteSection>
               <WriteWrapper>
@@ -168,14 +272,16 @@ const Post = ({ postData }: { postData: Board }) => {
                   <PostDescriptionWrapper>
                     <div>
                       <NameSpan>
-                        <Link href={`/${postData.id}`}>{postData.id}</Link>
+                        <Link href={`/${postData.username}`}>
+                          {postData.username}
+                        </Link>
                       </NameSpan>
                       &nbsp;
                       <PostDescription>
                         <span>
-                          {postData.title.split('\n').length > 1 ? (
+                          {postData.content.split('\n').length > 1 ? (
                             seeMore ? (
-                              postData.title.split('\n').map((line) => {
+                              postData.content.split('\n').map((line) => {
                                 return (
                                   <span key={line}>
                                     {line}
@@ -185,7 +291,7 @@ const Post = ({ postData }: { postData: Board }) => {
                               })
                             ) : (
                               <>
-                                {postData.title.split('\n')[0]}
+                                {postData.content.split('\n')[0]}
                                 <SeeMore>
                                   ...&nbsp;
                                   <button onClick={postSeeMore}>더 보기</button>
@@ -193,52 +299,66 @@ const Post = ({ postData }: { postData: Board }) => {
                               </>
                             )
                           ) : (
-                            postData.title
+                            postData.content
                           )}
                         </span>
                       </PostDescription>
                     </div>
                   </PostDescriptionWrapper>
                   <ReplyWrapper>
-                    {postData.reply.length > 2 && (
+                    {postData.commentCnt > 2 && (
                       <ReplyCounter>
-                        <Link href={'/'}>
-                          댓글 {postData.reply.length}개 모두 보기
-                        </Link>
+                        <div onClick={openBoardModal}>
+                          댓글 {postData.commentCnt}개 모두 보기
+                        </div>
                       </ReplyCounter>
                     )}
-                    {postData.reply.map((reply, index) => {
-                      return (
-                        <div key={index}>
-                          <div>
-                            <NameSpan>
-                              <Link href={`/${reply.id}`}>{reply.id}</Link>
-                            </NameSpan>
-                            &nbsp;
-                            <span>
-                              <span>{reply.content}</span>
-                            </span>
+                    {postData.comment ? postData.comment.map((reply: any, index: number) => {
+                      if (index > 1) {
+                        return;
+                      } else {
+                        return (
+                          <div key={index}>
+                            <div>
+                              <NameSpan>
+                                <Link href={`/${reply.username}`}>{reply.username}</Link>
+                              </NameSpan>
+                              &nbsp;
+                              <span>
+                                <span>{reply.content}</span>
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      }
+                    }) : null}
                   </ReplyWrapper>
                 </div>
               </WriteWrapper>
               <TimeWrapper>
-                <time>1시간 전</time>
+                <time onClick={openBoardModal}>
+                  {timeConvert(postData.createdDate)}
+                </time>
               </TimeWrapper>
               <CommentSection>
                 <div>
                   <form>
                     <IconButton>
-                      <FavoriteBorderIcon />
+                      <EmoticonIcon />
                     </IconButton>
                     <textarea
+                      ref={textAreaRef}
+                      rows={1}
+                      style={{
+                        height: textAreaHeight,
+                      }}
+                      value={text}
+                      onChange={onChangeHandler}
                       placeholder="댓글 달기..."
                       autoComplete="off"
-                      autoCorrect="off"></textarea>
-                    <PostButton>게시</PostButton>
+                      autoCorrect="off"
+                    />
+                    <PostButton onClick={() => postReplyHandler(text)}>게시</PostButton>
                   </form>
                 </div>
               </CommentSection>
@@ -250,7 +370,7 @@ const Post = ({ postData }: { postData: Board }) => {
   );
 };
 
-export default Post;
+export default React.memo(Post);
 
 const buttonStyle = css`
   border: 0;
@@ -333,12 +453,13 @@ type ImgCount = {
   imgCount: number;
   positionx?: number;
   index?: number;
+  endSwipe?: boolean;
 };
 
 const ImageCounter = styled.div<ImgCount>`
   width: 6px;
   height: 6px;
-  background: ${(props: { index: number; imgCount: number; }) =>
+  background: ${(props) =>
     props.index === props.imgCount - 1 ? '#0095f6' : '#a8a8a8'};
   border-radius: 50%;
   &:not(:last-of-type) {
@@ -357,12 +478,9 @@ const ImgDiv = styled.div<ImgCount>`
   display: flex;
   width: 100%;
   height: 100%;
-  transition: transform 0.3s;
+  transition: transform ${({ endSwipe }) => (endSwipe ? "0.2s" : "0s")};
   transform: translateX(
-    ${({ imgCount, positionx }) =>
-    positionx
-      ? `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`
-      : `${-100 * (imgCount - 1)}%`}
+    ${({ imgCount, positionx }) => `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`}
   );
 `;
 
@@ -405,7 +523,8 @@ type ImgLength = {
 
 const IconSection = styled.section<ImgLength>`
   display: flex;
-  margin-top: ${(props: { imgLength: number; }) => (props.imgLength > 1 ? '-34px' : '4px')};
+  margin-top: ${(props: { imgLength: number }) =>
+    props.imgLength > 1 ? '-34px' : '4px'};
   padding: 0 16px;
   & button {
     width: 40px;
@@ -483,8 +602,10 @@ const ReplyWrapper = styled.div`
 
 const ReplyCounter = styled.div`
   margin-bottom: 4px;
-  & > a {
+  & > div {
+    display: inline;
     color: #8e8e8e;
+    cursor: pointer;
   }
 `;
 
@@ -508,6 +629,7 @@ const TimeWrapper = styled.div`
   & > time {
     line-height: 18px;
     color: #8e8e8e;
+    cursor: pointer;
   }
 `;
 
@@ -525,12 +647,13 @@ const CommentSection = styled.section`
     display: flex;
     align-items: center;
     & > textarea {
+      box-sizing: border-box;
       display: flex;
       flex-grow: 1;
       border: none;
       resize: none;
-      height: 18px;
       color: #262626;
+      min-heigth: 18px;
       max-height: 80px;
       line-height: 18px;
       &:focus {
