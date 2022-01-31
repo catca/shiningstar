@@ -1,15 +1,23 @@
+import { checkUser } from 'lib/middlewares';
 import { dbConnect } from 'lib/mongoDB/dbConnect';
 import Follow from 'lib/mongoDB/models/Follow';
 import { NextApiRequest, NextApiResponse } from 'next';
+import nextConnect from 'next-connect';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
+const apiRoute = nextConnect({
+  onNoMatch: (req: NextApiRequest, res: NextApiResponse) => {
+    return res
+      .status(405)
+      .json({ error: `Method '${req.method}' Not Allowed` });
+  },
+});
+
+apiRoute.use(checkUser());
+
+apiRoute.get(async (req: any, res: NextApiResponse) => {
   await dbConnect();
 
   const { username, search } = req.query;
-
   if (req.method === 'GET') {
     Follow.aggregate(
       [
@@ -32,21 +40,30 @@ export default async function handler(
         },
         { $unwind: '$profile' },
         {
+          $addFields: {
+            followChecks: {
+              $size: {
+                $filter: {
+                  input: '$followerList',
+                  as: 'f',
+                  cond: {
+                    $eq: ['$$f.follow', req.user.username],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
           $project: {
             _id: 1,
-            followers: '$followerList',
+            // followChecks: 1,
             username: '$follower',
             name: '$profile.name',
             imageUrl: '$profile.imageUrl',
-            // relation: {
-            //   $cond: [
-            //     {
-            //       $eq: ['followers.$follow', '$username'],
-            //     },
-            //     true,
-            //     false,
-            //   ],
-            // },
+            followCheck: {
+              $cond: [{ $eq: ['$followChecks', 0] }, false, true],
+            },
           },
         },
       ],
@@ -105,4 +122,6 @@ export default async function handler(
       },
     );
   }
-}
+});
+
+export default apiRoute;

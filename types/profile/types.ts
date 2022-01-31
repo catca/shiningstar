@@ -55,5 +55,6 @@ export type BaseUser3 = {
 };
 
 export interface Follows extends BaseUser3 {
+  followCheck: boolean;
   _id: string;
 }

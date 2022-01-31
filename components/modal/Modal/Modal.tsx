@@ -52,9 +52,13 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
 
   const fetchData = async () => {
     if (modalData[0].name === '팔로우') {
-      setModalState(await fetchFollows(userData.username));
+      setModalState(
+        await fetchFollows(userData.username, userInfo.accessToken),
+      );
     } else if (modalData[0].name === '팔로워') {
-      setModalState(await fetchFollowers(userData.username));
+      setModalState(
+        await fetchFollowers(userData.username, userInfo.accessToken),
+      );
     } else if (modalData[0].name === '좋아요') {
       if (selectedBoard) {
         setModalState(
@@ -70,10 +74,11 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-  }, [])
+  }, []);
 
   return (
     <>
+      {console.log(modalState)}
       <div className={s.outerContainer_2} onClick={closeModal} />
       <div className={s.innerContainer_2}>
         {modalData.length === 1 ? (
@@ -141,7 +146,7 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
                           onClick={() => followerHandler(p.username, '')}>
                           <b>삭제</b>
                         </Button>
-                      ) : isFollow ? (
+                      ) : p.followCheck ? (
                         <Button
                           size="small"
                           variant="outlined"
@@ -189,7 +194,17 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
                       {/*TODO: 내 상태알 때, 나랑 팔로우 상태인지 아닌지에 따른 결과보여주는 로직 짜야함*/}
                       {p.username === userInfo.username ? (
                         <></>
-                      ) : isFollow ? (
+                      ) : isMe ? (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          style={{
+                            height: '28px',
+                          }}
+                          onClick={() => followerHandler(p.username, '')}>
+                          <b>삭제</b>
+                        </Button>
+                      ) : p.followCheck ? (
                         <Button
                           size="small"
                           variant="outlined"
@@ -236,7 +251,7 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
                       {/*TODO: 내 상태알 때, 나랑 팔로우 상태인지 아닌지에 따른 결과보여주는 로직 짜야함*/}
                       {p.username === userInfo.username ? (
                         <></>
-                      ) : isFollow ? (
+                      ) : p.followCheck ? (
                         <Button
                           size="small"
                           variant="outlined"
