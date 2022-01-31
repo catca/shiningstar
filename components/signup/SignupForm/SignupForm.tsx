@@ -76,12 +76,7 @@ const SignupForm: React.FC<SignupProps> = ({
   return (
     <SignupWrapper>
       <MainWrapper>
-        <H1
-          style={{
-            backgroundImage: `url(/instagramIcon.png)`,
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: '0 -130px',
-          }}></H1>
+        <H1 alt='logo' src='/stargram.png' />
         <div>
           <Form onSubmit={handleSubmit(onSubmit)}>
             <div>
@@ -297,12 +292,11 @@ const DownloadWrapper = styled.div`
   }
 `;
 
-const H1 = styled.h1`
+const H1 = styled.img`
   display: block;
-  width: 175px;
-  height: 51px;
-  margin: 22px auto 12px;
-  overflow: hidden;
+  width: 280px;
+  min-height: 40px;
+  margin: 16px auto 16px;
   white-space: nowrap;
 `;
 

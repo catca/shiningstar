@@ -204,7 +204,8 @@ const Container = styled.div`
   transform: translate(-50%,0);
   background-color: white;
   border-radius: 5px;
-  width: 378px;
+  max-width: 378px;
+  width: 100%;
   height: 360px;
   text-align: left; 
   & > div {
