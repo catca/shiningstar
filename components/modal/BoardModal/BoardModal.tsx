@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useEffect } from 'react';
 import Link from 'next/link';
 import s from '../CommonModal.module.scss';
+import rs from '../ReplyContent/ReplyContent.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectModal,
@@ -37,9 +38,9 @@ import {
   fetchPostGood,
 } from 'lib/apis/board';
 
-interface BoardModalProps { }
+interface BoardModalProps {}
 
-const BoardModal: React.FC<BoardModalProps> = ({ }) => {
+const BoardModal: React.FC<BoardModalProps> = ({}) => {
   const { selectedBoard } = useSelector(selectModal);
   const { userData } = useSelector(selectProfile);
   const { userInfo } = useSelector(selectUser);
@@ -56,12 +57,11 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-  }, [])
+  }, []);
 
   useEffect(() => {
     console.log(selectedBoard);
-  }, [selectedBoard])
-
+  }, [selectedBoard]);
 
   const onReplyHandler = (e: { target: { value: string } }) => {
     setPostReply({
@@ -187,7 +187,7 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
           <div className={s.innerContainer}>
             <div className={cn(s.header, s.mobileFlex)}>
               <div>
-                <ProfileImage size="board" imageUrl={selectedBoard.profileImageUrl} />
+                <ProfileImage size="board" imageUrl={userData.imageUrl} />
                 <Link href={`/${selectedBoard.username}`}>
                   <a id={s.profileId}>
                     <b>{selectedBoard.username}</b>
@@ -217,7 +217,10 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
             <div className={s.content}>
               <div className={cn(s.header, s.pcFlex)}>
                 <div>
-                  <ProfileImage size="board" imageUrl={selectedBoard.profileImageUrl} />
+                  <ProfileImage
+                    size="board"
+                    imageUrl={selectedBoard.profileImageUrl}
+                  />
                   <Link href={`/${selectedBoard.username}`}>
                     <a id={s.profileId}>
                       <b>{selectedBoard.username}</b>
@@ -272,6 +275,24 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
                 <div className={s.datef}>0시간 전</div>
               </div>
               <div className={s.comment}>
+                <div id={rs.form}>
+                  <ProfileImage size="board" imageUrl={userData.imageUrl} />
+                  <div className={rs.content}>
+                    <div className={rs.reply}>
+                      <Link href={`/${userData.username}`}>
+                        <a>
+                          <b>{userData.username}</b>
+                        </a>
+                      </Link>{' '}
+                      <span>{selectedBoard.content}</span>
+                    </div>
+                    <span>
+                      <FavoriteBorderRoundedIcon
+                        style={{ fontSize: '16px', cursor: 'pointer' }}
+                      />
+                    </span>
+                  </div>
+                </div>
                 {/* TODO: 댓글 목록 map 으로 하기 */}
                 {replys.map((reply: Reply, idx: number) => {
                   return (
