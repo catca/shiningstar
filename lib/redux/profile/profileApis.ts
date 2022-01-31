@@ -8,7 +8,7 @@ import type {
   UserBoards,
 } from 'types/profile/types';
 
-export async function getProfileData(pages: string) {
+export async function getProfileData(pages: string | string[] | undefined) {
   const data: Profile = await fetcher<Profile>(
     `${NEXT_SERVER}/test/user/profile/${pages}`,
   );
@@ -50,7 +50,7 @@ export async function getBase3UserProfile() {
 }
 
 // 게시글 유저이름으로 조회
-export async function getUserBoard(userId: string) {
+export async function getUserBoard(userId: string | string[] | undefined) {
   // test 게시글 데이터로 대체
   // return board.filter((arr) => {
   //   if (arr.userId === userId) {
