@@ -1,14 +1,10 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect } from 'react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { GetServerSideProps } from 'next';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from 'lib/redux/user/userSlice';
-import { getTotalBoards } from 'lib/redux/profile/profileApis';
-import { selectProfile, setUserData } from 'lib/redux/profile/profileSlice';
-import { setBoardData } from 'lib/redux/profile/profileSlice';
-import { Board } from 'types/profile/types';
 import { Container } from 'components/ui/Container';
 import Footer from 'components/main/Footer';
 import styled from '@emotion/styled';
@@ -22,9 +18,9 @@ import { BoardModal, Modal } from 'components/modal';
 import { selectModal } from 'lib/redux/modal/modalSlice';
 import { ModalDataType } from 'types/modal/types';
 
-const Main = ({}) => {
+const Main = ({ }) => {
   const { login, userInfo } = useSelector(selectUser);
-  const { selectedBoard, showBoardModal, showModal } = useSelector(selectModal);
+  const { showBoardModal, showModal } = useSelector(selectModal);
   const [mainData, setMainData] = useState([]);
   const dispatch = useDispatch();
   const favoriteModal: ModalDataType[] = [{ name: '좋아요', link: undefined }];
@@ -38,12 +34,12 @@ const Main = ({}) => {
           },
         })
         .then((response) => {
-          console.log(response.data);
           setMainData(response.data);
           // dispatch(setUserData(response.data));
         });
     }
   }, [userInfo]);
+
   return (
     <>
       <Head>
@@ -51,27 +47,32 @@ const Main = ({}) => {
         <meta name="description" content="instagram" />
       </Head>
       {login ? (
-        <Container>
-          <main>
-            <Section>
-              <div>
-                {mainData.map((postData, index) => {
-                  return (
-                    <Post
-                      key={index}
-                      postData={postData}
-                      setMainData={setMainData}
-                      mainData={mainData}
-                    />
-                  );
-                })}
-              </div>
-              <div>
-                <Footer />
-              </div>
-            </Section>
-          </main>
-        </Container>
+        mainData.length > 1 ?
+          <Container>
+            <main>
+              <Section>
+                <div>
+                  {mainData.map((postData, index) => {
+                    return (
+                      <Post
+                        key={index}
+                        postData={postData}
+                        setMainData={setMainData}
+                        mainData={mainData}
+                      />
+                    );
+                  })}
+                </div>
+                <div>
+                  <Footer />
+                </div>
+              </Section>
+            </main>
+          </Container>
+          :
+          <div style={{ position: 'relative', backgroundColor: '#fff', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 200 }}>
+            <img alt='loadingLogo' src='/stargram.png' width='280px' height='40px' />
+          </div>
       ) : (
         <LoginPage />
       )}

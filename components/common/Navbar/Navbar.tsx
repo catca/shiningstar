@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -72,11 +73,12 @@ const Navbar = () => {
               <>
                 <Link href="/">
                   <a className={s.mainlogo}>
-                    <Image
+                    <img
                       src={'/stargram.png'}
-                      width={'103px'}
+                      width={'140px'}
                       height={'20px'}
-                      alt={'mainlogo'}></Image>
+                      alt={'mainlogo'}
+                    />
                   </a>
                 </Link>
                 <SearchBox media={false} />
