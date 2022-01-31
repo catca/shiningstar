@@ -1,11 +1,10 @@
 import React from 'react';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getProfileData,
-  getProfileIds,
   getUserBoard,
 } from 'lib/redux/profile/profileApis';
 import {
@@ -26,13 +25,10 @@ import { Modal, BoardModal } from 'components/modal';
 import { BoardBanner, BoardContainer, UserInfo } from 'components/profile';
 import { Container } from 'components/ui/Container';
 
-import { ParsedUrlQuery } from 'querystring';
-
 import { Profile, UserBoards } from 'types/profile/types';
 import { ModalDataType } from 'types/modal/types';
 import { followChecker } from 'lib/apis/user';
 import { selectUser } from 'lib/redux/user/userSlice';
-import { connectToDatabase } from 'lib/mongoDB/mongodb';
 
 const UserProfile = ({
   bannerList,
@@ -136,43 +132,13 @@ const UserProfile = ({
 
 export default UserProfile;
 
-interface IParams extends ParsedUrlQuery {
-  profile: string;
-}
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  // TODO: 백엔드 연동시 추후에 api로 가져오기
-  const arr = (await getProfileIds()) as string[];
-  // const res = await fetch('http://localhost:3000/api/test/user/profiles');
-  // const arr: any[] = await res.json();
-  // const { db } = await connectToDatabase();
-
-  // const res = db.collection('users').find({}).toArray();
-  // console.log(res);
-  const paths = arr.map((profile) => {
-    return {
-      params: { profile },
-    };
-  });
-  // const paths = [
-  //   { params: { profile: 'winter' } },
-  //   { params: { profile: 'karina' } },
-  //   { params: { profile: 'irene' } },
-  // ];
-  return {
-    paths,
-    fallback: false,
-  };
-};
-
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async ({ query: { profile } }) => {
   const bannerList: object = {
     main: '게시물',
     channel: '동영상',
     saved: '저장됨',
     tagged: '태그됨',
   };
-  const { profile } = context.params as IParams;
 
   return {
     props: {
@@ -181,6 +147,5 @@ export const getStaticProps: GetStaticProps = async (context) => {
       profile,
       boardData: (await getUserBoard(profile)) as UserBoards,
     },
-    revalidate: 1,
   };
 };
