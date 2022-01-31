@@ -59,10 +59,6 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
     document.body.style.overflow = 'hidden';
   }, []);
 
-  useEffect(() => {
-    console.log(selectedBoard);
-  }, [selectedBoard]);
-
   const onReplyHandler = (e: { target: { value: string } }) => {
     setPostReply({
       ...postReply,
