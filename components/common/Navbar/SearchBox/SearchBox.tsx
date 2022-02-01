@@ -97,7 +97,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ media }) => {
   }, [inputText]);
 
   return (
-    <Container media={media} onClick={(e) => inputClick(e)}>
+    <Container mediaCheck={media} onClick={(e) => inputClick(e)}>
       <div>
         <Input
           ref={inputRef}
@@ -148,7 +148,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ media }) => {
 export default SearchBox;
 
 type ContainerProps = {
-  media: boolean;
+  mediaCheck: boolean;
 }
 
 const Container = styled.div<ContainerProps>`
@@ -157,7 +157,7 @@ const Container = styled.div<ContainerProps>`
     position: relative;
   }
   @media (max-width: 740px) {
-    display: ${props => props.media ? 'block' : 'none'};
+    display: ${props => props.mediaCheck ? 'block' : 'none'};
   }
 `;
 
