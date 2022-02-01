@@ -292,60 +292,22 @@ const NewPost: React.FC = () => {
                       <div
                         ref={imageControlRef}
                         className={s.thumbnailContainer}
-                        style={{
-                          width: `${images.length * 94 + (images.length - 1) * 12 + 100
-                            }px`,
-                        }}>
-                        <div
-                          style={{
-                            height: '94px',
-                            width: `${images.length * 94 + (images.length - 1) * 12
-                              }px`,
-                          }}>
-                          <div
-                            style={{ position: 'absolute', transform: 'none' }}>
-                            <div
-                              style={{
-                                backgroundColor: 'rgba(0, 0, 0, 0)',
-                                border: 'none',
-                                padding: 0,
-                                height: '94px',
-                              }}>
-                              <div
-                                style={{
-                                  backgroundColor: 'rgba(0, 0, 0, 0)',
-                                  boxShadow: 'rgba(0, 0, 0, 0) 0px 2px 6px 2px',
-                                  transform: 'none',
-                                }}>
+                        style={{ width: `${images.length * 94 + (images.length - 1) * 12 + 100}px` }}>
+                        <div style={{ width: `${images.length * 94 + (images.length - 1) * 12}px` }}>
+                          <div>
+                            <div>
+                              <div>
                                 <div
-                                  style={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0)',
-                                    height: '100%',
-                                    width: `${images.length * 94 +
-                                      (images.length - 1) * 12
-                                      }px`,
-                                    display: 'flex',
-                                  }}>
+                                  style={{ width: `${images.length * 94 + (images.length - 1) * 12}px` }}>
                                   {images.map((props, index) => {
                                     return (
                                       <div
                                         key={index}
-                                        style={{
-                                          backgroundColor: 'rgba(0, 0, 0, 0)',
-                                          position: 'relative',
-                                          marginRight: '12px',
-                                        }}>
+                                        className={s.thumbnailWrap}
+                                      >
                                         <img
                                           src={props.croppedImage}
                                           alt={props.image}
-                                          style={{
-                                            // backgroundImage: `url(${image})`, backgroundRepeat: 'no-repeat',
-                                            height: '94px',
-                                            transform:
-                                              'translateX(0px) translateY(0px) scale(1)',
-                                            transition: 'none 0s ease 0s',
-                                            width: '94px',
-                                          }}
                                           onClick={() =>
                                             setImageNumber(() => index + 1)
                                           }
@@ -356,15 +318,8 @@ const NewPost: React.FC = () => {
                                           onClick={(e) =>
                                             deleteImage(e, props.id)
                                           }
-                                          style={{
-                                            display: `${index + 1 === imageNumber
-                                              ? 'block'
-                                              : 'none'
-                                              }`,
-                                          }}>
-                                          <button
-                                            type="button"
-                                            style={{ cursor: 'pointer' }}>
+                                          style={{ display: `${index + 1 === imageNumber ? 'block' : 'none'}` }}>
+                                          <button type="button">
                                             <div>
                                               <DeleteIcon type={'postImage'} />
                                             </div>

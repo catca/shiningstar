@@ -46,9 +46,8 @@ const Crop = ({ image, id }: CropProps) => {
     dispatch(updateCroppedImage({ id: id, croppedImage: image }));
   }, [dispatch, id, image]);
 
-  function clickClopEvent(event: { target: any; currentTarget: { querySelector: (arg0: string) => { (): any; new(): any; querySelectorAll: { (arg0: string): any; new(): any; }; }; }; }) {
+  function clickClopEvent(event: { target: any; }) {
     var target = event.target;
-    console.log(target, zoomRef.current)
 
     if (zoomButton === false)
       return;
