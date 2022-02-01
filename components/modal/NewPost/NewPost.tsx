@@ -176,7 +176,7 @@ const NewPost: React.FC = () => {
     //   console.log(value);
     // }
     axios
-      .post(`${NEXT_SERVER}/test/newPost`, formdata, {
+      .post(`${NEXT_SERVER}/v1/newPost`, formdata, {
         headers: {
           'Content-Type': `multipart/form-data`,
           Authorization: `Bearer ${userInfo.accessToken}`,
