@@ -28,7 +28,7 @@ const Main = ({ }) => {
   useEffect(() => {
     if (userInfo.accessToken) {
       axios
-        .get(`${NEXT_SERVER}/test/main`, {
+        .get(`${NEXT_SERVER}/v1/main`, {
           headers: {
             Authorization: `Bearer ${userInfo.accessToken}`,
           },
