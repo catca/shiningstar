@@ -5,9 +5,8 @@ import { css } from '@emotion/react';
 import { ProfileImage } from 'components/profile';
 import Link from 'next/link';
 import { postFormatNumber, timeConvert } from 'lib/common';
-import Swipe from 'react-easy-swipe';
 
-import { Board, PostReply } from 'types/profile/types';
+import { Board } from 'types/profile/types';
 import { FavoriteIcon, CommentIcon, DirectIcon, MarkIcon, EmoticonIcon, SeeMoreIcon } from 'components/ui/Icon';
 import { fetchDeleteGood, fetchPostComment, fetchPostGood } from 'lib/apis/board';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,13 +14,11 @@ import { selectUser } from 'lib/redux/user/userSlice';
 import { NEXT_SERVER } from 'config';
 import fetcher from 'lib/common/fetcher';
 import { setBoardModal, setModal, setSelectBoard } from 'lib/redux/modal/modalSlice';
+import { ImageSlider } from 'components/ui/ImageSlider';
 
 const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData: Board, setMainData: (value: any) => void }) => {
   const { userInfo } = useSelector(selectUser);
-  const [imgCount, setImgCount] = useState<number>(1);
   const [seeMore, setSeeMore] = useState<boolean>(false);
-  const [positionx, setPositionx] = useState<number>(0);
-  const [endSwipe, setEndSwipe] = useState<boolean>(false);
   const dispatch = useDispatch();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [text, setText] = useState<string>("");
@@ -36,46 +33,10 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
     setText(event.target.value);
   };
 
-  const prevImg = () => {
-    setImgCount((imgCount) => imgCount - 1);
-  };
-  const nextImg = () => {
-    setImgCount((imgCount) => imgCount + 1);
-  };
   const postSeeMore = () => {
     setSeeMore(() => true);
   };
 
-  const onSwipeMove = (position: { x: number; y: number }) => {
-    setEndSwipe(false);
-    if (postData.boardImageUrl.length == 1) {
-      return;
-    }
-    if (imgCount == 1 && position.x < 0) {
-      setPositionx(() => position.x);
-      return;
-    }
-    if (imgCount > 1 && imgCount < postData.boardImageUrl.length) {
-      setPositionx(() => position.x);
-      return;
-    }
-    if (imgCount == postData.boardImageUrl.length && position.x > 0) {
-      setPositionx(() => position.x);
-      return;
-    }
-  };
-  const onSwipeEnd = () => {
-    if (positionx < -20) {
-      setImgCount((imgCount) => imgCount + 1);
-    }
-    if (positionx > 20) {
-      setImgCount((imgCount) => imgCount - 1);
-    }
-    setPositionx(() => 0);
-    setEndSwipe(true);
-  };
-
-  const [favorite, setFavorite] = React.useState<number>(0);
   const [pressFavorite, setPressFavorite] = React.useState<boolean>(false);
   const goodHandler = async () => {
     if (pressFavorite) {
@@ -86,7 +47,6 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       if (!res.ok) {
         alert('좋아요를 취소하지 못했습니다.');
       } else {
-        setFavorite((f) => f - 1);
         setPressFavorite(false);
         setMainData(mainData.map(data => {
           return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt - 1 } : data
@@ -100,7 +60,6 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
       if (!res.ok) {
         alert('좋아요를 누르지 못했습니다.');
       } else {
-        setFavorite((f) => f + 1);
         setPressFavorite(true);
         setMainData(mainData.map(data => {
           return data._id === postData._id ? { ...data, favoriteCnt: postData.favoriteCnt + 1 } : data
@@ -192,46 +151,7 @@ const Post = ({ mainData, postData, setMainData }: { mainData: Board[], postData
         </HeaderWrapper>
         <ImageWrapper>
           <div>
-            <PostImage>
-              <Swipe onSwipeEnd={onSwipeEnd} onSwipeMove={onSwipeMove}>
-                <ImgDiv imgCount={imgCount} positionx={positionx} endSwipe={endSwipe}>
-                  {postData.boardImageUrl.map((imageUrl, index) => {
-                    return <Img key={index} src={imageUrl} alt="" />;
-                  })}
-                </ImgDiv>
-              </Swipe>
-              {imgCount > 1 && (
-                <PrevButtonWrapper onClick={prevImg}>
-                  <div
-                    style={{
-                      backgroundImage: 'url(/instagramIcon.png)',
-                      backgroundPosition: '-130px -98px',
-                    }}></div>
-                </PrevButtonWrapper>
-              )}
-              {imgCount < postData.boardImageUrl.length && (
-                <NextButtonWrapper onClick={nextImg}>
-                  <div
-                    style={{
-                      backgroundImage: 'url(/instagramIcon.png)',
-                      backgroundPosition: '-162px -98px',
-                    }}></div>
-                </NextButtonWrapper>
-              )}
-            </PostImage>
-            {postData.boardImageUrl.length > 1 && (
-              <ImageCounterWrapper>
-                {postData.boardImageUrl.map((props, index) => {
-                  return (
-                    <ImageCounter
-                      key={index}
-                      index={index}
-                      imgCount={imgCount}
-                    />
-                  );
-                })}
-              </ImageCounterWrapper>
-            )}
+            <ImageSlider boardImageUrl={postData.boardImageUrl} type='main' />
           </div>
         </ImageWrapper>
         <div>
@@ -438,82 +358,6 @@ const ImageWrapper = styled.div`
   & > div {
     display: flex;
     flex-direction: column;
-  }
-`;
-
-const ImageCounterWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 15px;
-  margin-top: 15px;
-`;
-
-type ImgCount = {
-  imgCount: number;
-  positionx?: number;
-  index?: number;
-  endSwipe?: boolean;
-};
-
-const ImageCounter = styled.div<ImgCount>`
-  width: 6px;
-  height: 6px;
-  background: ${(props) =>
-    props.index === props.imgCount - 1 ? '#0095f6' : '#a8a8a8'};
-  border-radius: 50%;
-  &:not(:last-of-type) {
-    margin-right: 4px;
-  }
-`;
-
-const PostImage = styled.div`
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-`;
-
-const ImgDiv = styled.div<ImgCount>`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  transition: transform ${({ endSwipe }) => (endSwipe ? "0.2s" : "0s")};
-  transform: translateX(
-    ${({ imgCount, positionx }) => `calc(${positionx}px + ${-100 * (imgCount - 1)}%)`}
-  );
-`;
-
-const Img = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-const NextButtonWrapper = styled.button`
-  ${buttonStyle}
-  background: none;
-  padding: 16px 8px;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  & > div {
-    height: 30px;
-    width: 30px;
-  }
-`;
-
-const PrevButtonWrapper = styled.button`
-  ${buttonStyle}
-  background: none;
-  padding: 16px 8px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  & > div {
-    height: 30px;
-    width: 30px;
   }
 `;
 

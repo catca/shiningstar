@@ -39,6 +39,7 @@ import {
   fetchPostComment,
   fetchPostGood,
 } from 'lib/apis/board';
+import { ImageSlider } from 'components/ui/ImageSlider';
 
 interface BoardModalProps { }
 
@@ -207,44 +208,7 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
               <MoreHorizSharpIcon fontSize="small" />
             </div>
             <div className={s.imageBox}>
-              <PostImage>
-                <ImgDiv imgCount={imgCount} >
-                  {selectedBoard.boardImageUrl.map((imageUrl, index) => {
-                    return <Img key={index} src={imageUrl} alt="" />;
-                  })}
-                </ImgDiv>
-                {imgCount > 1 && (
-                  <PrevButtonWrapper onClick={prevImg}>
-                    <div
-                      style={{
-                        backgroundImage: 'url(/instagramIcon.png)',
-                        backgroundPosition: '-130px -98px',
-                      }}></div>
-                  </PrevButtonWrapper>
-                )}
-                {imgCount < selectedBoard.boardImageUrl.length && (
-                  <NextButtonWrapper onClick={nextImg}>
-                    <div
-                      style={{
-                        backgroundImage: 'url(/instagramIcon.png)',
-                        backgroundPosition: '-162px -98px',
-                      }}></div>
-                  </NextButtonWrapper>
-                )}
-              </PostImage>
-              {selectedBoard.boardImageUrl.length > 1 && (
-                <ImageCounterWrapper>
-                  {selectedBoard.boardImageUrl.map((props, index) => {
-                    return (
-                      <ImageCounter
-                        key={index}
-                        index={index}
-                        imgCount={imgCount}
-                      />
-                    );
-                  })}
-                </ImageCounterWrapper>
-              )}
+              <ImageSlider boardImageUrl={selectedBoard.boardImageUrl} type={'boardModal'} />
             </div>
             <div className={s.content}>
               <div className={cn(s.header, s.pcFlex)}>
@@ -423,84 +387,3 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
 };
 
 export default BoardModal;
-
-type ImgCount = {
-  imgCount: number;
-  index?: number;
-};
-
-const PostImage = styled.div`
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-`;
-
-const ImgDiv = styled.div<ImgCount>`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  transform: translateX(
-    ${({ imgCount }) => `${-100 * (imgCount - 1)}%`}
-  );
-`;
-
-const Img = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-const ImageCounterWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform: translateY(-20px);
-`;
-
-const ImageCounter = styled.div<ImgCount>`
-  width: 6px;
-  height: 6px;
-  background: ${({ index, imgCount }) =>
-    index === imgCount - 1 ? '#0095f6' : '#a8a8a8'};
-  border-radius: 50%;
-  &:not(:last-of-type) {
-    margin-right: 4px;
-  }
-`;
-
-const buttonStyle = css`
-  border: 0;
-  background-color: #fff;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const NextButtonWrapper = styled.button`
-  ${buttonStyle}
-  background: none;
-  padding: 16px 8px;
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  & > div {
-    height: 30px;
-    width: 30px;
-  }
-`;
-
-const PrevButtonWrapper = styled.button`
-  ${buttonStyle}
-  background: none;
-  padding: 16px 8px;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  & > div {
-    height: 30px;
-    width: 30px;
-  }
-`;
