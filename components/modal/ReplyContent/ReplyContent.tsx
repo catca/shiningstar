@@ -31,7 +31,6 @@ const ReplyContent: React.FC<ReplyProps> = ({
   const formatDate = (date: Date) => {
     const now = new Date();
     let dist = 0;
-    console.log(date);
     dist = (now.getTime() - new Date(date).getTime()) / 1000 / 60;
     if (dist < 59) {
       return Math.ceil(dist) + '분';

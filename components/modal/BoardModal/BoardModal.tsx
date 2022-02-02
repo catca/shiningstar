@@ -1,7 +1,9 @@
-import React, { ChangeEvent, useEffect } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import s from '../CommonModal.module.scss';
 import rs from '../ReplyContent/ReplyContent.module.css';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectModal,
@@ -38,13 +40,14 @@ import {
   fetchPostGood,
 } from 'lib/apis/board';
 
-interface BoardModalProps {}
+interface BoardModalProps { }
 
-const BoardModal: React.FC<BoardModalProps> = ({}) => {
+const BoardModal: React.FC<BoardModalProps> = ({ }) => {
   const { selectedBoard } = useSelector(selectModal);
   const { userData } = useSelector(selectProfile);
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
+  const [imgCount, setImgCount] = useState<number>(1);
 
   const [postReply, setPostReply] = React.useState<PostReply>({
     username: userInfo.username,
@@ -58,6 +61,13 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
   useEffect(() => {
     document.body.style.overflow = 'hidden';
   }, []);
+
+  const prevImg = () => {
+    setImgCount((imgCount) => imgCount - 1);
+  };
+  const nextImg = () => {
+    setImgCount((imgCount) => imgCount + 1);
+  };
 
   const onReplyHandler = (e: { target: { value: string } }) => {
     setPostReply({
@@ -168,6 +178,10 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
     }
   }, [userInfo.username, selectedBoard]);
 
+  useEffect(() => {
+    console.log(userData);
+  }, [userData])
+
   return (
     <>
       {selectedBoard && (
@@ -184,38 +198,60 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
             <div className={cn(s.header, s.mobileFlex)}>
               <div>
                 <ProfileImage size="board" imageUrl={userData.imageUrl} />
-                <Link href={`/${selectedBoard.username}`}>
+                <Link href={`/${userData.username}`}>
                   <a id={s.profileId}>
-                    <b>{selectedBoard.username}</b>
+                    <b>{userData.username}</b>
                   </a>
                 </Link>
               </div>
               <MoreHorizSharpIcon fontSize="small" />
             </div>
             <div className={s.imageBox}>
-              {/* TODO: 백엔드 이미지 저장 사이즈 고려하여 다시 css 만지기 */}
-
-              <div
-                className={s.image}
-                style={{
-                  backgroundImage: `url(${selectedBoard.boardImageUrl[0]})`,
-                }}
-              />
-              {/* FIXME: Image 태그 사용할지 백그라운드이미지 사용할지 추후 결정 */}
-              {/* <Image
-                src={selectedBoard.imageUrl[0]}
-                width={525}
-                height={300}
-                alt={'board'}
-                layout="responsive"
-              /> */}
+              <PostImage>
+                <ImgDiv imgCount={imgCount} >
+                  {selectedBoard.boardImageUrl.map((imageUrl, index) => {
+                    return <Img key={index} src={imageUrl} alt="" />;
+                  })}
+                </ImgDiv>
+                {imgCount > 1 && (
+                  <PrevButtonWrapper onClick={prevImg}>
+                    <div
+                      style={{
+                        backgroundImage: 'url(/instagramIcon.png)',
+                        backgroundPosition: '-130px -98px',
+                      }}></div>
+                  </PrevButtonWrapper>
+                )}
+                {imgCount < selectedBoard.boardImageUrl.length && (
+                  <NextButtonWrapper onClick={nextImg}>
+                    <div
+                      style={{
+                        backgroundImage: 'url(/instagramIcon.png)',
+                        backgroundPosition: '-162px -98px',
+                      }}></div>
+                  </NextButtonWrapper>
+                )}
+              </PostImage>
+              {selectedBoard.boardImageUrl.length > 1 && (
+                <ImageCounterWrapper>
+                  {selectedBoard.boardImageUrl.map((props, index) => {
+                    return (
+                      <ImageCounter
+                        key={index}
+                        index={index}
+                        imgCount={imgCount}
+                      />
+                    );
+                  })}
+                </ImageCounterWrapper>
+              )}
             </div>
             <div className={s.content}>
               <div className={cn(s.header, s.pcFlex)}>
                 <div>
                   <ProfileImage
                     size="board"
-                    imageUrl={selectedBoard.profileImageUrl}
+                    imageUrl={userData.imageUrl}
                   />
                   <Link href={`/${selectedBoard.username}`}>
                     <a id={s.profileId}>
@@ -277,15 +313,22 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
                     <div className={rs.reply}>
                       <Link href={`/${userData.username}`}>
                         <a>
-                          <b>{userData.username}</b>
+                          <b>{`${userData.username}`}</b>
                         </a>
                       </Link>{' '}
-                      <span>{selectedBoard.content}</span>
+                      <span>
+                        {
+                          selectedBoard.content.split('\n').map((line) => {
+                            return (
+                              <span key={line}>
+                                {line}
+                                <br />
+                              </span>
+                            );
+                          })}
+                      </span>
                     </div>
                     <span>
-                      <FavoriteBorderRoundedIcon
-                        style={{ fontSize: '16px', cursor: 'pointer' }}
-                      />
                     </span>
                   </div>
                 </div>
@@ -380,3 +423,84 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
 };
 
 export default BoardModal;
+
+type ImgCount = {
+  imgCount: number;
+  index?: number;
+};
+
+const PostImage = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+`;
+
+const ImgDiv = styled.div<ImgCount>`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transform: translateX(
+    ${({ imgCount }) => `${-100 * (imgCount - 1)}%`}
+  );
+`;
+
+const Img = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const ImageCounterWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-20px);
+`;
+
+const ImageCounter = styled.div<ImgCount>`
+  width: 6px;
+  height: 6px;
+  background: ${({ index, imgCount }) =>
+    index === imgCount - 1 ? '#0095f6' : '#a8a8a8'};
+  border-radius: 50%;
+  &:not(:last-of-type) {
+    margin-right: 4px;
+  }
+`;
+
+const buttonStyle = css`
+  border: 0;
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NextButtonWrapper = styled.button`
+  ${buttonStyle}
+  background: none;
+  padding: 16px 8px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  & > div {
+    height: 30px;
+    width: 30px;
+  }
+`;
+
+const PrevButtonWrapper = styled.button`
+  ${buttonStyle}
+  background: none;
+  padding: 16px 8px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  & > div {
+    height: 30px;
+    width: 30px;
+  }
+`;
