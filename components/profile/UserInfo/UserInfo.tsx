@@ -3,7 +3,7 @@ import Link from 'next/link';
 import s from './UserInfo.module.css';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { selectProfile } from 'lib/redux/profile/profileSlice';
+import { selectProfile, setUserData } from 'lib/redux/profile/profileSlice';
 import { setModal } from 'lib/redux/modal/modalSlice';
 
 import ProfileImage from '../ProfileImage';
@@ -14,13 +14,26 @@ import MoreHorizSharpIcon from '@material-ui/icons/MoreHorizSharp';
 
 import { formatNumber } from 'lib/common';
 import { selectUser } from 'lib/redux/user/userSlice';
+import { cancelFollow, postFollow } from 'lib/apis/user';
+import { useRouter } from 'next/router';
 
-interface UserInfoProps { }
+interface UserInfoProps {}
 
-const UserInfo: React.FC<UserInfoProps> = ({ }) => {
+const UserInfo: React.FC<UserInfoProps> = ({}) => {
   const { login, userInfo } = useSelector(selectUser);
-  const { userData } = useSelector(selectProfile);
+  const { userData, isFollow } = useSelector(selectProfile);
+  const router = useRouter();
   const dispatch = useDispatch();
+
+  const cancelFollowHandler = async () => {
+    await cancelFollow(userData.username, userInfo.accessToken);
+    router.reload();
+  };
+
+  const postFollowHandler = async () => {
+    await postFollow(userData.username, userInfo.accessToken);
+    router.reload();
+  };
 
   return (
     <>
@@ -55,43 +68,39 @@ const UserInfo: React.FC<UserInfoProps> = ({ }) => {
               </>
             ) : (
               <>
-                {
-                  // FIXME: api로 해당 유저가 follow관계인지 아닌지 여부도 주기
-                  // userData.follower
-                  //   .map((arr) => {
-                  //     return arr.id;
-                  //   })
-                  //   .includes(myUserInfo.id)
-                  true ? (
-                    <>
-                      <span className={s.prs}>
-                        <Button size="small" variant="outlined">
-                          <b>메세지 보내기</b>
-                        </Button>
-                      </span>
-                      <span className={s.prl}>
-                        <Button size="small" variant="outlined">
-                          <b>팔로우 취소</b>
-                        </Button>
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <span className={s.prl}>
-                        <Button
-                          style={{
-                            backgroundColor: '#2294ff',
-                            color: 'white',
-                            width: '80px',
-                          }}
-                          size="small"
-                          variant="contained">
-                          <b>팔로우</b>
-                        </Button>
-                      </span>
-                    </>
-                  )
-                }
+                {isFollow ? (
+                  <>
+                    <span className={s.prs}>
+                      <Button size="small" variant="outlined">
+                        <b>메세지 보내기</b>
+                      </Button>
+                    </span>
+                    <span className={s.prl}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={cancelFollowHandler}>
+                        <b>팔로우 취소</b>
+                      </Button>
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className={s.prl}>
+                      <Button
+                        style={{
+                          backgroundColor: '#2294ff',
+                          color: 'white',
+                          width: '80px',
+                        }}
+                        size="small"
+                        variant="contained"
+                        onClick={postFollowHandler}>
+                        <b>팔로우</b>
+                      </Button>
+                    </span>
+                  </>
+                )}
                 <MoreHorizSharpIcon style={{ fontSize: '26px' }} />
               </>
             )}
