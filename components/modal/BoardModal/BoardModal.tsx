@@ -41,9 +41,9 @@ import {
 } from 'lib/apis/board';
 import { ImageSlider } from 'components/ui/ImageSlider';
 
-interface BoardModalProps { }
+interface BoardModalProps {}
 
-const BoardModal: React.FC<BoardModalProps> = ({ }) => {
+const BoardModal: React.FC<BoardModalProps> = ({}) => {
   const { selectedBoard } = useSelector(selectModal);
   const { userData } = useSelector(selectProfile);
   const { userInfo } = useSelector(selectUser);
@@ -181,7 +181,7 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
 
   useEffect(() => {
     console.log(userData);
-  }, [userData])
+  }, [userData]);
 
   return (
     <>
@@ -208,15 +208,15 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
               <MoreHorizSharpIcon fontSize="small" />
             </div>
             <div className={s.imageBox}>
-              <ImageSlider boardImageUrl={selectedBoard.boardImageUrl} type={'boardModal'} />
+              <ImageSlider
+                boardImageUrl={selectedBoard.boardImageUrl}
+                type={'boardModal'}
+              />
             </div>
             <div className={s.content}>
               <div className={cn(s.header, s.pcFlex)}>
                 <div>
-                  <ProfileImage
-                    size="board"
-                    imageUrl={userData.imageUrl}
-                  />
+                  <ProfileImage size="board" imageUrl={userData.imageUrl} />
                   <Link href={`/${selectedBoard.username}`}>
                     <a id={s.profileId}>
                       <b>{selectedBoard.username}</b>
@@ -281,19 +281,17 @@ const BoardModal: React.FC<BoardModalProps> = ({ }) => {
                         </a>
                       </Link>{' '}
                       <span>
-                        {
-                          selectedBoard.content.split('\n').map((line) => {
-                            return (
-                              <span key={line}>
-                                {line}
-                                <br />
-                              </span>
-                            );
-                          })}
+                        {selectedBoard.content.split('\n').map((line) => {
+                          return (
+                            <span key={line}>
+                              {line}
+                              <br />
+                            </span>
+                          );
+                        })}
                       </span>
                     </div>
-                    <span>
-                    </span>
+                    <span></span>
                   </div>
                 </div>
                 {/* TODO: 댓글 목록 map 으로 하기 */}

@@ -5,7 +5,6 @@ import { NextApiResponse } from 'next';
 export const checkUser = () => {
   return async (req: any, res: NextApiResponse, next: any) => {
     await dbConnect();
-
     let token = req.headers.authorization;
     if (token) {
       let user =
