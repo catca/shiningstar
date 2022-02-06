@@ -88,6 +88,7 @@ export default async function handler(
           commentCnt: { $size: '$comments' },
         },
       },
+      { $sort: { modifiedDate: -1 } },
     ],
     (err: any, board: any) => {
       console.log('instagram', board);

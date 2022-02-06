@@ -50,7 +50,7 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
     if (modalData[0].name === '팔로우') {
       setModalState(
         await fetchFollows(userData.username, userInfo.accessToken),
@@ -66,11 +66,11 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
         );
       }
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, [modalData, userData]);
+  }, [fetchData, modalData, userData]);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -78,7 +78,6 @@ const Modal: React.FC<ModalProps> = ({ modalData }) => {
 
   return (
     <>
-      {console.log(modalState)}
       <div className={s.outerContainer_2} onClick={closeModal} />
       <div className={s.innerContainer_2}>
         {modalData.length === 1 ? (

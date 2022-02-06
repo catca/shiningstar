@@ -12,11 +12,6 @@ export async function getProfileData(pages: string | string[] | undefined) {
   const data: Profile = await fetcher<Profile>(
     `${NEXT_SERVER}/test/user/profile/${pages}`,
   );
-  // const data: UserData[] = testUserData.filter((arr) => {
-  //   if (arr.username === pages) {
-  //     return arr;
-  //   }
-  // });
   return data;
 }
 

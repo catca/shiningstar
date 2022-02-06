@@ -126,7 +126,7 @@
 @media (min-width: 940px) {
   .innerContainer {
     display: grid;
-    width: 860px;
+    width: 890px;
     grid-template-columns: 2fr 1fr;
   }
 
@@ -411,10 +411,42 @@
   background-color: rgba(0, 0, 0, 0.75);
   border-radius: 6px;
   & > div {
-    background-color: 'rgba(0, 0, 0, 0)';
+    height: 94px;
+    background-color: rgba(0, 0, 0, 0);
     & > div {
-      background-color: 'rgba(0, 0, 0, 0)';
+      position: absolute;
+      transform: none;
+      background-color: rgba(0, 0, 0, 0);
+      & > div {
+        background-color: rgba(0, 0, 0, 0);
+        border: none;
+        padding: 0;
+        height: 94px;
+        & > div {
+          background-color: rgba(0, 0, 0, 0);
+          box-shadow: rgba(0, 0, 0, 0) 0px 2px 6px 2px;
+          transform: none;
+          & > div {
+            background-color: rgba(0, 0, 0, 0);
+            height: 100%;
+            display: flex;
+          }
+        }
+      }
     }
+  }
+}
+
+.thumbnailWrap {
+  background-color: rgba(0, 0, 0, 0);
+  position: relative;
+  margin-right: 12px;
+  & > img {
+    height: 94px;
+    width: 94px;
+  }
+  & > div > button{
+    cursor: pointer;
   }
 }
 
