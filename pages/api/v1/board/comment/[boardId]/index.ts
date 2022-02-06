@@ -91,16 +91,13 @@ apiRoute.delete(async (req: any, res: NextApiResponse) => {
   if (!req.user) {
     return res.status(405).json({ status: 405, message: 'user doesnt exist' });
   }
-  BoardCmt.findOneAndRemove(
-    { boardId, username: req.user.username },
-    (err: any, boardCmts: any) => {
-      if (!boardCmts) {
-        return res.status(500).json({ status: 400, message: 'delete failed' });
-      } else {
-        return res.status(200).json({ status: 200, message: 'delete success' });
-      }
-    },
-  );
+  BoardCmt.findOneAndRemove({ _id: boardId }, (err: any, boardCmts: any) => {
+    if (!boardCmts) {
+      return res.status(400).json({ status: 400, message: 'delete failed' });
+    } else {
+      return res.status(200).json({ status: 200, message: 'delete success' });
+    }
+  });
 });
 
 export default apiRoute;

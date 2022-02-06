@@ -10,7 +10,6 @@ import {
   setBoardModal,
   setModal,
   setSelectBoard,
-  setSelectedReplyIdx,
 } from 'lib/redux/modal/modalSlice';
 
 import { ProfileImage } from 'components/profile';
@@ -299,7 +298,7 @@ const BoardModal: React.FC<BoardModalProps> = ({}) => {
                   return (
                     <ReplyContent
                       reply={reply}
-                      idx={idx}
+                      id={reply._id}
                       key={idx}
                       onFocus={inputFocusing}
                       editReReply={(name: string) => {

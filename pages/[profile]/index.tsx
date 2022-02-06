@@ -3,10 +3,7 @@ import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  getProfileData,
-  getUserBoard,
-} from 'lib/redux/profile/profileApis';
+import { getProfileData, getUserBoard } from 'lib/redux/profile/profileApis';
 import {
   initialBanner,
   setBoardData,
@@ -29,6 +26,8 @@ import { Profile, UserBoards } from 'types/profile/types';
 import { ModalDataType } from 'types/modal/types';
 import { followChecker } from 'lib/apis/user';
 import { selectUser } from 'lib/redux/user/userSlice';
+import { fetchDeleteComment } from 'lib/apis/board';
+import { useRouter } from 'next/router';
 
 const UserProfile = ({
   bannerList,
@@ -41,9 +40,11 @@ const UserProfile = ({
   profile: string;
   boardData: UserBoards;
 }) => {
-  const { selectedBoard, showBoardModal, showModal } = useSelector(selectModal);
+  const { selectedBoard, showBoardModal, showModal, selectedReplyId } =
+    useSelector(selectModal);
   const { userInfo } = useSelector(selectUser);
   const dispatch = useDispatch();
+  const router = useRouter();
 
   // FIXME:이 부분 좀 어떻게하면 자연스럽게할지 고민해보자
   const modalOnChecker = () => {
@@ -81,12 +82,15 @@ const UserProfile = ({
         // TODO: restapi 연결시 api로 삭제할 인덱스 보내는 함수 작성
         if (board !== undefined) {
           // FIXME: 댓글연결 다시
+          if (selectedReplyId) {
+            fetchDeleteComment(selectedReplyId, userInfo.accessToken);
+          }
           // dispatch(
           //   setSelectBoard({
           //     ...board,
           //     reply: board.reply.filter((arr, idx) => {
-          //       console.log(selectedReplyIdx, idx);
-          //       if (idx !== selectedReplyIdx) {
+          //       console.log(selectedReplyId, idx);
+          //       if (idx !== selectedReplyId) {
           //         return arr;
           //       }
           //     }),
@@ -132,7 +136,9 @@ const UserProfile = ({
 
 export default UserProfile;
 
-export const getServerSideProps: GetServerSideProps = async ({ query: { profile } }) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  query: { profile },
+}) => {
   const bannerList: object = {
     main: '게시물',
     channel: '동영상',

@@ -9,18 +9,18 @@ import { ProfileImage } from 'components/profile';
 
 import { Reply } from 'types/profile/types';
 import { useDispatch } from 'react-redux';
-import { setModal, setSelectedReplyIdx } from 'lib/redux/modal/modalSlice';
+import { setModal, setSelectedReplyId } from 'lib/redux/modal/modalSlice';
 
 interface ReplyProps {
   reply: Reply;
-  idx: number;
+  id: string;
   onFocus: () => void;
   editReReply: (id: string) => void;
 }
 
 const ReplyContent: React.FC<ReplyProps> = ({
   reply,
-  idx,
+  id,
   onFocus,
   editReReply,
 }) => {
@@ -77,7 +77,7 @@ const ReplyContent: React.FC<ReplyProps> = ({
                   id={s.hoverIcon}
                   fontSize="small"
                   onClick={() => {
-                    dispatch(setSelectedReplyIdx(idx));
+                    dispatch(setSelectedReplyId(id));
                     dispatch(setModal('reply', true));
                   }}
                 />
@@ -138,7 +138,7 @@ const ReplyContent: React.FC<ReplyProps> = ({
                           id={s.hoverIcon}
                           fontSize="small"
                           onClick={() => {
-                            dispatch(setSelectedReplyIdx(idx));
+                            dispatch(setSelectedReplyId(reply._id));
                             dispatch(setModal('reply', true));
                           }}
                         />

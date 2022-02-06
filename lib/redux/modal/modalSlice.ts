@@ -16,7 +16,7 @@ interface ShowModal {
 interface ModalSliceProps {
   showBoardModal: boolean;
   selectedBoard: Board | undefined;
-  selectedReplyIdx: number | undefined;
+  selectedReplyId: string | undefined;
 
   // FIXME: 지워도 되는지 다시 확인하기
   selectedBoardUser: Profile | undefined;
@@ -36,7 +36,7 @@ export const initialShowModal: ShowModal = {
 const initialState: ModalSliceProps = {
   showBoardModal: false,
   selectedBoard: undefined,
-  selectedReplyIdx: undefined,
+  selectedReplyId: undefined,
 
   // FIXME: 지워도 되는지 다시 확인하기
   selectedBoardUser: undefined,
@@ -83,8 +83,8 @@ export const modalSlice = createSlice({
     SET_SHOW_MODAL_INITIAL: (state, action: PayloadAction<ShowModal>) => {
       state.showModal = action.payload;
     },
-    SET_SELECTED_REPLY_IDX: (state, action: PayloadAction<number>) => {
-      state.selectedReplyIdx = action.payload;
+    SET_SELECTED_REPLY_IDX: (state, action: PayloadAction<string>) => {
+      state.selectedReplyId = action.payload;
     },
   },
 });
@@ -129,8 +129,8 @@ export function setModalInitial() {
     dispatch(SET_SHOW_MODAL_INITIAL(initialShowModal));
   };
 }
-export function setSelectedReplyIdx(idx: number) {
+export function setSelectedReplyId(id: string) {
   return (dispatch: any) => {
-    dispatch(SET_SELECTED_REPLY_IDX(idx));
+    dispatch(SET_SELECTED_REPLY_IDX(id));
   };
 }

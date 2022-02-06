@@ -37,6 +37,7 @@ export interface UserBoards {
 }
 
 export interface Reply extends BaseUser3 {
+  _id: string;
   content: string;
   createdDate: Date;
   modifiedDate: Date;
