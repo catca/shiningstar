@@ -16,6 +16,6 @@ module.exports = {
 
   env: {
     LOCAL_SERVER: 'http://localhost:3000/api',
-    PROD_SERVER: 'https://insta-frontend.vercel.app/api',
+    PROD_SERVER: 'https://shiningstargram.vercel.app/api',
   },
 };
